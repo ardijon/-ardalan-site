@@ -28,6 +28,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# freebuff temp files
+.freebuff/
+
 # windows reserved names
 nul
 
