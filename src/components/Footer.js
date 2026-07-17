@@ -17,7 +17,7 @@ export default function Footer() {
 
   return (
     <footer className="py-10 sm:py-14 border-t border-[var(--color-border)]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-3">

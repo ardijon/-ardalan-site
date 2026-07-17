@@ -2,6 +2,11 @@ import './globals.css'
 import { I18nProvider } from '@/lib/i18n/I18nProvider'
 import { SITE_URL } from '@/lib/constants'
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
+
 export const metadata = {
   title: {
     default: 'اردلان | خدمات فناوری و بیمه',

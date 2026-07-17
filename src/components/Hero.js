@@ -70,7 +70,7 @@ export default function Hero() {
               }`}
             >
               <span className="hidden sm:block h-px w-16 bg-gradient-to-l from-[var(--color-accent)] to-transparent" />
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tight text-[var(--color-primary)] whitespace-nowrap">
+              <h1 className="text-[clamp(2rem,8vw,6rem)] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tight text-[var(--color-primary)] text-balance">
                 {t('hero.name')}
               </h1>
               <span className="hidden sm:block h-px w-16 bg-gradient-to-r from-[var(--color-accent)] to-transparent" />

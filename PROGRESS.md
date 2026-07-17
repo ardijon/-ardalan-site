@@ -1,6 +1,6 @@
 # پروژه سایت شخصی اردلان پیری
 
-## آخرین بروزرسانی: تیر ۱۴۰۴
+## آخرین بروزرسانی: ۲۶ تیر ۱۴۰۴ — انتشار روی Netlify
 
 ---
 
@@ -135,6 +135,9 @@ npm start            # اجرای بیلد شده
 - [ ] پس‌زمینه متحرک اختصاصی برای هر سکشن
 
 ### فنی
-- [ ] استقرار روی Vercel یا سرور شخصی
+- [x] استقرار روی Netlify (۲۶ تیر ۱۴۰۴)
+- [x] GitHub repository: https://github.com/ardijon/-ardalan-site.git
+- [x] آدرس سایت: https://ardalanpiri.netlify.app
+- [ ] دامنه شخصی (اختیاری)
 - [ ] Backend برای فرم تماس (API route)
 - [ ] استفاده از `AnimateOnScroll` برای حذف کد تکراری IntersectionObserver

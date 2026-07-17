@@ -11,7 +11,7 @@ export default function Blog() {
 
   return (
     <section id="blog" className="py-16 sm:py-20 lg:py-28 bg-[var(--color-surface)]/50 scroll-mt-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
         <div
           ref={ref}
           style={{
