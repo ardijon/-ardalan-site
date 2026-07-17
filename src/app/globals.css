@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --color-bg: #F8F6F3;
+  --color-text: #1A1A2E;
+  --color-primary: #0F172A;
+  --color-accent: #D97706;
+  --color-tech: #0D9488;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-border: rgba(26, 26, 46, 0.08);
+  --color-glow: rgba(217, 119, 6, 0.06);
+}
+
+.dark {
+  color-scheme: dark;
+  --color-bg: #0B1120;
+  --color-text: #E2E8F0;
+  --color-primary: #F1F5F9;
+  --color-accent: #F59E0B;
+  --color-tech: #2DD4BF;
+  --color-surface: #0F172A;
+  --color-card: #1E293B;
+  --color-border: rgba(226, 232, 240, 0.08);
+  --color-glow: rgba(245, 158, 11, 0.05);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  direction: rtl;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 900;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, var(--color-glow) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, var(--color-glow) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, var(--color-glow) 0%, transparent 50%);
+}
+
+button, a, input, textarea, select {
+  touch-action: manipulation;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background-color: #D97706;
+  color: #fff;
+}
+
+.dark ::selection {
+  background-color: #F59E0B;
+  color: #0B1120;
+}
+
+@keyframes ripple {
+  from {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 3px;
+  opacity: 0.3;
+}

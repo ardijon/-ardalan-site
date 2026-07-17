@@ -1,0 +1,276 @@
+
+> ardalan-site@1.0.0 dev
+> next dev -p 3000
+
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListe ✓ Ready in 6.5s
+ ✓ Compiled /src/middleware in 286ms (72 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 2.5s (587 modules)
+ GET / 200 in 2660ms
+ GET / 200 in 65ms
+ GET / 200 in 44ms
+ GET / 200 in 39ms
+ GET / 200 in 40ms
+ GET / 200 in 40ms
+ ✓ Compiled /_not-found in 293ms (590 modules)
+ POST /api/visitors 404 in 402ms
+ POST /api/visitors 404 in 401ms
+ GET / 200 in 63ms
+ ✓ Compiled in 144ms (298 modules)
+ ✓ Compiled in 112ms (646 modules)
+ GET / 200 in 93ms
+ ✓ Compiled in 212ms (588 modules)
+ ✓ Compiled in 299ms (589 modules)
+ ⨯ ./src/components/Header.js
+Error: 
+  [31mx[0m Expected ',', got 'as'
+   ,-[[36;1;4mD:\New Projects\Landing Bio\ArdalaN\src\components\Header.js[0m:1:1]
+ [2m1[0m | import LanguageSwitcher as LanguageSwitcherNS from '@/lib/i18n/languageSwitcher'
+   : [31;1m                        ^^[0m
+ [2m2[0m | import { socialLinks } from '@/lib/socials'
+ [2m3[0m | 
+ [2m4[0m | const socialLinks = [
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Header.js
+./src/app/page.js
+ ✓ Compiled in 199ms (577 modules)
+ GET / 200 in 89ms
+ GET / 200 in 55ms
+ ✓ Compiled /blog/[slug] in 136ms (589 modules)
+ GET /blog/ai-triple-sales 200 in 455ms
+ ⨯ ./src/components/Portfolio.js
+Error: 
+  [31mx[0m Identifier cannot follow number
+    ,-[[36;1;4mD:\New Projects\Landing Bio\ArdalaN\src\components\Portfolio.js[0m:6:1]
+ [2m 6[0m | import { useI18n } from '@/lib/i18n/I18nProvider'
+ [2m 7[0m | import ProjectModal from './ProjectModal'
+ [2m 8[0m | 
+ [2m 9[0m | const INITIAL_COUNT = 6const projectStyles = [
+    : [31;1m                       ^[0m
+ [2m10[0m |   { color: 'from-[var(--color-primary)] to-[var(--color-tech)]' },
+ [2m11[0m |   { color: 'from-[var(--color-accent)] to-red-500' },
+ [2m12[0m |   { color: 'from-[var(--color-tech)] to-blue-500' },
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Portfolio.js
+./src/app/page.js
+ ⨯ ./src/components/Portfolio.js
+Error: 
+  [31mx[0m Identifier cannot follow number
+    ,-[[36;1;4mD:\New Projects\Landing Bio\ArdalaN\src\components\Portfolio.js[0m:6:1]
+ [2m 6[0m | import { useI18n } from '@/lib/i18n/I18nProvider'
+ [2m 7[0m | import ProjectModal from './ProjectModal'
+ [2m 8[0m | 
+ [2m 9[0m | const INITIAL_COUNT = 6const projectStyles = [
+    : [31;1m                       ^[0m
+ [2m10[0m |   { color: 'from-[var(--color-primary)] to-[var(--color-tech)]' },
+ [2m11[0m |   { color: 'from-[var(--color-accent)] to-red-500' },
+ [2m12[0m |   { color: 'from-[var(--color-tech)] to-blue-500' },
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Portfolio.js
+./src/app/page.js
+ ○ Compiling /_error ...
+ ⨯ ./src/components/Portfolio.js
+Error: 
+  [31mx[0m Identifier cannot follow number
+    ,-[[36;1;4mD:\New Projects\Landing Bio\ArdalaN\src\components\Portfolio.js[0m:6:1]
+ [2m 6[0m | import { useI18n } from '@/lib/i18n/I18nProvider'
+ [2m 7[0m | import ProjectModal from './ProjectModal'
+ [2m 8[0m | 
+ [2m 9[0m | const INITIAL_COUNT = 6const projectStyles = [
+    : [31;1m                       ^[0m
+ [2m10[0m |   { color: 'from-[var(--color-primary)] to-[var(--color-tech)]' },
+ [2m11[0m |   { color: 'from-[var(--color-accent)] to-red-500' },
+ [2m12[0m |   { color: 'from-[var(--color-tech)] to-blue-500' },
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Portfolio.js
+./src/app/page.js
+ GET /blog/ai-triple-sales 500 in 1373ms
+ ⨯ ./src/components/Portfolio.js
+Error: 
+  [31mx[0m Identifier cannot follow number
+    ,-[[36;1;4mD:\New Projects\Landing Bio\ArdalaN\src\components\Portfolio.js[0m:6:1]
+ [2m 6[0m | import { useI18n } from '@/lib/i18n/I18nProvider'
+ [2m 7[0m | import ProjectModal from './ProjectModal'
+ [2m 8[0m | 
+ [2m 9[0m | const INITIAL_COUNT = 6const projectStyles = [
+    : [31;1m                       ^[0m
+ [2m10[0m |   { color: 'from-[var(--color-primary)] to-[var(--color-tech)]' },
+ [2m11[0m |   { color: 'from-[var(--color-accent)] to-red-500' },
+ [2m12[0m |   { color: 'from-[var(--color-tech)] to-blue-500' },
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Portfolio.js
+./src/app/page.js
+ ⨯ ./src/components/Portfolio.js
+Error: 
+  [31mx[0m Identifier cannot follow number
+    ,-[[36;1;4mD:\New Projects\Landing Bio\ArdalaN\src\components\Portfolio.js[0m:6:1]
+ [2m 6[0m | import { useI18n } from '@/lib/i18n/I18nProvider'
+ [2m 7[0m | import ProjectModal from './ProjectModal'
+ [2m 8[0m | 
+ [2m 9[0m | const INITIAL_COUNT = 6const projectStyles = [
+    : [31;1m                       ^[0m
+ [2m10[0m |   { color: 'from-[var(--color-primary)] to-[var(--color-tech)]' },
+ [2m11[0m |   { color: 'from-[var(--color-accent)] to-red-500' },
+ [2m12[0m |   { color: 'from-[var(--color-tech)] to-blue-500' },
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Portfolio.js
+./src/app/page.js
+ POST /api/visitors 500 in 174ms
+ ⨯ ./src/components/Portfolio.js
+Error: 
+  [31mx[0m Identifier cannot follow number
+    ,-[[36;1;4mD:\New Projects\Landing Bio\ArdalaN\src\components\Portfolio.js[0m:6:1]
+ [2m 6[0m | import { useI18n } from '@/lib/i18n/I18nProvider'
+ [2m 7[0m | import ProjectModal from './ProjectModal'
+ [2m 8[0m | 
+ [2m 9[0m | const INITIAL_COUNT = 6const projectStyles = [
+    : [31;1m                       ^[0m
+ [2m10[0m |   { color: 'from-[var(--color-primary)] to-[var(--color-tech)]' },
+ [2m11[0m |   { color: 'from-[var(--color-accent)] to-red-500' },
+ [2m12[0m |   { color: 'from-[var(--color-tech)] to-blue-500' },
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Portfolio.js
+./src/app/page.js
+ POST /api/send-message 500 in 82ms
+ ✓ Compiled /api/send-message in 482ms (805 modules)
+ GET / 200 in 106ms
+ ✓ Compiled /blog/[slug] in 171ms (344 modules)
+ GET /blog/ai-triple-sales 200 in 298ms
+ ✓ Compiled /api/visitors in 58ms (376 modules)
+ GET /api/visitors 200 in 223ms
+ POST /api/visitors 200 in 5ms
+ GET /blog/nonexistent 404 in 180ms
+ GET / 200 in 79ms
+ GET / 200 in 42ms
+ ✓ Compiled in 317ms (819 modules)
+ GET / 200 in 421ms
+ ✓ Compiled /api/visitors in 43ms (365 modules)
+ POST /api/visitors 200 in 85ms
+ POST /api/visitors 200 in 85ms
+ ✓ Compiled in 324ms (851 modules)
+ GET /api/visitors 200 in 11ms
+ GET /api/visitors 200 in 5ms
+ ✓ Compiled in 234ms (851 modules)
+ GET /api/visitors 200 in 16ms
+ GET /api/visitors 200 in 4ms
+ GET / 200 in 71ms
+ GET /api/visitors 200 in 4ms
+ GET /api/visitors 200 in 4ms
+ ✓ Compiled /api/send-message in 73ms (367 modules)
+ POST /api/send-message 200 in 3698ms
+ GET / 200 in 90ms
+ GET /api/visitors 200 in 6ms
+ GET /api/visitors 200 in 5ms
+ GET / 200 in 60ms
+ ✓ Compiled in 498ms (819 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat 'D:\New Projects\Landing Bio\ArdalaN\.next\server\app\api\send-message'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/send-message/route' in D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'D:\New Projects\Landing Bio\ArdalaN\.next\server\app\api\send-message\route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/send-message/route' in 'D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/send-message/route (expected D:\New Projects\Landing Bio\ArdalaN\.next\server\app\api\send-message\route.js)
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\require.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\load-components.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\utils.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\utils.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/blog/[slug]/page' in D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'D:\New Projects\Landing Bio\ArdalaN\.next\server\app\blog\[slug]\page.js', but to 'Error: Can't resolve '../../../../.next/server/app/blog/[slug]/page' in 'D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/blog/[slug]/page (expected D:\New Projects\Landing Bio\ArdalaN\.next\server\app\blog\[slug]\page.js)
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\require.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\load-components.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\utils.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\utils.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/_not-found/page' in D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server for build dependencies doesn't lead to expected result 'D:\New Projects\Landing Bio\ArdalaN\.next\server\app\_not-found\page.js', but to 'Error: Can't resolve '../../../../.next/server/app/_not-found/page' in 'D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/_not-found/page (expected D:\New Projects\Landing Bio\ArdalaN\.next\server\app\_not-found\page.js)
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\require.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\require.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\load-components.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\server\load-components.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\utils.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\utils.js
+<w>  at file dependencies D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at file D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+<w>  at resolve commonjs D:\New Projects\Landing Bio\ArdalaN\node_modules\next\dist\build\webpack\loaders\next-route-loader\index.js
+ ✓ Compiled in 282ms (819 modules)
+ ✓ Compiled in 281ms (819 modules)
+ ✓ Compiled in 162ms (819 modules)
+ ✓ Compiled in 134ms (819 modules)
+ ✓ Compiled in 170ms (819 modules)
+ ✓ Compiled in 124ms (819 modules)
+ ✓ Compiled in 212ms (819 modules)
+ ✓ Compiled in 137ms (819 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'D:\New Projects\Landing Bio\ArdalaN\.next\cache\webpack\server-development\3.pack.gz_' -> 'D:\New Projects\Landing Bio\ArdalaN\.next\cache\webpack\server-development\3.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'D:\New Projects\Landing Bio\ArdalaN\.next\cache\webpack\client-development\7.pack.gz_' -> 'D:\New Projects\Landing Bio\ArdalaN\.next\cache\webpack\client-development\7.pack.gz'
+ ✓ Compiled in 120ms (819 modules)
+ ✓ Compiled in 128ms (819 modules)
+ ✓ Compiled in 124ms (819 modules)
+ ✓ Compiled in 106ms (819 modules)
+ ⨯ ./src/components/Services.js
+Error: 
+  [31mx[0m Expected ';', got ')'
+    ,-[[36;1;4mD:\New Projects\Landing Bio\ArdalaN\src\components\Services.js[0m:93:1]
+ [2m93[0m |                   {service.desc}
+ [2m94[0m |                 </p>
+ [2m95[0m |               </div>
+ [2m96[0m |             ))}
+    : [31;1m             ^[0m
+ [2m97[0m |           </div>
+ [2m98[0m |         </div>
+ [2m99[0m |       </div>
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/Services.js
+./src/app/page.js
+ ✓ Compiled in 124ms (819 modules)
+ ✓ Compiled in 106ms (819 modules)
+ ✓ Compiled in 125ms (819 modules)
+ ✓ Compiled in 107ms (819 modules)
+ ✓ Compiled in 112ms (819 modules)
+ ✓ Compiled in 77ms (486 modules)
