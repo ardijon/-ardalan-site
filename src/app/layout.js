@@ -93,10 +93,7 @@ export default function RootLayout({ children }) {
             })();
           `
         }} />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
       </head>
       <body className="min-h-screen antialiased">
         <I18nProvider>
