@@ -1,12 +1,22 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import { getArticle, getAllSlugs } from '@/lib/articles'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { SITE_URL } from '@/lib/constants'
+import dictionary from '@/lib/i18n/dictionary'
+
+export const dynamic = 'force-dynamic'
 
 export function generateStaticParams() {
   return getAllSlugs().map(slug => ({ slug }))
+}
+
+function getLocale(requestCookies) {
+  const cookie = requestCookies.get('NEXT_LOCALE')?.value
+  if (cookie === 'fa' || cookie === 'en') return cookie
+  return 'fa'
 }
 
 export function generateMetadata({ params }) {
@@ -40,7 +50,11 @@ export function generateMetadata({ params }) {
 }
 
 export default function BlogPost({ params }) {
-  const article = getArticle(params.slug)
+  const cookieStore = cookies()
+  const locale = getLocale(cookieStore)
+  const t = (path) => path.split('.').reduce((o, k) => o?.[k], dictionary[locale]) ?? path
+
+  const article = getArticle(params.slug, locale)
   if (!article) return notFound()
 
   const jsonLd = {
@@ -51,12 +65,12 @@ export default function BlogPost({ params }) {
     datePublished: article.isoDate || article.date,
     author: {
       '@type': 'Person',
-      name: 'اردلان پیری',
+      name: locale === 'en' ? 'Ardalan Piri' : 'اردلان پیری',
       url: SITE_URL,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'اردلان',
+      name: locale === 'en' ? 'Ardalan' : 'اردلان',
       logo: {
         '@type': 'ImageObject',
         url: `${SITE_URL}/profile.png`,
@@ -84,7 +98,7 @@ export default function BlogPost({ params }) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            {'بازگشت به وبلاگ'}
+            {t('blog.back')}
           </Link>
 
           <div className="flex items-center gap-3 mb-6">
@@ -92,7 +106,7 @@ export default function BlogPost({ params }) {
               {article.cat}
             </span>
             <span className="text-sm text-[var(--color-text)]/40">{article.date}</span>
-            <span className="text-sm text-[var(--color-text)]/40">· {article.readTime} {'دقیقه مطالعه'}</span>
+            <span className="text-sm text-[var(--color-text)]/40">· {article.readTime} {t('blog.minuteRead')}</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--color-primary)] leading-tight mb-8">
@@ -119,16 +133,16 @@ export default function BlogPost({ params }) {
 
           <div className="mt-12 p-8 rounded-2xl bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/20 text-center">
             <p className="text-lg font-bold text-[var(--color-text)] mb-2">
-              {'می‌خوای کسب و کارت رو هوشمند کنی؟'}
+              {t('blog.ctaTitle')}
             </p>
             <p className="text-sm text-[var(--color-text)]/50 mb-6">
-              {'همین الان مشاوره رایگان بگیر'}
+              {t('blog.ctaDesc')}
             </p>
             <a
               href="/#contact"
               className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-accent)] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-[var(--color-accent)]/20"
             >
-              {'شروع کن'}
+              {t('blog.ctaBtn')}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
