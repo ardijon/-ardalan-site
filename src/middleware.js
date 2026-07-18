@@ -18,11 +18,11 @@ export function middleware(request) {
   }
 
   const accept = request.headers.get('Accept-Language') || ''
-  const preferred = accept.split(',')
+  const languages = accept.split(',')
     .map(s => s.split(';')[0].trim().slice(0, 2))
-    .find(s => SUPPORTED.includes(s))
+    .filter(s => SUPPORTED.includes(s))
 
-  const locale = preferred || DEFAULT
+  const locale = languages.includes('fa') ? 'fa' : (languages[0] || DEFAULT)
   const response = NextResponse.next()
   response.cookies.set('NEXT_LOCALE', locale, { path: '/', maxAge: 31536000 })
   return response
