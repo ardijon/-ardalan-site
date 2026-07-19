@@ -18,7 +18,8 @@ const projectStyles = [
 ]
 
 export default function Portfolio() {
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
+  const isRtl = dir === 'rtl'
   const [ref, visible] = useInView({ threshold: 0.08 })
   const [selected, setSelected] = useState(null)
   const [activeCategory, setActiveCategory] = useState(t('portfolio.categories')[0])
@@ -92,7 +93,7 @@ export default function Portfolio() {
                   transform: visible ? 'translateY(0)' : 'translateY(24px)',
                   transition: `opacity 0.6s ease ${i * 100}ms, transform 0.6s ease ${i * 100}ms`,
                 }}
-                className="group relative h-56 rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300 text-right w-full"
+                className={`group relative h-56 rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300 ${isRtl ? 'text-right' : 'text-left'} w-full`}
               >
                 {project.image ? (
                   <Image src={project.image} alt={project.title} fill className="object-cover group-hover:scale-105 transition-all duration-500" />

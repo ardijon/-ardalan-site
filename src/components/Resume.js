@@ -4,7 +4,8 @@ import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
 export default function Resume() {
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
+  const isRtl = dir === 'rtl'
   const [ref, visible] = useInView({ threshold: 0.08 })
   const experiences = t('resume.items')
 
@@ -40,7 +41,7 @@ export default function Resume() {
                 className="relative flex gap-4 sm:gap-8 pb-8 sm:pb-10 last:pb-0 group"
               >
                 {i < experiences.length - 1 && (
-                  <div className="absolute right-[15px] sm:right-[19px] top-9 sm:top-10 bottom-0 w-px bg-[var(--color-border)]" />
+                  <div className={`absolute ${isRtl ? 'right-[15px] sm:right-[19px]' : 'left-[15px] sm:left-[19px]'} top-9 sm:top-10 bottom-0 w-px bg-[var(--color-border)]`} />
                 )}
 
                 <div className="flex flex-col items-center">

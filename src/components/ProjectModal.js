@@ -7,7 +7,8 @@ import { useI18n } from '@/lib/i18n/I18nProvider'
 const focusableSelector = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
 
 export default function ProjectModal({ project, onClose }) {
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
+  const isRtl = dir === 'rtl'
   const modalRef = useRef(null)
   const previousFocus = useRef(null)
 
@@ -72,7 +73,7 @@ export default function ProjectModal({ project, onClose }) {
       >
         <button
           onClick={onClose}
-          className="absolute top-4 left-4 p-1.5 rounded-lg text-[var(--color-text)]/40 hover:text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-all z-10"
+          className={`absolute top-4 ${isRtl ? 'left-4' : 'right-4'} p-1.5 rounded-lg text-[var(--color-text)]/40 hover:text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-all z-10`}
           aria-label={t('projectModal.close')}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

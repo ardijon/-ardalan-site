@@ -55,7 +55,8 @@ function StatCard({ stat, visible, index }) {
 }
 
 export default function About() {
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
+  const isRtl = dir === 'rtl'
   const [ref, visible] = useInView({ threshold: 0.1 })
   const titleText = t('about.title')
   const [charIndex, setCharIndex] = useState(0)
@@ -108,7 +109,9 @@ export default function About() {
               <p dangerouslySetInnerHTML={{ __html: renderBold(t('about.p1')) }} />
               <p>{t('about.p2')}</p>
               <p dangerouslySetInnerHTML={{ __html: renderBold(t('about.p3')) }} />
-              <div className="relative pr-6 sm:pr-8 border-r-2 border-[var(--color-accent)]/30 pt-2">
+              <div className={`relative pt-2 ${
+                isRtl ? 'pr-6 sm:pr-8 border-r-2' : 'pl-6 sm:pl-8 border-l-2'
+              } border-[var(--color-accent)]/30`}>
                 <p className="text-lg sm:text-xl leading-relaxed text-[var(--color-text)]/70" dangerouslySetInnerHTML={{ __html: renderBold(t('about.quote')) }} />
               </div>
             </div>

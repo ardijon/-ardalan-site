@@ -6,7 +6,8 @@ import { useI18n } from '@/lib/i18n/I18nProvider'
 import TrustSeal from './TrustSeal'
 
 export default function Hero() {
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
+  const isRtl = dir === 'rtl'
   const [loaded, setLoaded] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
   const sectionRef = useRef(null)
@@ -55,7 +56,7 @@ export default function Hero() {
 
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 w-full">
         <div className="flex flex-col-reverse lg:flex-row items-center gap-8 sm:gap-12 lg:gap-20">
-          <div className="flex-1 text-center lg:text-right">
+          <div className={`flex-1 text-center ${isRtl ? 'lg:text-right' : 'lg:text-left'}`}>
             <div
               className={`inline-block px-3 py-1 mb-4 sm:mb-6 text-[10px] sm:text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full border border-[var(--color-accent)]/20 transition-all duration-700 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -65,7 +66,7 @@ export default function Hero() {
             </div>
 
             <div
-              className={`flex items-center gap-3 sm:gap-4 justify-center lg:justify-start transition-all duration-700 delay-100 ${
+              className={`flex items-center gap-3 sm:gap-4 justify-center ${isRtl ? 'lg:justify-start' : 'lg:justify-end'} transition-all duration-700 delay-100 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
@@ -77,7 +78,7 @@ export default function Hero() {
             </div>
 
             <div
-              className={`mt-4 sm:mt-6 flex items-center gap-3 justify-center lg:justify-start transition-all duration-700 delay-150 ${
+              className={`mt-4 sm:mt-6 flex items-center gap-3 justify-center ${isRtl ? 'lg:justify-start' : 'lg:justify-end'} transition-all duration-700 delay-150 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
@@ -88,7 +89,7 @@ export default function Hero() {
             </div>
 
             <p
-              className={`mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-[var(--color-text)]/60 max-w-xl leading-relaxed lg:mx-0 mx-auto transition-all duration-700 delay-200 ${
+              className={`mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-[var(--color-text)]/60 max-w-xl leading-relaxed ${isRtl ? 'lg:mx-0' : 'lg:mr-0 lg:ml-auto'} mx-auto transition-all duration-700 delay-200 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
@@ -96,7 +97,7 @@ export default function Hero() {
             </p>
 
             <div
-              className={`flex flex-wrap gap-3 sm:gap-4 mt-6 sm:mt-8 justify-center lg:justify-start transition-all duration-700 delay-300 ${
+              className={`flex flex-wrap gap-3 sm:gap-4 mt-6 sm:mt-8 justify-center ${isRtl ? 'lg:justify-start' : 'lg:justify-end'} transition-all duration-700 delay-300 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >

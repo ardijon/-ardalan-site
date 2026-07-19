@@ -95,6 +95,14 @@ export default function RootLayout({ children }) {
               }
               var meta = document.querySelector('meta[name="theme-color"]');
               if (meta) meta.content = dark ? '#0B1120' : '#F8F6F3';
+
+              var c = document.cookie.match(/(?:^|; )NEXT_LOCALE=([^;]*)/);
+              var ls = localStorage.getItem('NEXT_LOCALE');
+              var lang = (c && c[1]) || ls || 'fa';
+              if (lang !== 'fa' && lang !== 'en') lang = 'fa';
+              document.documentElement.lang = lang;
+              document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+              document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
             })();
           `
         }} />

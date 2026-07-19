@@ -22,7 +22,8 @@ const contactIcons = [
 ]
 
 export default function Contact() {
-  const { t } = useI18n()
+  const { t, dir } = useI18n()
+  const isRtl = dir === 'rtl'
   const [ref, visible] = useInView({ threshold: 0.08 })
   const [ripples, setRipples] = useState([])
   const [sent, setSent] = useState(false)
