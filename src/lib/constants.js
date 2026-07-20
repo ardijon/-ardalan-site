@@ -1,1 +1,1 @@
-export const SITE_URL = 'https://ardalanpiri.netlify.app'
+export const SITE_URL = 'https://ai2apps.sbs'
