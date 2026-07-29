@@ -1,4 +1,5 @@
 import { getAllSlugs } from '@/lib/articles'
+import { getAllProducts } from '@/lib/products'
 import { SITE_URL } from '@/lib/constants'
 
 export default function sitemap() {
@@ -12,6 +13,7 @@ export default function sitemap() {
     { url: `${baseUrl}/#resume`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/#blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/#contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/store`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
   ]
 
   const blogPages = getAllSlugs().map(slug => ({
@@ -21,5 +23,12 @@ export default function sitemap() {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...blogPages]
+  const storePages = getAllProducts().map(p => ({
+    url: `${baseUrl}/store/${p.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
+
+  return [...staticPages, ...blogPages, ...storePages]
 }

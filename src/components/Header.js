@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import ThemeToggle from './ThemeToggle'
 import { LogoV1 } from './Logo'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import LanguageSwitcher from '@/lib/i18n/languageSwitcher'
 import { socialLinks } from '@/lib/socials'
 
-const navHrefs = ['#about', '#services', '#portfolio', '#resume', '#blog', '#contact']
+const navHrefs = ['#about', '#services', '#portfolio', '/store', '#resume', '#blog', '#contact']
 
 export default function Header() {
   const { t } = useI18n()
@@ -16,10 +17,15 @@ export default function Header() {
   const [activeSection, setActiveSection] = useState('')
   const closeRef = useRef(null)
 
-  const navItems = navHrefs.map(href => ({
-    label: t(`header.nav.${href.replace('#', '')}`),
-    href,
-  }))
+  const navItems = navHrefs.map(href => {
+    const isPage = href.startsWith('/')
+    const key = isPage ? 'store' : href.replace('#', '')
+    return {
+      label: t(`header.nav.${key}`),
+      href,
+      isPage,
+    }
+  })
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -96,9 +102,9 @@ export default function Header() {
 
             <nav className="flex items-center gap-8" aria-label={t('header.menuLabel')}>
               {navItems.map((item) => {
-                const isActive = activeSection === item.href.replace('#', '')
+                const isActive = !item.isPage && activeSection === item.href.replace('#', '')
                 return (
-                  <a
+                  <Link
                     key={item.href}
                     href={item.href}
                     className={`text-sm font-medium transition-colors relative ${
@@ -109,7 +115,7 @@ export default function Header() {
                     {isActive && (
                       <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-accent)] rounded-full" />
                     )}
-                  </a>
+                  </Link>
                 )
               })}
             </nav>
@@ -148,9 +154,9 @@ export default function Header() {
 
           <nav className="flex-1 overflow-y-auto p-4 space-y-1" aria-label={t('header.menuLabel')}>
             {navItems.map((item) => {
-              const isActive = activeSection === item.href.replace('#', '')
+              const isActive = !item.isPage && activeSection === item.href.replace('#', '')
               return (
-                <a
+                <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
@@ -162,7 +168,7 @@ export default function Header() {
                     isActive ? 'bg-[var(--color-accent)] scale-100' : 'bg-[var(--color-text)]/20 scale-0'
                   }`} />
                   {item.label}
-                </a>
+                </Link>
               )
             })}
           </nav>

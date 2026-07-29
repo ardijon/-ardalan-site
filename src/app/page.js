@@ -3,6 +3,7 @@ import Hero from '@/components/Hero'
 import About from '@/components/About'
 import Services from '@/components/Services'
 import Portfolio from '@/components/Portfolio'
+import StoreSection from '@/components/Store/StoreSection'
 import Resume from '@/components/Resume'
 import Blog from '@/components/Blog'
 import Contact from '@/components/Contact'
@@ -21,6 +22,8 @@ export default function Home() {
         <Services />
         <GirihDivider />
         <Portfolio />
+        <GirihDivider />
+        <StoreSection />
         <GirihDivider />
         <Resume />
         <GirihDivider />

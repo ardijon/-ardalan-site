@@ -1,0 +1,88 @@
+[
+  {
+    "slug": "insurance-recruit-template",
+    "title": {
+      "fa": "قالب جذب نماینده بیمه",
+      "en": "Insurance Agent Recruitment Template"
+    },
+    "shortTitle": {
+      "fa": "قالب بیمه",
+      "en": "Insurance Template"
+    },
+    "description": {
+      "fa": "قالب حرفه‌ای Next.js برای جذب نماینده بیمه عمر — شامل صفحه اصلی، فرم درخواست، پنل مدیریت، ربات تلگرام و سیستم امتیازدهی خودکار.",
+      "en": "Professional Next.js template for life insurance agent recruitment — includes landing page, application form, admin panel, Telegram bot, and automatic scoring system."
+    },
+    "shortDescription": {
+      "fa": "سایت اختصاصی مدیر فروش بیمه عمر با فرم جذب نماینده و پنل مدیریت",
+      "en": "Life insurance sales manager website with agent recruitment form and admin panel"
+    },
+    "features": {
+      "fa": [
+        "صفحه اصلی حرفه‌ای با پروفایل مدیر و دیوار موفقیت",
+        "فرم درخواست نمایندگی ۳ مرحله‌ای با اعتبارسنجی",
+        "پنل مدیریت با لیست متقاضیان و امتیازدهی",
+        "اتصال ربات تلگرام برای نوتیفیکیشن لحظه‌ای",
+        "سیستم لینک ارجاع نمایندگان",
+        "طراحی ریسپانسیو موبایل و دسکتاپ",
+        "پشتیبانی از تم روشن و تاریک",
+        "دیتابیس Turso/SQLite با سیستم Migration",
+        "سئو بهینه و متا تگ‌ها"
+      ],
+      "en": [
+        "Professional landing page with manager profile and success wall",
+        "3-step agent application form with validation",
+        "Admin panel with applicant list and scoring",
+        "Telegram bot integration for instant notifications",
+        "Agent referral link system",
+        "Responsive design for mobile and desktop",
+        "Light and dark theme support",
+        "Turso/SQLite database with migration system",
+        "Optimized SEO and meta tags"
+      ]
+    },
+    "tech": ["Next.js", "React", "Tailwind CSS", "Turso", "SQLite", "Telegram Bot", "TypeScript"],
+    "pricing": {
+      "free": {
+        "price": 0,
+        "priceDisplay": { "fa": "رایگان", "en": "Free" },
+        "period": { "fa": "", "en": "" },
+        "features": {
+          "fa": ["مشاهده دموی آنلاین", "اسکرین‌شات‌های محصول"],
+          "en": ["View online demo", "Product screenshots"]
+        },
+        "cta": { "fa": "مشاهده دمو", "en": "View Demo" }
+      },
+      "starter": {
+        "price": 299000,
+        "priceDisplay": { "fa": "۲۹۹,۰۰۰", "en": "$29" },
+        "period": { "fa": "تومان/ماه", "en": "/month" },
+        "features": {
+          "fa": ["هاست و دامنه اختصاصی", "پشتیبانی فنی", "آپدیت‌های دوره‌ای"],
+          "en": ["Custom hosting & domain", "Technical support", "Periodic updates"]
+        },
+        "cta": { "fa": "خرید اشتراک", "en": "Subscribe" }
+      },
+      "pro": {
+        "price": 4900000,
+        "priceDisplay": { "fa": "۴,۹۰۰,۰۰۰", "en": "$49" },
+        "period": { "fa": "تومان (یکبار)", "en": "(one-time)" },
+        "features": {
+          "fa": ["کد کامل منبع", "دیپلوی روی هاست شخصی", "آموزش راه‌اندازی", "۶ ماه پشتیبانی رایگان"],
+          "en": ["Full source code", "Deploy on personal hosting", "Setup tutorial", "6 months free support"]
+        },
+        "cta": { "fa": "خرید کد منبع", "en": "Buy Source Code" }
+      }
+    },
+    "demoUrl": "/demo/insurance",
+    "screenshots": [
+      { "src": "/demo/insurance/hero.svg", "alt": { "fa": "صفحه اصلی سایت", "en": "Website homepage" } },
+      { "src": "/demo/insurance/profile.svg", "alt": { "fa": "پروفایل مدیر فروش", "en": "Sales manager profile" } },
+      { "src": "/demo/insurance/success-wall.svg", "alt": { "fa": "دیوار موفقیت نمایندگان", "en": "Agent success wall" } },
+      { "src": "/demo/insurance/growth-path.svg", "alt": { "fa": "مسیر رشد نمایندگان", "en": "Agent growth path" } },
+      { "src": "/demo/insurance/application-form.svg", "alt": { "fa": "فرم درخواست نمایندگی", "en": "Agent application form" } },
+      { "src": "/demo/insurance/admin-panel.svg", "alt": { "fa": "پنل مدیریت", "en": "Admin panel" } }
+    ],
+    "github": "https://github.com/ardijon/insurance-recruit-template"
+  }
+]

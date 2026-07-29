@@ -1,0 +1,6 @@
+﻿<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="675" fill="#F8F6F3"/>
+  <rect x="400" y="250" width="400" height="60" rx="8" fill="#7C3AED" opacity="0.1"/>
+  <text x="600" y="290" text-anchor="middle" font-family="system-ui" font-size="24" font-weight="bold" fill="#1A1A2E">فرم درخواست نمایندگی</text>
+  <text x="600" y="340" text-anchor="middle" font-family="system-ui" font-size="16" fill="#6B7280">۳ مرحله با اعتبارسنجی کامل</text>
+</svg>

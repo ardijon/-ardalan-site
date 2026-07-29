@@ -20,6 +20,10 @@ function pruneBuckets() {
 
 function ip(request) {
   if (request.ip) return request.ip
+  const nf = request.headers.get('x-nf-client-connection-ip')
+  if (nf) return nf
+  const cf = request.headers.get('cf-connecting-ip')
+  if (cf) return cf
   const xff = request.headers.get('x-forwarded-for') || ''
   if (xff) return xff.split(',').pop().trim() || 'unknown'
   const real = request.headers.get('x-real-ip')

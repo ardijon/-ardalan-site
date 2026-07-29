@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import ProjectModal from './ProjectModal'
@@ -16,6 +17,11 @@ const projectStyles = [
   { color: 'from-[var(--color-accent)] to-[var(--color-tech)]' },
   { color: 'from-emerald-500 to-[var(--color-tech)]' },
 ]
+
+const projectStoreLinks = {
+  'سامانه جامع مشاوره و فروش بیمه': '/store/insurance-recruit-template',
+  'Comprehensive Insurance Platform': '/store/insurance-recruit-template',
+}
 
 export default function Portfolio() {
   const { t, dir } = useI18n()
@@ -83,44 +89,63 @@ export default function Portfolio() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {visibleProjects.map((project, i) => (
-              <button
-                key={project.title}
-                type="button"
-                onClick={() => setSelected(project)}
-                style={{
-                  opacity: visible ? 1 : 0,
-                  transform: visible ? 'translateY(0)' : 'translateY(24px)',
-                  transition: `opacity 0.6s ease ${i * 100}ms, transform 0.6s ease ${i * 100}ms`,
-                }}
-                className={`group relative h-56 rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300 ${isRtl ? 'text-right' : 'text-left'} w-full`}
-              >
-                {project.image ? (
-                  <Image src={project.image} alt={project.title} fill className="object-cover group-hover:scale-105 transition-all duration-500" />
-                ) : (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500`} />
-                )}
-                <div className="absolute inset-0 bg-black/30" />
+            {visibleProjects.map((project, i) => {
+              const storeLink = projectStoreLinks[project.title]
+              return (
+                <div
+                  key={project.title}
+                  style={{
+                    opacity: visible ? 1 : 0,
+                    transform: visible ? 'translateY(0)' : 'translateY(24px)',
+                    transition: `opacity 0.6s ease ${i * 100}ms, transform 0.6s ease ${i * 100}ms`,
+                  }}
+                  className={`group relative h-56 rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300 ${isRtl ? 'text-right' : 'text-left'} w-full`}
+                >
+                  {project.image ? (
+                    <Image src={project.image} alt={project.title} fill className="object-cover group-hover:scale-105 transition-all duration-500" />
+                  ) : (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500`} />
+                  )}
+                  <div className="absolute inset-0 bg-black/30" />
 
-                <div className="absolute top-4 right-4">
-                  <span className="px-3 py-1 text-xs font-medium text-white/80 bg-white/20 rounded-full backdrop-blur-sm">
-                    {project.cat}
-                  </span>
-                </div>
+                  <div className="absolute top-4 right-4">
+                    <span className="px-3 py-1 text-xs font-medium text-white/80 bg-white/20 rounded-full backdrop-blur-sm">
+                      {project.cat}
+                    </span>
+                  </div>
 
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="text-xl font-bold text-white">
-                    {project.title}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-2 text-white/70 text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
-                    <span>{t('portfolio.viewProject')}</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <h3 className="text-xl font-bold text-white">
+                      {project.title}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-2">
+                      {storeLink ? (
+                        <Link
+                          href={storeLink}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-white bg-[var(--color-accent)] rounded-full hover:bg-[var(--color-accent)]/90 transition-colors"
+                        >
+                          {t('store.buyNow')}
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => setSelected(project)}
+                          className="inline-flex items-center gap-1.5 text-white/70 text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
+                        >
+                          <span>{t('portfolio.viewProject')}</span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </button>
-            ))}
+              )
+            })}
           </div>
 
           {hasMore && (
