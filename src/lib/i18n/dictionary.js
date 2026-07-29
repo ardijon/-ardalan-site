@@ -138,6 +138,12 @@ const dictionary = {
     visitor: {
       label: 'بازدیدکننده',
     },
+    countdown: {
+      days: 'روز',
+      hours: 'ساعت',
+      minutes: 'دقیقه',
+      seconds: 'ثانیه',
+    },
     notFound: {
       title: '۴۰۴',
       message: 'صفحه‌ای که دنبالش هستی پیدا نشد!',
@@ -181,6 +187,26 @@ const dictionary = {
         holderName: 'اردلان پیری',
         instructions: 'مبلغ را به شماره کارت above واریز کرده و رسید پرداخت را ارسال کنید.',
       },
+    },
+    trust: {
+      secure: { title: 'امنیت کامل', desc: 'پرداخت امن و رمزنگاری شده' },
+      payment: { title: 'پرداخت آسان', desc: 'پرداخت با کارت بانکی' },
+      refund: { title: 'بازگشت وجه', desc: 'ضمانت ۷ روزه بازگشت وجه' },
+      instant: { title: 'تحویل فوری', desc: 'بلافاصله پس از خرید' },
+    },
+    faq: {
+      badge: 'سوالات متداول',
+      title: 'سوالاتی که ممکنه داشته باشید',
+      q1: 'آیا کد منبع قابل ویرایش است؟',
+      a1: 'بله، کد کاملاً قابل ویرایش و سفارشی‌سازی است. شما می‌توانید هر بخشی را تغییر دهید.',
+      q2: 'پشتیبانی فنی چگونه است؟',
+      a2: 'تا ۶ ماه پس از خرید، پشتیبانی فنی رایگان از طریق تلگرام و واتساپ دریافت می‌کنید.',
+      q3: 'آیا امکان بازگشت وجه وجود دارد؟',
+      a3: 'بله، تا ۷ روز پس از خرید در صورت عدم رضایت، وجه کامل بازگشت داده می‌شود.',
+      q4: 'آپدیت‌ها رایگان است؟',
+      a4: 'بله، تمام آپدیت‌های آتی به صورت رایگان قابل دریافت است.',
+      q5: 'نیاز به هاست دارم؟',
+      a5: 'بله، برای اجرای پروژه به یک هاست Node.js (مثل Vercel یا Railway) نیاز دارید.',
     },
   },
 
@@ -323,6 +349,12 @@ const dictionary = {
     visitor: {
       label: 'visitors',
     },
+    countdown: {
+      days: 'Days',
+      hours: 'Hours',
+      minutes: 'Minutes',
+      seconds: 'Seconds',
+    },
     notFound: {
       title: '404',
       message: 'Page not found!',
@@ -366,6 +398,26 @@ const dictionary = {
         holderName: 'Ardalan Piri',
         instructions: 'Transfer the amount to the card number above and send the payment receipt.',
       },
+    },
+    trust: {
+      secure: { title: 'Fully Secure', desc: 'Encrypted & safe payment' },
+      payment: { title: 'Easy Payment', desc: 'Pay with bank card' },
+      refund: { title: 'Money Back', desc: '7-day money-back guarantee' },
+      instant: { title: 'Instant Delivery', desc: 'Immediately after purchase' },
+    },
+    faq: {
+      badge: 'FAQ',
+      title: 'Frequently Asked Questions',
+      q1: 'Is the source code editable?',
+      a1: 'Yes, the code is fully editable and customizable. You can modify any part of it.',
+      q2: 'How does technical support work?',
+      a2: 'You receive free technical support for 6 months via Telegram and WhatsApp after purchase.',
+      q3: 'Is there a refund policy?',
+      a3: 'Yes, within 7 days of purchase, if you\'re not satisfied, a full refund is provided.',
+      q4: 'Are updates free?',
+      a4: 'Yes, all future updates are available for free.',
+      q5: 'Do I need hosting?',
+      a5: 'Yes, you need a Node.js hosting (like Vercel or Railway) to run the project.',
     },
   },
 }

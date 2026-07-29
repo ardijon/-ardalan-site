@@ -1,20 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import ProductDetail from './ProductDetail'
 import PricingTable from './PricingTable'
 import PurchaseForm from './PurchaseForm'
+import TrustBadges from './TrustBadges'
+import SocialProof from './SocialProof'
+import FaqSection from './FaqSection'
+import StickyCTA from './StickyCTA'
 import GirihDivider from '@/components/GirihDivider'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
 export default function ProductClient({ product }) {
   const { t, dir, locale } = useI18n()
   const isRtl = dir === 'rtl'
-  const [selectedPlan, setSelectedPlan] = useState(null)
+  const [selectedPlan, setSelectedPlan] = useState('pro')
+  const pricingRef = useRef(null)
+
+  function handleBuyClick() {
+    pricingRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
-    <main>
+    <main className="pb-20">
       <section className="pt-28 sm:pt-32 pb-16 sm:pb-20">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
           <Link
@@ -27,7 +36,7 @@ export default function ProductClient({ product }) {
             {t('store.backToStore')}
           </Link>
 
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--color-primary)]">
               {product.title[locale] || product.title.en}
             </h1>
@@ -36,12 +45,14 @@ export default function ProductClient({ product }) {
             </p>
           </div>
 
+          <SocialProof />
+
           <div className="flex flex-wrap gap-3 mb-10">
             <a
               href={product.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 active:scale-95 transition-all"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
@@ -53,7 +64,7 @@ export default function ProductClient({ product }) {
                 href={product.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-[var(--color-text)]/70 border border-[var(--color-border)] rounded-xl hover:bg-[var(--color-text)]/5 transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-[var(--color-text)]/70 border border-[var(--color-border)] rounded-xl hover:bg-[var(--color-text)]/5 active:scale-95 transition-all"
               >
                 GitHub
               </a>
@@ -69,13 +80,14 @@ export default function ProductClient({ product }) {
           <div className="grid lg:grid-cols-2 gap-12">
             <ProductDetail product={product} />
 
-            <div className="space-y-8">
+            <div className="space-y-8" ref={pricingRef}>
               <div>
                 <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-6">
                   {t('store.pricing')}
                 </h2>
                 <PricingTable
                   pricing={product.pricing}
+                  selectedPlan={selectedPlan}
                   onSelectPlan={setSelectedPlan}
                 />
               </div>
@@ -95,6 +107,22 @@ export default function ProductClient({ product }) {
           </div>
         </div>
       </section>
+
+      <GirihDivider />
+
+      <section className="py-12 sm:py-16">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
+          <TrustBadges />
+        </div>
+      </section>
+
+      <FaqSection />
+
+      <StickyCTA
+        product={product}
+        selectedPlan={selectedPlan}
+        onBuy={handleBuyClick}
+      />
     </main>
   )
 }
