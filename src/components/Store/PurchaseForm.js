@@ -81,62 +81,52 @@ export default function PurchaseForm({ product, selectedPlan }) {
         )}
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-text)]/70 mb-1.5">
-            {t('store.purchaseForm.name')} *
-          </label>
           <input
             type="text"
             name="name"
             required
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
+            placeholder={`${t('store.purchaseForm.name')} *`}
+            className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
             dir={isRtl ? 'rtl' : 'ltr'}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-text)]/70 mb-1.5">
-            {t('store.purchaseForm.phone')} *
-          </label>
           <input
             type="tel"
             name="phone"
             required
             value={formData.phone}
             onChange={handleChange}
-            placeholder="09xxxxxxxxx"
-            className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
-            dir="ltr"
+            placeholder={`${t('store.purchaseForm.phone')} *`}
+            className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
+            dir={isRtl ? 'rtl' : 'ltr'}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-text)]/70 mb-1.5">
-            {t('store.purchaseForm.domain')} *
-          </label>
           <input
             type="text"
             name="domain"
             required
             value={formData.domain}
             onChange={handleChange}
-            placeholder="example.com"
-            className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
-            dir="ltr"
+            placeholder={`${t('store.purchaseForm.domain')} *`}
+            className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
+            dir={isRtl ? 'rtl' : 'ltr'}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[var(--color-text)]/70 mb-1.5">
-            {t('store.purchaseForm.message')}
-          </label>
           <textarea
             name="message"
             rows={3}
             value={formData.message}
             onChange={handleChange}
-            className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all resize-none"
+            placeholder={t('store.purchaseForm.message')}
+            className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all resize-none"
             dir={isRtl ? 'rtl' : 'ltr'}
           />
         </div>

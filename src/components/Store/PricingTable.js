@@ -13,14 +13,14 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
   ]
 
   return (
-    <div className="grid sm:grid-cols-3 gap-4">
+    <div className="grid sm:grid-cols-3 gap-4 items-stretch">
       {plans.map((plan) => {
         const isSelected = selectedPlan === plan.key
         return (
           <div
             key={plan.key}
             onClick={() => onSelectPlan(plan.key)}
-            className={`relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer ${
+            className={`relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer flex flex-col ${
               isSelected
                 ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5 shadow-lg shadow-[var(--color-accent)]/10 scale-[1.02]'
                 : plan.highlighted
@@ -48,7 +48,7 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
               {t(`store.${plan.key === 'pro' ? 'professional' : plan.key}`)}
             </h3>
 
-            <div className="mb-4">
+            <div className="mb-4 whitespace-nowrap">
               <span className="text-3xl font-black text-[var(--color-primary)]">
                 {plan.priceDisplay[locale] || plan.priceDisplay.en}
               </span>
@@ -59,32 +59,34 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
               )}
             </div>
 
-            <ul className="space-y-2 mb-6">
+            <ul className="space-y-2 mb-6" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
               {(plan.features[locale] || plan.features.en || []).map((feature, i) => (
-                <li key={i} className={`flex items-start gap-2 text-sm text-[var(--color-text)]/70 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                <li key={i} className="flex items-start gap-2 text-sm text-[var(--color-text)]/70">
                   <span className="mt-0.5 w-4 h-4 shrink-0 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center text-[10px]">
                     ✓
                   </span>
-                  <span>{feature}</span>
+                  <span className="leading-relaxed">{feature}</span>
                 </li>
               ))}
             </ul>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onSelectPlan(plan.key)
-              }}
-              className={`w-full py-2.5 px-4 text-sm font-bold rounded-xl transition-all ${
-                isSelected
-                  ? 'text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent)]/90'
-                  : plan.highlighted
+            <div className="mt-auto">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onSelectPlan(plan.key)
+                }}
+                className={`w-full py-2.5 px-4 text-sm font-bold rounded-xl transition-all ${
+                  isSelected
                     ? 'text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent)]/90'
-                    : 'text-[var(--color-accent)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/10'
-              }`}
-            >
-              {plan.cta[locale] || plan.cta.en}
-            </button>
+                    : plan.highlighted
+                      ? 'text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent)]/90'
+                      : 'text-[var(--color-accent)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/10'
+                }`}
+              >
+                {plan.cta[locale] || plan.cta.en}
+              </button>
+            </div>
           </div>
         )
       })}

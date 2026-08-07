@@ -74,7 +74,7 @@
         "cta": { "fa": "خرید کد منبع", "en": "Buy Source Code" }
       }
     },
-    "demoUrl": "/demo/insurance",
+    "demoUrl": "/demo/insurance-recruit-template",
     "screenshots": [
       { "src": "/demo/insurance/hero.svg", "alt": { "fa": "صفحه اصلی سایت", "en": "Website homepage" } },
       { "src": "/demo/insurance/profile.svg", "alt": { "fa": "پروفایل مدیر فروش", "en": "Sales manager profile" } },

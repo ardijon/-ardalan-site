@@ -15,9 +15,9 @@ export default function ProductDetail({ product }) {
         <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
           {t('store.features')}
         </h2>
-        <ul className="grid sm:grid-cols-2 gap-3">
+        <ul className="grid sm:grid-cols-2 gap-3" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
           {(product.features[locale] || product.features.en || []).map((feature, i) => (
-            <li key={i} className={`flex items-start gap-3 text-[var(--color-text)]/80 ${isRtl ? 'flex-row-reverse' : ''}`}>
+            <li key={i} className="flex items-start gap-3 text-[var(--color-text)]/80">
               <span className="mt-1 w-5 h-5 shrink-0 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center text-xs">
                 ✓
               </span>

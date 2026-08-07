@@ -208,6 +208,17 @@ const dictionary = {
       q5: 'نیاز به هاست دارم؟',
       a5: 'بله، برای اجرای پروژه به یک هاست Node.js (مثل Vercel یا Railway) نیاز دارید.',
     },
+    whyUs: {
+      fast: { title: 'تحویل فوری', desc: 'بلافاصله پس از خرید، کد منبع دانلود کنید' },
+      customizable: { title: 'قابل سفارشی‌سازی', desc: 'کد کاملاً قابل ویرایش و تطبیق با نیاز شما' },
+      quality: { title: 'کیفیت تضمینی', desc: 'با استانداردهای روز دنیا و بهترین practices' },
+      support: { title: 'پشتیبانی ۶ ماهه', desc: 'پشتیبانی رایگان از طریق تلگرام و واتساپ' },
+    },
+    howItWorks: {
+      browse: { title: 'محصول رو انتخاب کنید', desc: 'از بین قالب‌ها و ابزارهای حرفه‌ای، بهترین رو پیدا کنید' },
+      purchase: { title: 'خرید رو انجام بدید', desc: 'از طریق کارت بانکی پرداخت کنید و سفارش رو ثبت کنید' },
+      download: { title: 'دانلود و راه‌اندازی', desc: 'کد منبع رو دانلود کنید و روی هاست خودتون راه‌اندازی کنید' },
+    },
   },
 
   en: {
@@ -418,6 +429,17 @@ const dictionary = {
       a4: 'Yes, all future updates are available for free.',
       q5: 'Do I need hosting?',
       a5: 'Yes, you need a Node.js hosting (like Vercel or Railway) to run the project.',
+    },
+    whyUs: {
+      fast: { title: 'Instant Delivery', desc: 'Download source code immediately after purchase' },
+      customizable: { title: 'Fully Customizable', desc: 'Code is fully editable and adaptable to your needs' },
+      quality: { title: 'Quality Guaranteed', desc: 'Built with modern standards and best practices' },
+      support: { title: '6-Month Support', desc: 'Free support via Telegram and WhatsApp' },
+    },
+    howItWorks: {
+      browse: { title: 'Choose a Product', desc: 'Find the best template or tool from our professional collection' },
+      purchase: { title: 'Make a Purchase', desc: 'Pay with bank card and place your order' },
+      download: { title: 'Download & Deploy', desc: 'Download source code and deploy on your own hosting' },
     },
   },
 }
