@@ -5,7 +5,6 @@ import ProductCard from '@/components/Store/ProductCard'
 import FeaturedProduct from '@/components/Store/FeaturedProduct'
 import WhyUs from '@/components/Store/WhyUs'
 import HowItWorks from '@/components/Store/HowItWorks'
-import StoreCountdown from '@/components/Store/StoreCountdown'
 import GirihDivider from '@/components/GirihDivider'
 import products from '@/lib/products'
 import { SITE_URL } from '@/lib/constants'
@@ -55,7 +54,6 @@ export default function StorePage() {
         <StoreHero />
         <FeaturedProduct product={featuredProduct} />
         <GirihDivider />
-        <StoreCountdown />
         <section id="products" className="py-16 sm:py-20 scroll-mt-20">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
