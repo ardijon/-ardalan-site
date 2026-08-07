@@ -11,7 +11,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }) {
-  const product = getProduct(params.slug)
+  const { slug } = await params
+  const product = getProduct(slug)
   if (!product) return { title: '404' }
 
   const title = `${product.title.fa} | فروشگاه اردلان`

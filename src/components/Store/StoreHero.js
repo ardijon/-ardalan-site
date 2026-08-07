@@ -62,7 +62,7 @@ export default function StoreHero() {
               className="group inline-flex items-center gap-2 px-8 py-4 text-base font-bold text-white bg-[var(--color-accent)] rounded-2xl hover:bg-[var(--color-accent)]/90 active:scale-95 transition-all shadow-lg shadow-[var(--color-accent)]/20"
             >
               {locale === 'fa' ? 'مشاهده محصولات' : 'View Products'}
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover:translate-x-1 transition-transform">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:rotate-180 transition-transform`}>
                 <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
             </a>

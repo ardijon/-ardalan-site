@@ -16,8 +16,9 @@ function getLocale(requestCookies) {
   return 'fa'
 }
 
-export function generateMetadata({ params }) {
-  const article = getArticle(params.slug)
+export async function generateMetadata({ params }) {
+  const { slug } = await params
+  const article = getArticle(slug)
   if (!article) return {}
   return {
     title: article.title,
@@ -25,7 +26,7 @@ export function generateMetadata({ params }) {
     openGraph: {
       title: article.title,
       description: article.excerpt,
-      url: `${SITE_URL}/blog/${params.slug}`,
+      url: `${SITE_URL}/blog/${slug}`,
       type: 'article',
       publishedTime: article.isoDate || article.date,
       images: [

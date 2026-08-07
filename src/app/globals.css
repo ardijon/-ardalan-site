@@ -27,6 +27,7 @@
   --color-primary: #0F172A;
   --color-accent: #D97706;
   --color-tech: #0D9488;
+  --color-success: #16A34A;
   --color-surface: #ffffff;
   --color-card: #ffffff;
   --color-border: rgba(26, 26, 46, 0.08);
@@ -40,6 +41,7 @@
   --color-primary: #F1F5F9;
   --color-accent: #F59E0B;
   --color-tech: #2DD4BF;
+  --color-success: #22C55E;
   --color-surface: #0F172A;
   --color-card: #1E293B;
   --color-border: rgba(226, 232, 240, 0.08);
@@ -84,10 +86,19 @@ button, a, input, textarea, select {
   touch-action: manipulation;
 }
 
+/* Focus Ring Enhancement */
 *:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: 4px;
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.2);
+}
+
+/* Smooth Scroll */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -132,4 +143,33 @@ button, a, input, textarea, select {
   background: var(--color-accent);
   border-radius: 3px;
   opacity: 0.3;
+}
+
+/* Custom Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Gradient Text Utility */
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Skeleton Loading Animation */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-bg) 50%,
+    var(--color-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }

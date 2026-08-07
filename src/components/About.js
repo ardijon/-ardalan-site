@@ -5,13 +5,7 @@ import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import AnimatedCounter from './AnimatedCounter'
 import TrustSeal from './TrustSeal'
-
-function escapeHtml(input) {
-  return String(input)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-}
+import { escapeHtml } from '@/lib/markdown'
 
 function renderBold(text) {
   const escaped = escapeHtml(text)

@@ -66,6 +66,17 @@ export function I18nProvider({ children }) {
       setCookie('NEXT_LOCALE', next)
       setLocalStorage('NEXT_LOCALE', next)
       applyDir(next)
+
+      // Update page metadata
+      const site = dictionary[next]?.site || dictionary.fa.site
+      if (site) {
+        document.title = site.title || document.title
+        const descMeta = document.querySelector('meta[name="description"]')
+        if (descMeta && site.description) {
+          descMeta.setAttribute('content', site.description)
+        }
+      }
+
       setTimeout(() => setTransitioning(false), 50)
     }, 150)
   }, [locale])

@@ -65,6 +65,14 @@ export default function Header() {
 
   return (
     <>
+      {/* Skip to content link for accessibility */}
+      <a
+        href="#about"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[var(--color-accent)] focus:text-white focus:rounded-lg focus:shadow-lg"
+      >
+        {t('header.skipToContent') || 'Skip to content'}
+      </a>
+
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled ? 'bg-[var(--color-bg)]/80 backdrop-blur-xl shadow-sm' : 'bg-transparent'

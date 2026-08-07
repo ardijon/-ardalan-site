@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useInView } from '@/hooks/useInView'
@@ -30,6 +30,31 @@ export default function Portfolio() {
   const [selected, setSelected] = useState(null)
   const [activeCategory, setActiveCategory] = useState(t('portfolio.categories')[0])
   const [showCount, setShowCount] = useState(INITIAL_COUNT)
+  const cardsRef = useRef([])
+
+  const handleMouseMove = useCallback((e, index) => {
+    const card = cardsRef.current[index]
+    if (!card) return
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+    const rotateX = (y - centerY) / 15
+    const rotateY = (centerX - x) / 15
+
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`
+    card.style.boxShadow = `0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 30px rgba(217, 119, 6, 0.15)`
+  }, [])
+
+  const handleMouseLeave = useCallback((index) => {
+    const card = cardsRef.current[index]
+    if (!card) return
+
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
+    card.style.boxShadow = 'none'
+  }, [])
 
   const categories = t('portfolio.categories')
   const projectData = t('portfolio.projects')
@@ -94,12 +119,16 @@ export default function Portfolio() {
               return (
                 <div
                   key={project.title}
+                  ref={el => cardsRef.current[i] = el}
                   style={{
                     opacity: visible ? 1 : 0,
                     transform: visible ? 'translateY(0)' : 'translateY(24px)',
-                    transition: `opacity 0.6s ease ${i * 100}ms, transform 0.6s ease ${i * 100}ms`,
+                    transition: `opacity 0.6s ease ${i * 100}ms, transform 0.6s ease ${i * 100}ms, box-shadow 0.3s ease`,
+                    transformStyle: 'preserve-3d',
                   }}
-                  className={`group relative h-56 rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300 ${isRtl ? 'text-right' : 'text-left'} w-full`}
+                  className={`group relative h-56 rounded-2xl overflow-hidden cursor-pointer ${isRtl ? 'text-right' : 'text-left'} w-full`}
+                  onMouseMove={(e) => handleMouseMove(e, i)}
+                  onMouseLeave={() => handleMouseLeave(i)}
                 >
                   {project.image ? (
                     <Image src={project.image} alt={project.title} fill className="object-cover group-hover:scale-105 transition-all duration-500" />
@@ -133,10 +162,10 @@ export default function Portfolio() {
                       ) : (
                         <button
                           onClick={() => setSelected(project)}
-                          className="inline-flex items-center gap-1.5 text-white/70 text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0"
+                          className="group/btn inline-flex items-center gap-1.5 text-white text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full hover:bg-[var(--color-accent)] hover:scale-105"
                         >
                           <span>{t('portfolio.viewProject')}</span>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                          <svg className="w-4 h-4 group-hover/btn:translate-x-1 rtl:group-hover/btn:-translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                             <path d="M5 12h14M12 5l7 7-7 7" />
                           </svg>
                         </button>
@@ -152,9 +181,12 @@ export default function Portfolio() {
             <div className="text-center mt-10">
               <button
                 onClick={() => setShowCount(prev => prev + INITIAL_COUNT)}
-                className="px-6 py-3 text-sm font-medium text-[var(--color-accent)] border border-[var(--color-accent)]/30 rounded-xl hover:bg-[var(--color-accent)]/10 transition-all"
+                className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-[var(--color-accent)] border-2 border-[var(--color-accent)]/30 rounded-xl hover:bg-[var(--color-accent)] hover:text-white hover:border-[var(--color-accent)] hover:shadow-lg hover:shadow-[var(--color-accent)]/20 hover:-translate-y-1 transition-all duration-300"
               >
-                {t('portfolio.more')}
+                <span>{t('portfolio.more')}</span>
+                <svg className="w-4 h-4 group-hover:translate-y-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M12 5v14M5 12l7 7 7-7" />
+                </svg>
               </button>
             </div>
           )}

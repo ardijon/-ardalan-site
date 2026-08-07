@@ -29,6 +29,7 @@ export default function Contact() {
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(false)
+  const [validationError, setValidationError] = useState('')
   const buttonRef = useRef(null)
 
   const contactLinks = t('contact.links')
@@ -55,9 +56,12 @@ export default function Contact() {
     const message = (data.get('message') || '').toString().trim()
 
     if (!name || !phone || !message) {
+      setValidationError(t('contact.form.validationError'))
+      setTimeout(() => setValidationError(''), 3000)
       return
     }
 
+    setValidationError('')
     setSending(true)
     setError(false)
 
@@ -79,7 +83,7 @@ export default function Contact() {
     } finally {
       setSending(false)
     }
-  }, [addRipple])
+  }, [addRipple, t])
 
   return (
     <section id="contact" className="py-16 sm:py-20 lg:py-28 scroll-mt-20">
@@ -153,6 +157,7 @@ export default function Contact() {
                   type="text"
                   autoComplete="name"
                   placeholder={t('contact.form.name')}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text)]/30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-all"
                 />
               </div>
@@ -165,6 +170,7 @@ export default function Contact() {
                   autoComplete="tel"
                   inputMode="tel"
                   placeholder={t('contact.form.phone')}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text)]/30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-all"
                 />
               </div>
@@ -175,6 +181,7 @@ export default function Contact() {
                   name="message"
                   placeholder={t('contact.form.message')}
                   rows="4"
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text)]/30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-all resize-none"
                 />
               </div>
@@ -215,6 +222,15 @@ export default function Contact() {
                   className="col-span-full mt-2 text-sm font-medium text-red-500 text-center"
                 >
                   {t('contact.form.error')}
+                </p>
+              )}
+
+              {validationError && (
+                <p
+                  role="status"
+                  className="col-span-full mt-2 text-sm font-medium text-amber-500 text-center"
+                >
+                  {validationError}
                 </p>
               )}
             </form>

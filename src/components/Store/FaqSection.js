@@ -47,8 +47,10 @@ function FaqItem({ item, isOpen, onToggle }) {
           stroke="currentColor"
           strokeWidth="2"
           className={`shrink-0 text-[var(--color-text)]/40 transition-transform duration-200 ${
-            locale === 'rtl' ? 'rotate-180' : ''
-          } ${isOpen ? 'rotate-180' : ''}`}
+            isOpen
+              ? (locale === 'rtl' ? '' : 'rotate-180')
+              : (locale === 'rtl' ? 'rotate-180' : '')
+          }`}
         >
           <path d="M19 9l-7 7-7-7" />
         </svg>

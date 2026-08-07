@@ -23,6 +23,7 @@ const dictionary = {
       social: 'شبکه‌های اجتماعی',
       menuLabel: 'منو',
       closeLabel: 'بستن منو',
+      skipToContent: 'رفتن به محتوا',
     },
     socialLabels: {
       telegram: 'تلگرام',
@@ -37,7 +38,7 @@ const dictionary = {
       badge: 'توسعه‌دهنده نرم‌افزار · متخصص هوش مصنوعی · تحلیلگر بازارهای مالی',
       name: 'اردلان پیری',
       subtitle: 'نوآوری با فناوری و هوش مصنوعی',
-      description: 'توسعه نرم‌افزار — هوش مصنوعی — تحلیل بازارهای مالی — مشاوره بیمه',
+      description: 'توسعه نرم‌افزار  ·  هوش مصنوعی  ·  تحلیل بازارهای مالی  ·  مشاوره بیمه',
       cta1: 'مشاهده خدمات',
       cta2: 'دریافت مشاوره',
     },
@@ -130,6 +131,7 @@ const dictionary = {
         sending: 'در حال ارسال...',
         success: 'پیام شما دریافت شد — به‌زودی با شما تماس می‌گیرم.',
         error: 'خطا در ارسال پیام — لطفاً دوباره تلاش کنید.',
+        validationError: 'لطفاً تمام فیلدها را پر کنید.',
       },
     },
     footer: {
@@ -245,6 +247,7 @@ const dictionary = {
       social: 'Social Media',
       menuLabel: 'Menu',
       closeLabel: 'Close menu',
+      skipToContent: 'Skip to content',
     },
     socialLabels: {
       telegram: 'Telegram',
@@ -259,7 +262,7 @@ const dictionary = {
       badge: 'Software Developer · AI Specialist · Financial Markets Analyst',
       name: 'Ardalan Piri',
       subtitle: 'Innovation through Technology & AI',
-      description: 'Software Development — Artificial Intelligence — Financial Markets — Insurance Consulting',
+      description: 'Software Development  ·  Artificial Intelligence  ·  Financial Markets  ·  Insurance Consulting',
       cta1: 'View Services',
       cta2: 'Get Consultation',
     },
@@ -352,6 +355,7 @@ const dictionary = {
         sending: 'Sending...',
         success: 'Your message has been received — I\'ll get back to you soon.',
         error: 'Error sending message — please try again.',
+        validationError: 'Please fill in all fields.',
       },
     },
     footer: {

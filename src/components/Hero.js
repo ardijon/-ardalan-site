@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { useI18n } from '@/lib/i18n/I18nProvider'
-import TrustSeal from './TrustSeal'
 
 export default function Hero() {
   const { t, dir } = useI18n()
@@ -18,19 +17,20 @@ export default function Hero() {
   }, [])
 
   const handleMouseMove = useCallback((e) => {
+    if (isTouchDevice) return
     const el = e.currentTarget
     const rect = el.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width) * 100
     const y = ((e.clientY - rect.top) / rect.height) * 100
     el.style.setProperty('--mx', `${x}%`)
     el.style.setProperty('--my', `${y}%`)
-  }, [])
+  }, [isTouchDevice])
 
   return (
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[100dvh] flex items-center overflow-hidden pt-14 sm:pt-20 pb-8 sm:pb-8 scroll-mt-20"
+      className="relative min-h-[100dvh] flex items-center pt-14 sm:pt-20 pb-8 sm:pb-8 scroll-mt-20"
       onMouseMove={isTouchDevice ? undefined : handleMouseMove}
       style={{ '--mx': '50%', '--my': '50%' }}
     >
@@ -71,19 +71,18 @@ export default function Hero() {
               }`}
             >
               <span className="hidden sm:block h-px w-16 bg-gradient-to-l from-[var(--color-accent)] to-transparent" />
-              <h1 className="text-[clamp(2rem,8vw,6rem)] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tight text-[var(--color-primary)] text-balance">
+              <h1 className="text-[clamp(2rem,8vw,6rem)] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-[1.1] tracking-tight text-balance bg-gradient-to-l from-[var(--color-primary)] via-[var(--color-accent)] to-[var(--color-primary)] bg-clip-text text-transparent drop-shadow-lg">
                 {t('hero.name')}
               </h1>
               <span className="hidden sm:block h-px w-16 bg-gradient-to-r from-[var(--color-accent)] to-transparent" />
             </div>
 
             <div
-              className={`mt-4 sm:mt-6 flex items-center gap-3 justify-center ${isRtl ? 'lg:justify-start' : 'lg:justify-end'} transition-all duration-700 delay-150 ${
+              className={`mt-2 sm:mt-3 flex items-center gap-3 justify-center ${isRtl ? 'lg:justify-start' : 'lg:justify-end'} transition-all duration-700 delay-150 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              <TrustSeal size={32} />
-              <p className="text-xs sm:text-sm text-[var(--color-text)]/40 font-medium tracking-wide">
+              <p className="text-xs sm:text-sm text-[var(--color-text)]/60 font-medium tracking-wide">
                 {t('hero.subtitle')}
               </p>
             </div>
@@ -97,24 +96,27 @@ export default function Hero() {
             </p>
 
             <div
-              className={`flex flex-wrap gap-3 sm:gap-4 mt-6 sm:mt-8 justify-center ${isRtl ? 'lg:justify-start' : 'lg:justify-end'} transition-all duration-700 delay-300 ${
+              className={`flex flex-wrap gap-3 mt-6 sm:mt-8 justify-center ${isRtl ? 'lg:justify-start' : 'lg:justify-end'} transition-all duration-700 delay-300 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
               <a
                 href="#services"
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-accent)] text-white text-sm sm:text-base font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/30 hover:-translate-y-0.5"
+                className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-l from-[var(--color-accent)] to-amber-600 text-white text-sm sm:text-base font-medium rounded-xl shadow-lg shadow-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/40 hover:-translate-y-1 hover:scale-105 transition-all duration-300"
               >
                 {t('hero.cta1')}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                <svg className="w-4 h-4 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </a>
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 border border-[var(--color-border)] text-[var(--color-text)] text-sm sm:text-base font-medium rounded-xl hover:bg-[var(--color-text)]/5 hover:border-[var(--color-accent)]/30 transition-all"
+                className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 border-2 border-[var(--color-border)] text-[var(--color-text)] text-sm sm:text-base font-medium rounded-xl hover:bg-[var(--color-accent)]/10 hover:border-[var(--color-accent)]/50 hover:-translate-y-1 transition-all duration-300"
               >
                 {t('hero.cta2')}
+                <svg className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 rtl:rotate-180 rtl:translate-x-2 rtl:group-hover:-translate-x-0 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </a>
             </div>
           </div>
@@ -124,38 +126,45 @@ export default function Hero() {
               loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
             }`}
           >
-            <div className="relative w-44 h-44 sm:w-60 sm:h-60 lg:w-80 lg:h-80 xl:w-96 xl:h-96">
-              <div className="absolute inset-6 rounded-full bg-black/10 dark:bg-black/30 blur-3xl" />
-
-              <div className="absolute -inset-3 z-20 pointer-events-none">
-                <svg className="w-full h-full" viewBox="0 0 200 200">
+            <div
+              className="relative w-48 h-48 sm:w-64 sm:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 group"
+            >
+              {/* دوخت چرم - حلقه ظریف */}
+              <div className="absolute -inset-1 sm:-inset-1.5 pointer-events-none z-20">
+                <svg className="w-full h-full" viewBox="0 0 200 200" overflow="visible">
+                  <defs>
+                    <filter id="leather-shadow" x="-10%" y="-10%" width="120%" height="120%">
+                      <feDropShadow dx="0" dy="0.5" stdDeviation="0.5" floodColor="#8B4513" floodOpacity="0.3"/>
+                    </filter>
+                  </defs>
+                  {/* دوخت ظریف روی حلقه سفید */}
                   <circle
-                    cx="100" cy="100" r="98"
+                    cx="100" cy="100" r="99"
                     fill="none"
-                    stroke="currentColor"
+                    stroke="#8B4513"
                     strokeWidth="1.5"
-                    strokeDasharray="16 10"
-                    className="text-[var(--color-accent)]/40"
+                    strokeDasharray="8 4"
+                    strokeLinecap="round"
+                    filter="url(#leather-shadow)"
+                    className="dark:stroke-amber-600"
                   />
                 </svg>
               </div>
 
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-3/4 h-4 bg-gradient-to-b from-black/5 to-transparent dark:from-black/20 rounded-full" />
+              {/* پس‌زمینه درخشان ملایم */}
+              <div className="absolute inset-4 rounded-full bg-[var(--color-accent)]/10 dark:bg-[var(--color-accent)]/15 blur-2xl group-hover:bg-[var(--color-accent)]/20 transition-all duration-700" />
 
-              <div className="relative w-full h-full rounded-full overflow-hidden ring-[6px] ring-white dark:ring-[var(--color-surface)] shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-accent)]/10 to-transparent z-10" />
+              {/* تصویر پروفایل */}
+              <div className="relative w-full h-full rounded-full overflow-hidden ring-[6px] ring-white dark:ring-[var(--color-surface)] shadow-2xl group-hover:shadow-[0_0_40px_rgba(217,119,6,0.2)] transition-all duration-500 z-10">
+                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-accent)]/10 via-transparent to-[var(--color-tech)]/10 z-10 group-hover:from-[var(--color-accent)]/20 group-hover:to-[var(--color-tech)]/20 transition-all duration-500" />
                 <Image
                   src="/profile.png"
                   alt={t('hero.name')}
                   fill
-                  className="object-cover"
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
                   priority
                 />
               </div>
-            </div>
-
-            <div className="mt-4 sm:mt-6 flex justify-center">
-              <TrustSeal size={36} />
             </div>
           </div>
         </div>

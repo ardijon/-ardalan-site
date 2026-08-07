@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import TrustSeal from './TrustSeal'
 import VisitorCounter from './VisitorCounter'
 import QRCodeSVG from './QRCodeSVG'
@@ -9,11 +8,8 @@ import { socialLinks } from '@/lib/socials'
 import { SITE_URL } from '@/lib/constants'
 
 export default function Footer() {
-  const { t, locale } = useI18n()
-  const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear())
-  useEffect(() => {
-    setCurrentYear(new Date().getFullYear())
-  }, [locale])
+  const { t } = useI18n()
+  const currentYear = new Date().getFullYear()
 
   return (
     <footer className="py-10 sm:py-14 border-t border-[var(--color-border)]">

@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { extractClientKey } from '@/lib/request-ip'
+import { escapeHtml } from '@/lib/markdown'
 
 export const runtime = 'nodejs'
 
@@ -18,23 +20,16 @@ function pruneBuckets() {
   if (buckets.size > MAX_BUCKETS) buckets.clear()
 }
 
-function ip(request) {
-  if (request.ip) return request.ip
-  const nf = request.headers.get('x-nf-client-connection-ip')
-  if (nf) return nf
-  const cf = request.headers.get('cf-connecting-ip')
-  if (cf) return cf
-  const xff = request.headers.get('x-forwarded-for') || ''
-  if (xff) return xff.split(',').pop().trim() || 'unknown'
-  const real = request.headers.get('x-real-ip')
-  return real || 'unknown'
-}
-
-function escapeHtml(input) {
-  return String(input)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+function checkCsrf(request) {
+  const origin = request.headers.get('origin')
+  const host = request.headers.get('host')
+  if (!origin || !host) return false
+  try {
+    const originHost = new URL(origin).host
+    return originHost === host
+  } catch {
+    return false
+  }
 }
 
 function validate({ name, phone, message }) {
@@ -61,8 +56,12 @@ function checkRate(key) {
 }
 
 export async function POST(request) {
+  if (!checkCsrf(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
+
   pruneBuckets()
-  if (!checkRate(ip(request))) {
+  if (!checkRate(extractClientKey(request))) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
