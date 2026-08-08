@@ -24,7 +24,7 @@ export default function Blog() {
             <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
               {t('blog.badge')}
             </span>
-            <h2 className="mt-6 text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)] whitespace-nowrap">
+            <h2 className="mt-6 text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)]">
               {t('blog.title')}
             </h2>
           </div>

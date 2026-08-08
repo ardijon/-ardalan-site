@@ -102,7 +102,7 @@ export default function Contact() {
             </span>
             <div className="flex items-center justify-center gap-3 mt-6">
               <TrustSeal size={32} />
-              <h2 className="text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] whitespace-nowrap">
+              <h2 className="text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)]">
                 {t('contact.title')}
               </h2>
             </div>
