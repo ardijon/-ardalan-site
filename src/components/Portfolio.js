@@ -92,7 +92,7 @@ export default function Portfolio() {
             <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
               {t('portfolio.badge')}
             </span>
-            <h2 className="mt-6 text-5xl sm:text-6xl lg:text-7xl font-black text-[var(--color-primary)]">
+            <h2 className="mt-6 text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)] whitespace-nowrap">
               {t('portfolio.title')}
             </h2>
           </div>

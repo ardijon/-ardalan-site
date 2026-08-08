@@ -91,7 +91,7 @@ export default function Services() {
             <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
               {t('services.badge')}
             </span>
-            <h2 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-black text-[var(--color-primary)]">
+            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] whitespace-nowrap">
               {t('services.title')}
             </h2>
           </div>

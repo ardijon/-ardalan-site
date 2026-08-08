@@ -88,7 +88,7 @@ export default function About() {
               transition: 'opacity 0.7s ease, transform 0.7s ease',
             }}
           >
-            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-[var(--color-primary)] leading-tight min-h-[1.2em]">
+            <h2 className="text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)] leading-tight min-h-[1.2em] whitespace-nowrap">
               <span>
                 {visible ? titleText.slice(0, charIndex) : ''}
                 {!typingDone && visible && <span className="animate-pulse text-[var(--color-accent)]">|</span>}
