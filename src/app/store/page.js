@@ -58,7 +58,7 @@ export default function StorePage() {
           <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full border border-[var(--color-accent)]/20">
-                ALL PRODUCTS
+                همه محصولات
               </span>
               <h2 className="mt-6 text-3xl sm:text-4xl font-black text-[var(--color-primary)]">
                 همه محصولات

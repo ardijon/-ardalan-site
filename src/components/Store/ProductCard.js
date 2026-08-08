@@ -26,6 +26,7 @@ export default function ProductCard({ product, featured = false }) {
             src={product.screenshots[0].src}
             alt={product.screenshots[0].alt[locale] || product.screenshots[0].alt.en}
             fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover group-hover:scale-110 transition-transform duration-700"
           />
         ) : (
@@ -61,16 +62,10 @@ export default function ProductCard({ product, featured = false }) {
       </div>
 
       <div className="p-6">
-        <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-start gap-3 mb-3">
           <h3 className="text-lg font-bold text-[var(--color-primary)] leading-snug group-hover:text-[var(--color-accent)] transition-colors">
             {product.title[locale] || product.title.en}
           </h3>
-          <div className="flex items-center gap-1 shrink-0">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-400">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-            <span className="text-xs font-bold text-[var(--color-text)]/60">5.0</span>
-          </div>
         </div>
 
         <p className="text-sm text-[var(--color-text)]/50 leading-relaxed mb-4 line-clamp-2">

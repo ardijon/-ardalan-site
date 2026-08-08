@@ -7,10 +7,10 @@ export default function StoreHero() {
   const { t, locale } = useI18n()
   const [ref, visible] = useInView({ threshold: 0.08 })
 
-  const stats = [
-    { num: locale === 'fa' ? '+۱۲۰' : '+120', label: locale === 'fa' ? 'خریدار راضی' : 'Happy Buyers' },
-    { num: locale === 'fa' ? '+۵۰' : '+50', label: locale === 'fa' ? 'پروژه تحویلی' : 'Projects Delivered' },
-    { num: '۹۹٪', label: locale === 'fa' ? 'رضایت مشتری' : 'Satisfaction' },
+  const features = [
+    { icon: '⚡', text: locale === 'fa' ? 'تحویل فوری' : 'Instant Delivery' },
+    { icon: '🔧', text: locale === 'fa' ? 'کد قابل ویرایش' : 'Editable Code' },
+    { icon: '🛡️', text: locale === 'fa' ? 'ضمانت ۷ روزه' : '7-Day Guarantee' },
   ]
 
   return (
@@ -74,46 +74,65 @@ export default function StoreHero() {
             </a>
           </div>
 
-          <div className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-            {stats.map((stat, i) => (
+          <div className="mt-16 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+            {features.map((feature, i) => (
               <div
                 key={i}
-                className="text-center"
+                className="flex items-center gap-2"
                 style={{
                   opacity: visible ? 1 : 0,
                   transform: visible ? 'translateY(0)' : 'translateY(20px)',
                   transition: `opacity 0.6s ease ${0.3 + i * 0.15}s, transform 0.6s ease ${0.3 + i * 0.15}s`,
                 }}
               >
-                <div className="text-2xl sm:text-3xl font-black text-[var(--color-accent)]">
-                  {stat.num}
-                </div>
-                <div className="text-xs sm:text-sm text-[var(--color-text)]/50 mt-1">
-                  {stat.label}
-                </div>
+                <span className="text-lg">{feature.icon}</span>
+                <span className="text-sm font-medium text-[var(--color-text)]/60">{feature.text}</span>
               </div>
             ))}
+          </div>
+
+          {/* Product Preview Mockup */}
+          <div
+            className="mt-16 mx-auto max-w-3xl"
+            style={{
+              opacity: visible ? 1 : 0,
+              transform: visible ? 'translateY(0)' : 'translateY(40px)',
+              transition: 'opacity 1s ease 0.5s, transform 1s ease 0.5s',
+            }}
+          >
+            <div className="relative rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl shadow-[var(--color-accent)]/5 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--color-border)]">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400/80" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
+                  <div className="w-3 h-3 rounded-full bg-green-400/80" />
+                </div>
+                <div className="flex-1 text-center">
+                  <span className="text-xs text-[var(--color-text)]/30 font-mono">ai2apps.sbs/store</span>
+                </div>
+              </div>
+              <div className="p-6 sm:p-8">
+                <div className="grid sm:grid-cols-3 gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] overflow-hidden">
+                      <div className="h-24 bg-gradient-to-br from-[var(--color-accent)]/10 to-[var(--color-tech)]/10" />
+                      <div className="p-3 space-y-2">
+                        <div className="h-2.5 bg-[var(--color-text)]/10 rounded-full w-3/4" />
+                        <div className="h-2 bg-[var(--color-text)]/5 rounded-full w-1/2" />
+                        <div className="flex items-center justify-between pt-2">
+                          <div className="h-3 bg-[var(--color-accent)]/20 rounded-full w-16" />
+                          <div className="h-6 bg-[var(--color-accent)]/80 rounded-lg w-14" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-16 border-t border-[var(--color-border)]">
-        <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-6 text-sm text-[var(--color-text)]/40">
-            {[
-              { icon: '🛡️', text: locale === 'fa' ? 'ضمانت ۷ روزه' : '7-Day Guarantee' },
-              { icon: '⚡', text: locale === 'fa' ? 'تحویل فوری' : 'Instant Delivery' },
-              { icon: '🔧', text: locale === 'fa' ? 'پشتیبانی ۶ ماهه' : '6-Month Support' },
-              { icon: '💻', text: locale === 'fa' ? 'کد قابل ویرایش' : 'Editable Code' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span>{item.icon}</span>
-                <span>{item.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   )
 }

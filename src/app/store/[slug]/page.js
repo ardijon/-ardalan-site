@@ -73,11 +73,6 @@ export default function ProductPage({ params }) {
         name: 'اردلان پیری',
       },
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '5',
-      reviewCount: '1',
-    },
   }
 
   const breadcrumbSchema = {

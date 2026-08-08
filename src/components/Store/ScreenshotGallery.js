@@ -17,6 +17,7 @@ export default function ScreenshotGallery({ screenshots }) {
           src={screenshots[activeIndex].src}
           alt={screenshots[activeIndex].alt[locale] || screenshots[activeIndex].alt.en}
           fill
+          sizes="(max-width: 768px) 100vw, 60vw"
           className="object-contain p-2"
           priority
         />
@@ -37,6 +38,7 @@ export default function ScreenshotGallery({ screenshots }) {
               src={shot.src}
               alt={shot.alt[locale] || shot.alt.en}
               fill
+              sizes="96px"
               className="object-cover"
             />
           </button>
