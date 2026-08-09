@@ -130,37 +130,11 @@ async function createZipPackage(orderId, productId, domain) {
   }
 
   console.log(`[Deploy] Creating ZIP package...`)
-  try {
-    // Use Node.js archive libraries instead of shell commands when possible
-    const archiver = (await import('archiver')).default
-    const output = fs.createWriteStream(outputFile)
-    const archive = archiver('zip', { zlib: { level: 9 } })
-
-    return new Promise((resolve, reject) => {
-      output.on('close', () => {
-        console.log(`[Deploy] ZIP package created: ${outputFile}`)
-        updateDeployment(orderId, {
-          downloadUrl: `/uploads/deployments/${orderId}.zip`,
-        })
-        resolve()
-      })
-
-      archive.on('error', reject)
-      archive.pipe(output)
-      archive.glob('{.next,public,package.json,package-lock.json}', {
-        cwd: productDir,
-        ignore: ['node_modules/**']
-      })
-      archive.finalize()
-    })
-  } catch {
-    // Fallback to shell command if archiver not available (legacy compatibility)
-    // Note: paths are validated above, so this is safe
-    execSync(
-      `cd "${productDir}" && zip -r "${outputFile}" .next public package.json package-lock.json -x "node_modules/*"`,
-      { stdio: 'pipe' }
-    )
-  }
+  // Use shell command with validated paths (paths are validated above)
+  execSync(
+    `cd "${productDir}" && zip -r "${outputFile}" .next public package.json package-lock.json -x "node_modules/*"`,
+    { stdio: 'pipe' }
+  )
 
   updateDeployment(orderId, {
     downloadUrl: `/uploads/deployments/${orderId}.zip`,
