@@ -102,7 +102,7 @@ export default function Hero() {
             >
               <a
                 href="#services"
-                className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-l from-[var(--color-accent)] to-amber-600 text-white text-sm sm:text-base font-medium rounded-xl shadow-lg shadow-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/40 hover:-translate-y-1 hover:scale-105 transition-all duration-300"
+                className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-accent)] text-white text-sm sm:text-base font-medium rounded-xl shadow-lg shadow-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/40 hover:-translate-y-1 hover:scale-105 transition-all duration-300"
               >
                 {t('hero.cta1')}
                 <svg className="w-4 h-4 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
@@ -111,7 +111,7 @@ export default function Hero() {
               </a>
               <a
                 href="#contact"
-                className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 border-2 border-[var(--color-border)] text-[var(--color-text)] text-sm sm:text-base font-medium rounded-xl hover:bg-[var(--color-accent)]/10 hover:border-[var(--color-accent)]/50 hover:-translate-y-1 transition-all duration-300"
+                className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 border-2 border-[var(--color-accent)] text-[var(--color-accent)] text-sm sm:text-base font-medium rounded-xl hover:bg-[var(--color-accent)] hover:text-white hover:-translate-y-1 transition-all duration-300"
               >
                 {t('hero.cta2')}
                 <svg className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 rtl:rotate-180 rtl:translate-x-2 rtl:group-hover:-translate-x-0 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
@@ -161,6 +161,7 @@ export default function Hero() {
                   src="/profile.png"
                   alt={t('hero.name')}
                   fill
+                  sizes="(max-width: 640px) 192px, (max-width: 1024px) 320px, 384px"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                   priority
                 />

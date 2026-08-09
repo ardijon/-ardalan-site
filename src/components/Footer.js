@@ -43,18 +43,23 @@ export default function Footer() {
                 ))}
               </div>
             </div>
-            <div className="p-2 inline-block w-fit rounded-xl bg-white dark:bg-white shadow-sm">
+            <div className="p-2 inline-block w-fit rounded-xl bg-white shadow-sm border border-[var(--color-border)]">
               <QRCodeSVG value={SITE_URL} size={90} />
             </div>
           </div>
         </div>
 
         <div className="mt-8 pt-5 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-sm text-[var(--color-text)]/30">
+          <p className="text-sm text-[var(--color-text)]/50">
             &copy; {currentYear} &mdash; Ardalan. {t('site.copyright')}
           </p>
-          <VisitorCounter />
-          <p className="text-xs text-[var(--color-text)]/20">
+          <div className="flex items-center gap-4">
+            <a href="/store/track" className="text-sm text-[var(--color-accent)] hover:underline">
+              {t('store.trackOrder')}
+            </a>
+            <VisitorCounter />
+          </div>
+          <p className="text-xs text-[var(--color-text)]/40">
             {t('site.madeWith')}
           </p>
         </div>

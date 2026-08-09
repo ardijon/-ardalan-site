@@ -49,6 +49,18 @@ function getClientIp(request) {
   return '127.0.0.1'
 }
 
+function checkCsrf(request) {
+  const origin = request.headers.get('origin')
+  const host = request.headers.get('host')
+  if (!origin || !host) return false
+  try {
+    const originHost = new URL(origin).host
+    return originHost === host
+  } catch {
+    return false
+  }
+}
+
 export async function GET(request) {
   const ip = getClientIp(request)
   if (!checkRateLimit(ip)) {
@@ -71,6 +83,11 @@ export async function POST(request) {
   const ip = getClientIp(request)
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
+  }
+
+  // CSRF protection
+  if (!checkCsrf(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   }
 
   if (!checkAuth(request)) {
@@ -99,6 +116,11 @@ export async function PUT(request) {
     return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
   }
 
+  // CSRF protection
+  if (!checkCsrf(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
+
   if (!checkAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -124,6 +146,11 @@ export async function DELETE(request) {
   const ip = getClientIp(request)
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
+  }
+
+  // CSRF protection
+  if (!checkCsrf(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   }
 
   if (!checkAuth(request)) {

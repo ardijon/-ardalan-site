@@ -48,12 +48,6 @@
   --color-glow: rgba(245, 158, 11, 0.05);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -183,4 +177,14 @@ button, a, input, textarea, select {
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Scrollbar Hide Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -8,7 +8,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider'
 import LanguageSwitcher from '@/lib/i18n/languageSwitcher'
 import { socialLinks } from '@/lib/socials'
 
-const navHrefs = ['#about', '#services', '#portfolio', '/store', '#resume', '#blog', '#contact']
+const navHrefs = ['#about', '#services', '#portfolio', '/store', '/store/track', '#resume', '#blog', '#contact']
 
 export default function Header() {
   const { t } = useI18n()
@@ -16,10 +16,20 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
   const closeRef = useRef(null)
+  const menuTimeoutRef = useRef(null)
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (menuTimeoutRef.current) clearTimeout(menuTimeoutRef.current)
+    }
+  }, [])
 
   const navItems = navHrefs.map(href => {
     const isPage = href.startsWith('/')
-    const key = isPage ? 'store' : href.replace('#', '')
+    let key = isPage ? href.replace('/', '').replace('/', '.') : href.replace('#', '')
+    if (key === 'store.track') key = 'trackOrder'
+    if (key === 'store') key = 'store'
     return {
       label: t(`header.nav.${key}`),
       href,
@@ -44,11 +54,14 @@ export default function Header() {
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = 'hidden'
-      setTimeout(() => closeRef.current?.focus(), 100)
+      menuTimeoutRef.current = setTimeout(() => closeRef.current?.focus(), 100)
     } else {
       document.body.style.overflow = ''
     }
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+      if (menuTimeoutRef.current) clearTimeout(menuTimeoutRef.current)
+    }
   }, [menuOpen])
 
   useEffect(() => {
@@ -65,14 +78,6 @@ export default function Header() {
 
   return (
     <>
-      {/* Skip to content link for accessibility */}
-      <a
-        href="#about"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[var(--color-accent)] focus:text-white focus:rounded-lg focus:shadow-lg"
-      >
-        {t('header.skipToContent') || 'Skip to content'}
-      </a>
-
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled ? 'bg-[var(--color-bg)]/80 backdrop-blur-xl shadow-sm' : 'bg-transparent'

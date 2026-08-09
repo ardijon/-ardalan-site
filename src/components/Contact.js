@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import TrustSeal from './TrustSeal'
@@ -31,6 +31,24 @@ export default function Contact() {
   const [error, setError] = useState(false)
   const [validationError, setValidationError] = useState('')
   const buttonRef = useRef(null)
+  const timeoutRefs = useRef([])
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach(id => clearTimeout(id))
+    }
+  }, [])
+
+  // Helper to track timeout IDs
+  const trackTimeout = useCallback((callback, delay) => {
+    const id = setTimeout(() => {
+      timeoutRefs.current = timeoutRefs.current.filter(tid => tid !== id)
+      callback()
+    }, delay)
+    timeoutRefs.current.push(id)
+    return id
+  }, [])
 
   const contactLinks = t('contact.links')
 
@@ -42,10 +60,10 @@ export default function Contact() {
     const size = Math.max(rect.width, rect.height)
     const id = Date.now() + Math.random()
     setRipples(prev => [...prev, { id, x, y, size }])
-    setTimeout(() => {
+    trackTimeout(() => {
       setRipples(prev => prev.filter(r => r.id !== id))
     }, 600)
-  }, [])
+  }, [trackTimeout])
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
@@ -57,7 +75,7 @@ export default function Contact() {
 
     if (!name || !phone || !message) {
       setValidationError(t('contact.form.validationError'))
-      setTimeout(() => setValidationError(''), 3000)
+      trackTimeout(() => setValidationError(''), 3000)
       return
     }
 
@@ -76,14 +94,14 @@ export default function Contact() {
       const btn = buttonRef.current
       if (btn) addRipple(btn)
       form.reset()
-      setTimeout(() => setSent(false), 5000)
+      trackTimeout(() => setSent(false), 5000)
     } catch {
       setError(true)
-      setTimeout(() => setError(false), 5000)
+      trackTimeout(() => setError(false), 5000)
     } finally {
       setSending(false)
     }
-  }, [addRipple, t])
+  }, [addRipple, t, trackTimeout])
 
   return (
     <section id="contact" className="py-16 sm:py-20 lg:py-28 scroll-mt-20">
@@ -219,7 +237,7 @@ export default function Contact() {
               {error && (
                 <p
                   role="status"
-                  className="col-span-full mt-2 text-sm font-medium text-red-500 text-center"
+                  className="col-span-full mt-2 text-sm font-medium text-red-600 dark:text-red-400 text-center"
                 >
                   {t('contact.form.error')}
                 </p>
@@ -228,7 +246,7 @@ export default function Contact() {
               {validationError && (
                 <p
                   role="status"
-                  className="col-span-full mt-2 text-sm font-medium text-amber-500 text-center"
+                  className="col-span-full mt-2 text-sm font-medium text-amber-600 dark:text-amber-400 text-center"
                 >
                   {validationError}
                 </p>

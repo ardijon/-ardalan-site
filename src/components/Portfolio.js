@@ -3,9 +3,15 @@
 import { useState, useMemo, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
-import ProjectModal from './ProjectModal'
+
+// Dynamic import for ProjectModal (only needed on user interaction)
+const ProjectModal = dynamic(() => import('./ProjectModal'), {
+  loading: () => null,
+  ssr: false,
+})
 
 const INITIAL_COUNT = 6
 
@@ -131,7 +137,7 @@ export default function Portfolio() {
                   onMouseLeave={() => handleMouseLeave(i)}
                 >
                   {project.image ? (
-                    <Image src={project.image} alt={project.title} fill className="object-cover group-hover:scale-105 transition-all duration-500" />
+                    <Image src={project.image} alt={project.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-all duration-500" />
                   ) : (
                     <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500`} />
                   )}
