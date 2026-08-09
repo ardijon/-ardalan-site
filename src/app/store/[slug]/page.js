@@ -49,8 +49,9 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default function ProductPage({ params }) {
-  const product = getProduct(params.slug)
+export default async function ProductPage({ params }) {
+  const { slug } = await params
+  const product = getProduct(slug)
   if (!product) notFound()
 
   const productSchema = {

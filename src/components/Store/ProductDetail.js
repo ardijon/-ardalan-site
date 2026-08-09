@@ -11,6 +11,14 @@ export default function ProductDetail({ product }) {
     <div className="space-y-12">
       <ScreenshotGallery screenshots={product.screenshots} />
 
+      <div className="p-5 rounded-2xl bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/10" style={{ direction: isRtl ? 'rtl' : 'ltr', textAlign: 'justify' }}>
+        {t('store.valueProposition').split('\n\n').map((paragraph, i) => (
+          <p key={i} className={`text-sm leading-relaxed text-[var(--color-text)]/70 ${i > 0 ? 'mt-3' : ''}`}>
+            {paragraph}
+          </p>
+        ))}
+      </div>
+
       <div>
         <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
           {t('store.features')}
@@ -32,7 +40,7 @@ export default function ProductDetail({ product }) {
           {t('store.techStack')}
         </h2>
         <div className="flex flex-wrap gap-2">
-          {product.tech.map((tech) => (
+          {(product.tech || []).map((tech) => (
             <span
               key={tech}
               className="px-3 py-1.5 text-xs font-medium text-[var(--color-tech)] bg-[var(--color-tech)]/10 rounded-full border border-[var(--color-tech)]/20"

@@ -44,7 +44,7 @@ export default function ProductCard({ product, featured = false }) {
             </span>
           )}
           <span className="px-3 py-1 text-[10px] font-medium text-white/90 bg-[var(--color-accent)]/80 rounded-full backdrop-blur-sm">
-            {product.tech.slice(0, 2).join(' · ')}
+            {(product.tech || []).slice(0, 2).join(' · ')}
           </span>
         </div>
 

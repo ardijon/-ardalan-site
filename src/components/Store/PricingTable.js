@@ -7,13 +7,12 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
   const isRtl = dir === 'rtl'
 
   const plans = [
-    { key: 'free', ...pricing.free, highlighted: false },
     { key: 'starter', ...pricing.starter, highlighted: false },
     { key: 'pro', ...pricing.pro, highlighted: true },
   ]
 
   return (
-    <div className="grid sm:grid-cols-3 gap-4 items-stretch">
+    <div className="grid sm:grid-cols-2 gap-4 items-stretch">
       {plans.map((plan) => {
         const isSelected = selectedPlan === plan.key
         return (

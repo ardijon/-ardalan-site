@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import OrderManagement from '@/components/Admin/OrderManagement'
 
 const EMPTY_PRODUCT = {
   slug: '',
@@ -31,6 +32,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [activeTab, setActiveTab] = useState('products')
 
   function getAuthHeader() {
     if (!auth) return {}
@@ -228,33 +230,61 @@ export default function AdminPage() {
       <>
         <Header />
         <main className="pt-24 pb-16 min-h-screen flex items-center justify-center">
-          <form onSubmit={handleLogin} className="w-full max-w-sm space-y-4 p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)]">
-            <h1 className="text-xl font-bold text-[var(--color-primary)] text-center">ورود به پنل مدیریت</h1>
-            {message && (
-              <div className="px-3 py-2 text-sm rounded-lg bg-red-50 text-red-600 border border-red-200">{message}</div>
-            )}
-            <input
-              type="text"
-              placeholder="نام کاربری"
-              value={loginForm.user}
-              onChange={e => setLoginForm(p => ({ ...p, user: e.target.value }))}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-            />
-            <input
-              type="password"
-              placeholder="رمز عبور"
-              value={loginForm.pass}
-              onChange={e => setLoginForm(p => ({ ...p, pass: e.target.value }))}
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'در حال بررسی...' : 'ورود'}
-            </button>
-          </form>
+          <div className="w-full max-w-sm mx-auto px-5">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-accent)]/10 flex items-center justify-center">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--color-accent)]">
+                  <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-black text-[var(--color-primary)]">ورود به پنل مدیریت</h1>
+              <p className="mt-2 text-sm text-[var(--color-text)]/50">فقط مدیران سیستم</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-4 p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg">
+              {message && (
+                <div className="px-4 py-3 text-sm rounded-xl bg-red-50 text-red-600 border border-red-200">
+                  {message}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-medium text-[var(--color-text)]/50 mb-2">نام کاربری</label>
+                <input
+                  type="text"
+                  placeholder="نام کاربری"
+                  value={loginForm.user}
+                  onChange={e => setLoginForm(p => ({ ...p, user: e.target.value }))}
+                  className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
+                  dir="ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[var(--color-text)]/50 mb-2">رمز عبور</label>
+                <input
+                  type="password"
+                  placeholder="رمز عبور"
+                  value={loginForm.pass}
+                  onChange={e => setLoginForm(p => ({ ...p, pass: e.target.value }))}
+                  className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
+                  dir="ltr"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 px-6 text-sm font-bold text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-[var(--color-accent)]/20"
+              >
+                {loading ? 'در حال بررسی...' : 'ورود'}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-xs text-[var(--color-text)]/30">
+              اطلاعات ورود از متغیرهای محیطی خوانده می‌شود
+            </p>
+          </div>
         </main>
         <Footer />
       </>
@@ -281,15 +311,17 @@ export default function AdminPage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-2xl font-bold text-[var(--color-primary)]">پنل مدیریت فروشگاه</h1>
-              <p className="text-sm text-[var(--color-text)]/50 mt-1">مدیریت محصولات و قیمت‌ها</p>
+              <p className="text-sm text-[var(--color-text)]/50 mt-1">مدیریت محصولات، سفارشات و قیمت‌ها</p>
             </div>
             <div className="flex gap-2">
-              <button
-                onClick={handleNew}
-                className="px-4 py-2 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 transition-colors"
-              >
-                + محصول جدید
-              </button>
+              {activeTab === 'products' && (
+                <button
+                  onClick={handleNew}
+                  className="px-4 py-2 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 transition-colors"
+                >
+                  + محصول جدید
+                </button>
+              )}
               <button
                 onClick={() => { setAuth(null); setProducts([]) }}
                 className="px-4 py-2 text-sm font-medium text-[var(--color-text)]/60 border border-[var(--color-border)] rounded-xl hover:bg-[var(--color-text)]/5 transition-colors"
@@ -299,12 +331,35 @@ export default function AdminPage() {
             </div>
           </div>
 
+          {/* Tabs */}
+          <div className="flex gap-1 p-1 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] mb-8">
+            {[
+              { key: 'products', label: 'محصولات' },
+              { key: 'orders', label: 'سفارشات' },
+            ].map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all ${
+                  activeTab === tab.key
+                    ? 'bg-[var(--color-accent)] text-white shadow-sm'
+                    : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
           {message && (
             <div className="mb-6 px-4 py-3 text-sm rounded-lg bg-orange-50 text-orange-700 border border-orange-200">
               {message}
             </div>
           )}
 
+          {activeTab === 'orders' ? (
+            <OrderManagement auth={auth} />
+          ) : (
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1 space-y-3">
               <h2 className="text-sm font-semibold text-[var(--color-text)]/60 mb-3">لیست محصولات</h2>
@@ -431,6 +486,7 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+          )}
         </div>
       </main>
       <Footer />
