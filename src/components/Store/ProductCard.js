@@ -48,10 +48,10 @@ export default function ProductCard({ product, featured = false }) {
           </span>
         </div>
 
-        <div className={`absolute bottom-3 ${isRtl ? 'right-3' : 'left-3'} opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0`}>
+        <div className={`absolute bottom-3 ${isRtl ? 'right-3' : 'left-3'}`}>
           <Link
             href={product.demoUrl}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
