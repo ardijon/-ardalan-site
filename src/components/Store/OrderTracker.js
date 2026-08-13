@@ -3,10 +3,16 @@
 import { useState } from 'react'
 import OrderTimeline from './OrderTimeline'
 import { useI18n } from '@/lib/i18n/I18nProvider'
+import products from '@/lib/products'
 
 export default function OrderTracker() {
   const { t, dir, locale } = useI18n()
   const isRtl = dir === 'rtl'
+
+  const getProductName = (productId) => {
+    const product = products.find(p => p.slug === productId)
+    return product?.title?.[locale] || product?.title?.en || productId
+  }
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
   const [order, setOrder] = useState(null)
@@ -100,11 +106,16 @@ export default function OrderTracker() {
           <div className="mt-6 pt-4 border-t border-[var(--color-border)] space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-[var(--color-text)]/50">{t('store.order.product')}</span>
-              <span className="font-medium text-[var(--color-text)]">{order.product}</span>
+              <span className="font-medium text-[var(--color-text)]">{getProductName(order.product)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-[var(--color-text)]/50">{t('store.order.plan')}</span>
-              <span className="font-medium text-[var(--color-text)]">{order.plan}</span>
+              <span className="font-medium text-[var(--color-text)]">
+                {locale === 'fa'
+                  ? (order.plan === 'pro' ? 'حرفه‌ای (یکبار)' : 'ماهانه')
+                  : (order.plan === 'pro' ? 'Pro (one-time)' : 'Monthly')
+                }
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-[var(--color-text)]/50">{t('store.order.createdAt')}</span>
@@ -112,6 +123,22 @@ export default function OrderTracker() {
                 {new Date(order.createdAt).toLocaleDateString(locale === 'fa' ? 'fa-IR' : 'en-US')}
               </span>
             </div>
+            {order.plan === 'pro' && (
+              <div className="flex justify-between text-sm">
+                <span className="text-[var(--color-text)]/50">{locale === 'fa' ? 'مبلغ' : 'Amount'}</span>
+                <span className="font-bold text-[var(--color-accent)]">
+                  {locale === 'fa' ? '۱۴,۹۰۰,۰۰۰ تومان' : '$149'}
+                </span>
+              </div>
+            )}
+            {order.plan === 'starter' && (
+              <div className="flex justify-between text-sm">
+                <span className="text-[var(--color-text)]/50">{locale === 'fa' ? 'مبلغ ماهانه' : 'Monthly Amount'}</span>
+                <span className="font-bold text-[var(--color-accent)]">
+                  {locale === 'fa' ? '۴۹۰,۰۰۰ تومان/ماه' : '$5/month'}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}

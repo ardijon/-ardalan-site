@@ -76,7 +76,7 @@ export async function POST(request, { params }) {
     const bytes = await file.arrayBuffer()
     fs.writeFileSync(filepath, Buffer.from(bytes))
 
-    const order = uploadReceipt(id, {
+    const order = await uploadReceipt(id, {
       filename,
       amount: amount ? parseInt(amount) : 0,
       trackingCode: trackingCode || '',
@@ -86,6 +86,13 @@ export async function POST(request, { params }) {
       return NextResponse.json(
         { error: 'سفارش یافت نشد' },
         { status: 404 }
+      )
+    }
+
+    if (order.error === 'receipt_only_allowed_for_pending_orders') {
+      return NextResponse.json(
+        { error: 'رسید فقط برای سفارشات در انتظار پرداخت قابل آپلود است' },
+        { status: 400 }
       )
     }
 

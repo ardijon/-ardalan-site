@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
-export default function ReceiptUpload({ orderId, onSuccess }) {
+export default function ReceiptUpload({ orderId, onSuccess, expectedAmount }) {
   const { t, dir, locale } = useI18n()
   const isRtl = dir === 'rtl'
   const [status, setStatus] = useState('idle')
@@ -36,6 +36,30 @@ export default function ReceiptUpload({ orderId, onSuccess }) {
     if (!file) {
       setError(locale === 'fa' ? 'لطفاً تصویر رسید را انتخاب کنید' : 'Please select a receipt image')
       return
+    }
+
+    // Validate amount against expected price
+    if (expectedAmount && formData.amount) {
+      const paid = Number(formData.amount.replace(/\D/g, ''))
+      if (paid < expectedAmount * 0.9) {
+        setError(locale === 'fa'
+          ? `مبلغ پرداختی (${paid.toLocaleString('fa-IR')} تومان) کمتر از مبلغ مورد انتظار است`
+          : `Paid amount (${paid.toLocaleString('en-US')} Tomans) is less than expected`
+        )
+        return
+      }
+    }
+
+    // Validate amount against expected price
+    if (expectedAmount && formData.amount) {
+      const paid = Number(formData.amount.replace(/\D/g, ''))
+      if (paid < expectedAmount * 0.9) {
+        setError(locale === 'fa'
+          ? `مبلغ پرداختی (${paid.toLocaleString('fa-IR')} تومان) کمتر از مبلغ مورد انتظار است`
+          : `Paid amount (${paid.toLocaleString('en-US')} Tomans) is less than expected`
+        )
+        return
+      }
     }
 
     setStatus('uploading')
@@ -143,14 +167,14 @@ export default function ReceiptUpload({ orderId, onSuccess }) {
             <input
               type="text"
               inputMode="numeric"
-              value={formData.amount ? Number(formData.amount).toLocaleString('en-US') : ''}
+              value={formData.amount ? Number(formData.amount).toLocaleString(locale === 'fa' ? 'fa-IR' : 'en-US') : ''}
               onChange={(e) => {
                 let raw = e.target.value
                 raw = raw.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
                 raw = raw.replace(/[^\d]/g, '')
                 setFormData(prev => ({ ...prev, amount: raw }))
               }}
-              placeholder={locale === 'fa' ? 'مثلاً 4900000' : 'e.g. 4900000'}
+              placeholder={locale === 'fa' ? 'مثلاً ۴٬۹۰۰٬۰۰۰' : 'e.g. 4,900,000'}
               className="w-full pl-14 pr-3 py-2 text-sm rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50"
               dir="ltr"
             />

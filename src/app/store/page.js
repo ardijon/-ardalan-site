@@ -8,12 +8,12 @@ import products from '@/lib/products'
 import { SITE_URL } from '@/lib/constants'
 
 export const metadata = {
-  title: 'فروشگاه | قالب‌ها و ابزارهای حرفه‌ای',
-  description: 'قالب‌ها و ابزارهای حرفه‌ای Next.js برای شروع سریع کسب‌وکار — قالب جذب نماینده بیمه، فروشگاه آنلاین و ابزارهای هوش مصنوعی',
-  keywords: ['فروشگاه', 'قالب Next.js', 'قالب وب‌سایت', 'ابزار هوش مصنوعی', 'قالب بیمه', 'توسعه نرم‌افزار'],
+  title: 'فروشگاه | توانا — سیستم جذب هوشمند نماینده بیمه',
+  description: 'توانا — سیستم جذب هوشمند نماینده بیمه عمر با فیلترینگ رفتاری و امتیازدهی خودکار',
+  keywords: ['فروشگاه', 'جذب نماینده بیمه', 'سیستم استخدام', 'توانا', 'تهران', 'ابزار هوش مصنوعی'],
   openGraph: {
-    title: 'فروشگاه | قالب‌ها و ابزارهای حرفه‌ای',
-    description: 'قالب‌ها و ابزارهای حرفه‌ای برای شروع سریع کسب‌وکار',
+    title: 'فروشگاه | توانا — سیستم جذب هوشمند نماینده بیمه',
+    description: 'توانا — سیستم جذب هوشمند نماینده بیمه عمر',
     url: `${SITE_URL}/store`,
     type: 'website',
   },
@@ -26,8 +26,8 @@ export default function StorePage() {
   const storeSchema = {
     '@context': 'https://schema.org',
     '@type': 'Store',
-    name: 'فروشگاه اردلان',
-    description: 'قالب‌ها و ابزارهای حرفه‌ای برای شروع سریع کسب‌وکار',
+    name: 'فروشگاه توانا',
+    description: 'توانا — سیستم جذب هوشمند نماینده بیمه عمر',
     url: `${SITE_URL}/store`,
     seller: {
       '@type': 'Person',
@@ -37,7 +37,7 @@ export default function StorePage() {
       '@type': 'Offer',
       name: p.title.fa,
       description: p.shortDescription.fa,
-      price: p.pricing?.pro?.price || 0,
+      price: p.pricing?.pro?.price || p.pricing?.starter?.price || 0,
       priceCurrency: 'IRR',
       availability: 'https://schema.org/InStock',
     })),

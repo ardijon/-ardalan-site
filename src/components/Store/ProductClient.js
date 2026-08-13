@@ -50,7 +50,7 @@ export default function ProductClient({ product }) {
             </div>
 
             <div className="lg:col-span-2" ref={pricingRef}>
-              <div className="sticky top-28 space-y-6">
+              <div className="lg:sticky lg:top-28 space-y-6">
                 <PricingTable
                   pricing={product.pricing}
                   selectedPlan={selectedPlan}

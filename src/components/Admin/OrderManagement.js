@@ -53,7 +53,7 @@ export default function OrderManagement({ auth }) {
 
   useEffect(() => {
     if (auth) fetchOrders()
-  }, [auth, filter])
+  }, [auth, filter, fetchOrders])
 
   async function updateOrderStatus(orderId, status, note = '') {
     setActionLoading(true)

@@ -1,23 +1,23 @@
 [
   {
-    "slug": "insurance-recruit-template",
+    "slug": "tavana",
     "featured": true,
     "category": "template",
     "title": {
-      "fa": "قالب جذب نماینده بیمه",
-      "en": "Insurance Agent Recruitment Template"
+      "fa": "توانا — سیستم جذب هوشمند نماینده بیمه",
+      "en": "Tavana — Smart Insurance Agent Recruitment System"
     },
     "shortTitle": {
-      "fa": "قالب بیمه",
-      "en": "Insurance Template"
+      "fa": "توانا",
+      "en": "Tavana"
     },
     "description": {
-      "fa": "قالب حرفه‌ای Next.js برای جذب نماینده بیمه عمر — شامل صفحه اصلی، فرم درخواست، پنل مدیریت، ربات تلگرام و سیستم امتیازدهی خودکار.",
-      "en": "Professional Next.js template for life insurance agent recruitment — includes landing page, application form, admin panel, Telegram bot, and automatic scoring system."
+      "fa": "«آیا آماده‌اید از یک استخدام‌کننده معمولی به یک رهبر جریان‌ساز تبدیل شوید؟» در دنیای شلوغ بیمه، تفاوت بین یک مدیر موفق و یک مدیر معمولی، در سیستمی است که دارند. شما سالها تجربه را در کوله‌پشتی خود دارید، اما آیا متقاضیان شما در نگاه اول، این شکوه و تخصص را حس می‌کنند؟ وب‌اپلیکیشن توانا، تنها یک سایت نیست؛ میراث دیجیتال شماست. تصور کنید متقاضی وارد قلمرو اختصاصی شما می‌شود؛ جایی که دامنه سایت به نام شماست، تندیس‌های افتخارتان می‌درخشند و داستان‌های موفقیت تیم‌تان، قلب او را به تپش می‌اندازد. اینجا دیگر شما به دنبال نیرو نمی‌گردید، بلکه افراد باکیفیت برای پیوستن به امپراتوری شما صف می‌کشند. با این ابزار، شما زمانتان را که گران‌بها‌ترین دارایی شماست صرف هر کسی نمی‌کنید. سیستم هوشمند شما، افراد را از فیلترهای تخصصی رد می‌کند و فقط کسانی را به میز مصاحبه شما می‌رساند که پتانسیل ستاره شدن را دارند. نظم، پرستیژ و قدرت؛ این سه کلمه تعریف جدید کسب‌وکار شما با این وب‌اپلیکیشن خواهد بود. زمان آن رسیده که با ابزارهای سنتی خداحافظی کنید و به عصر مدیریت هوشمند سلام کنید.",
+      "en": "Are you ready to transform from an ordinary recruiter into a trendsetting leader? In the crowded world of insurance, the difference between a successful manager and an average one lies in the system they wield. You carry years of experience on your shoulders, but can your candidates sense that greatness and expertise at first glance? The Tavana web application is more than a website — it's your digital legacy. Imagine an applicant stepping into your exclusive realm, where the domain bears your name, your award trophies shine bright, and your team's success stories make their heart race. Here, you no longer chase after talent — quality candidates line up to join your empire. With this tool, you won't waste your most precious asset — your time — on just anyone. Your smart system filters candidates through professional gates and only delivers those with star potential to your interview table. Discipline, prestige, and power — these three words will define your new business identity with this web application. It's time to say goodbye to traditional tools and welcome the era of smart management."
     },
     "shortDescription": {
-      "fa": "سایت اختصاصی مدیر فروش بیمه عمر با فرم جذب نماینده و پنل مدیریت",
-      "en": "Life insurance sales manager website with agent recruitment form and admin panel"
+      "fa": "سیستم هوشمند ارزیابی و جذب نماینده بیمه با فیلترینگ رفتاری و امتیازدهی خودکار",
+      "en": "Smart insurance agent evaluation and recruitment system with behavioral filtering and automatic scoring"
     },
     "features": {
       "fa": [
@@ -43,48 +43,237 @@
         "Optimized SEO and meta tags"
       ]
     },
-    "tech": ["Next.js", "React", "Tailwind CSS", "Turso", "SQLite", "Telegram Bot", "TypeScript"],
+    "tech": [
+      "Next.js",
+      "React",
+      "Tailwind CSS",
+      "Turso",
+      "SQLite",
+      "Telegram Bot",
+      "TypeScript"
+    ],
     "pricing": {
-      "free": {
-        "price": 0,
-        "priceDisplay": { "fa": "رایگان", "en": "Free" },
-        "period": { "fa": "", "en": "" },
-        "features": {
-          "fa": ["مشاهده دموی آنلاین", "اسکرین‌شات‌های محصول"],
-          "en": ["View online demo", "Product screenshots"]
-        },
-        "cta": { "fa": "مشاهده دمو", "en": "View Demo" }
-      },
       "starter": {
-        "price": 399000,
-        "priceDisplay": { "fa": "۳۹۹,۰۰۰", "en": "$39" },
-        "period": { "fa": "تومان/ماه", "en": "/month" },
-        "features": {
-          "fa": ["هاست و دامنه اختصاصی", "پشتیبانی فنی", "آپدیت‌های دوره‌ای"],
-          "en": ["Custom hosting & domain", "Technical support", "Periodic updates"]
+        "price": 490000,
+        "priceDisplay": {
+          "fa": "۴۹۰,۰۰۰",
+          "en": "$5"
         },
-        "cta": { "fa": "خرید اشتراک", "en": "Subscribe" }
+        "period": {
+          "fa": "تومان/ماه",
+          "en": "/month"
+        },
+        "features": {
+          "fa": [
+            "هاست و دامنه اختصاصی",
+            "پشتیبانی فنی",
+            "آپدیت‌های دوره‌ای"
+          ],
+          "en": [
+            "Custom hosting & domain",
+            "Technical support",
+            "Periodic updates"
+          ]
+        },
+        "cta": {
+          "fa": "خرید اشتراک",
+          "en": "Subscribe"
+        }
       },
       "pro": {
-        "price": 4900000,
-        "priceDisplay": { "fa": "۴,۹۰۰,۰۰۰", "en": "$49" },
-        "period": { "fa": "تومان (یکبار)", "en": "(one-time)" },
-        "features": {
-          "fa": ["کد کامل منبع", "دیپلوی روی هاست شخصی", "آموزش راه‌اندازی", "۶ ماه پشتیبانی رایگان"],
-          "en": ["Full source code", "Deploy on personal hosting", "Setup tutorial", "6 months free support"]
+        "price": 14900000,
+        "priceDisplay": {
+          "fa": "۱۴,۹۰۰,۰۰۰",
+          "en": "$149"
         },
-        "cta": { "fa": "خرید کد منبع", "en": "Buy Source Code" }
+        "period": {
+          "fa": "تومان (یکبار)",
+          "en": "(one-time)"
+        },
+        "features": {
+          "fa": [
+            "کد کامل منبع",
+            "دیپلوی روی هاست شخصی",
+            "آموزش راه‌اندازی",
+            "۶ ماه پشتیبانی رایگان"
+          ],
+          "en": [
+            "Full source code",
+            "Deploy on personal hosting",
+            "Setup tutorial",
+            "6 months free support"
+          ]
+        },
+        "cta": {
+          "fa": "خرید کد منبع",
+          "en": "Buy Source Code"
+        }
       }
     },
-    "demoUrl": "/demo/insurance-recruit-template",
+    "demoUrl": "/demo/tavana",
     "screenshots": [
-      { "src": "/demo/insurance/hero.svg", "alt": { "fa": "صفحه اصلی سایت", "en": "Website homepage" } },
-      { "src": "/demo/insurance/profile.svg", "alt": { "fa": "پروفایل مدیر فروش", "en": "Sales manager profile" } },
-      { "src": "/demo/insurance/success-wall.svg", "alt": { "fa": "دیوار موفقیت نمایندگان", "en": "Agent success wall" } },
-      { "src": "/demo/insurance/growth-path.svg", "alt": { "fa": "مسیر رشد نمایندگان", "en": "Agent growth path" } },
-      { "src": "/demo/insurance/application-form.svg", "alt": { "fa": "فرم درخواست نمایندگی", "en": "Agent application form" } },
-      { "src": "/demo/insurance/admin-panel.svg", "alt": { "fa": "پنل مدیریت", "en": "Admin panel" } }
+      {
+        "src": "/images/insurance-product/scalable-architecture-insurance-industry.webp",
+        "alt": {
+          "fa": "معماری مقیاس‌پذیر در صنعت بیمه، گذر از استخدام سنتی به هوشمند",
+          "en": "Scalable Architecture in Insurance Industry, Transition from Traditional to Smart Recruitment"
+        }
+      },
+      {
+        "src": "/images/insurance-product/evolution-of-recruitment-ecosystem-full.webp",
+        "alt": {
+          "fa": "تکامل اکوسیستم جذب نیرو در صنعت بیمه و مقایسه روش‌های مدرن",
+          "en": "Recruitment Ecosystem Evolution in Insurance and Modern Methods Comparison"
+        }
+      },
+      {
+        "src": "/images/insurance-product/scalable-ecosystem-three-engines.webp",
+        "alt": {
+          "fa": "معماری مقیاس‌پذیری: سه موتور محرک اکوسیستم شامل جذب و برندینگ، فیلترینگ و اتوماسیون، رشد و وفاداری",
+          "en": "Scalability Architecture: Three Ecosystem Engines Including Attraction & Branding, Filtering & Automation, Growth & Loyalty"
+        }
+      },
+      {
+        "src": "/images/insurance-product/smart-recruiter-strategic-hub-full.webp",
+        "alt": {
+          "fa": "پایگاه استراتژیک استخدام‌کننده هوشمند و معمار اکوسیستم",
+          "en": "Smart Recruiter Strategic Hub and Ecosystem Architect"
+        }
+      },
+      {
+        "src": "/images/insurance-product/personal-branding-insurance-manager-full.webp",
+        "alt": {
+          "fa": "برندینگ شخصی مدیر بیمه با پروفایل اختصاصی و نمایش افتخارات",
+          "en": "Insurance Manager Personal Branding with Exclusive Profile and Achievements Display"
+        }
+      },
+      {
+        "src": "/images/insurance-product/strategic-hub-mobile-interface.webp",
+        "alt": {
+          "fa": "رابط کاربری موبایل پایگاه استراتژیک: دسترسی آسان به داشبورد مدیریت",
+          "en": "Strategic Hub Mobile Interface: Easy Access to Management Dashboard"
+        }
+      },
+      {
+        "src": "/images/insurance-product/psychometric-assessment-attraction-model.webp",
+        "alt": {
+          "fa": "مدل جذب روانشناختی: سنجش انگیزه، نظم و برنامه‌ریزی در متقاضیان",
+          "en": "Psychometric Attraction Model: Assessing Motivation, Discipline, and Planning in Applicants"
+        }
+      },
+      {
+        "src": "/images/insurance-product/applicant-mind-dissection-psychometric-tests-full.webp",
+        "alt": {
+          "fa": "کالبدشکافی ذهن متقاضی با تست‌های روانسنجی و تناسب شغلی",
+          "en": "Applicant Mind Dissection with Psychometric and Job Fit Tests"
+        }
+      },
+      {
+        "src": "/images/insurance-product/insurance-manager-profile-mobile.webp",
+        "alt": {
+          "fa": "پروفایل مدیر بیمه در موبایل: نمایش حرفه‌ای برند شخصی در جیب شما",
+          "en": "Insurance Manager Profile on Mobile: Professional Personal Brand Display in Your Pocket"
+        }
+      },
+      {
+        "src": "/images/insurance-product/live-performance-kpi-dashboard-full.webp",
+        "alt": {
+          "fa": "داشبورد زنده عملکرد و شاخص‌های کلیدی KPI به عنوان ویترین اقتدار",
+          "en": "Live Performance Dashboard and KPIs as Authority Showcase"
+        }
+      },
+      {
+        "src": "/images/insurance-product/ecosystem-framework-mobile-display.webp",
+        "alt": {
+          "fa": "نمای موبایل سه ستون تسلط استراتژیک: داشبورد هوشمند در سفر",
+          "en": "Mobile Display of Three Pillars of Strategic Domination: Smart Dashboard on the Go"
+        }
+      },
+      {
+        "src": "/images/insurance-product/strategic-domination-ecosystem-framework.webp",
+        "alt": {
+          "fa": "سه ستون تسلط استراتژیک (The Ecosystem Framework) برای رشد و رهبری تیم فروش",
+          "en": "Three Pillars of Strategic Domination (The Ecosystem Framework) for Sales Team Growth and Leadership"
+        }
+      },
+      {
+        "src": "/images/insurance-product/social-proof-mobile-screens.webp",
+        "alt": {
+          "fa": "تأیید اجتماعی در موبایل: نمایش افتخارات و موفقیت‌های تیم در صفحه کوچک",
+          "en": "Social Proof on Mobile: Displaying Achievements and Team Success on Small Screen"
+        }
+      },
+      {
+        "src": "/images/insurance-product/smart-registration-end-of-aimless-calls.webp",
+        "alt": {
+          "fa": "ثبت‌نام هوشمند: پایان جمع‌آوری شماره تلفن‌های بی‌هدف و فیلترینگ متقاضی در ۳ مرحله",
+          "en": "Smart Registration: End of Aimless Phone Number Collection and 3-Stage Applicant Filtering"
+        }
+      },
+      {
+        "src": "/images/insurance-product/applicant-dissection-before-first-contact.webp",
+        "alt": {
+          "fa": "کالبدشکافی متقاضی پیش از اولین تماس — امتیاز عالی (+۸۵) در مقابل وضعیت جدید",
+          "en": "Applicant Dissection Before First Contact — Excellent Score (+85) vs New Status"
+        }
+      },
+      {
+        "src": "/images/insurance-product/strategic-hub-ecosystem-overview-full.webp",
+        "alt": {
+          "fa": "نمای کلی اکوسیستم پایگاه استراتژیک جذب هوشمند",
+          "en": "Full Overview of Smart Recruitment Strategic Hub Ecosystem"
+        }
+      },
+      {
+        "src": "/images/insurance-product/behavioral-assessment-mobile-view.webp",
+        "alt": {
+          "fa": "ارزیابی رفتاری در موبایل: تست‌های روانسنجی قابل دسترسی در هر زمان و مکان",
+          "en": "Mobile Behavioral Assessment: Psychometric Tests Accessible Anytime, Anywhere"
+        }
+      },
+      {
+        "src": "/images/insurance-product/registration-form-mobile-optimization.webp",
+        "alt": {
+          "fa": "فرم ثبت‌نام ریسپانسیو: تجربه کاربری بهینه ثبت‌نام نمایندگان در موبایل",
+          "en": "Responsive Registration Form: Optimized Agent Registration UX on Mobile"
+        }
+      },
+      {
+        "src": "/images/insurance-product/kpi-dashboard-mobile-responsive.webp",
+        "alt": {
+          "fa": "داشبورد KPI ریسپانسیو: نمایش شاخص‌های کلیدی عملکرد در موبایل",
+          "en": "Responsive KPI Dashboard: Key Performance Indicators Display on Mobile"
+        }
+      },
+      {
+        "src": "/images/insurance-product/insurance-recruitment-pipeline-full.webp",
+        "alt": {
+          "fa": "خط لوله جذب بیمه از ثبت‌نام تا استخدام با اتوماسیون کامل",
+          "en": "Insurance Recruitment Pipeline from Registration to Hiring with Full Automation"
+        }
+      },
+      {
+        "src": "/images/insurance-product/dashboard-analytics-growth-insurance.webp",
+        "alt": {
+          "fa": "داشبورد تحلیل و رشد مدیریت بیمه با نمودارهای تعاملی",
+          "en": "Insurance Management Analytics and Growth Dashboard with Interactive Charts"
+        }
+      },
+      {
+        "src": "/images/insurance-product/scientific-filtering-behavioral-assessment-engine.webp",
+        "alt": {
+          "fa": "فیلترینگ علمی: سنجش پارامترهای رفتاری (Assessment Engine) با الگوریتم ترجمه برای شناسایی پتانسیل",
+          "en": "Scientific Filtering: Behavioral Parameters Assessment Engine with Algorithmic Translation for Potential Identification"
+        }
+      },
+      {
+        "src": "/images/insurance-product/complete-recruitment-solution-roadmap.webp",
+        "alt": {
+          "fa": "نقشه راه کامل راهکار جذب نیرو برای صنعت بیمه",
+          "en": "Complete Recruitment Solution Roadmap for Insurance Industry"
+        }
+      }
     ],
-    "github": "https://github.com/ardijon/insurance-recruit-template"
+    "github": "https://github.com/ardijon/tavana"
   }
 ]

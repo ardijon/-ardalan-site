@@ -74,7 +74,7 @@ export async function PATCH(request) {
       )
     }
 
-    const order = updateOrderStatus(orderId, status, note || '')
+    const order = await updateOrderStatus(orderId, status, note || '')
     if (!order) {
       return NextResponse.json(
         { error: 'سفارش یافت نشد' },

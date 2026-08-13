@@ -30,6 +30,14 @@ export async function POST(request) {
       )
     }
 
+    const validPlans = ['starter', 'pro']
+    if (!validPlans.includes(plan)) {
+      return NextResponse.json(
+        { error: 'پلن نامعتبر است' },
+        { status: 400 }
+      )
+    }
+
     const product = getProduct(productId)
     if (!product) {
       return NextResponse.json(
@@ -46,7 +54,7 @@ export async function POST(request) {
       )
     }
 
-    const order = createOrder({ productId, plan, customer })
+    const order = await createOrder({ productId, plan, customer })
 
     return NextResponse.json({
       success: true,

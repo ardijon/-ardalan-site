@@ -1,49 +1,275 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
 export default function ScreenshotGallery({ screenshots }) {
   const { dir, locale } = useI18n()
+  const isRtl = dir === 'rtl'
   const [activeIndex, setActiveIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+  const lightboxRef = useRef(null)
+  const mainImageRef = useRef(null)
+  const minDistance = 50
+
+  const altText = (shot) => shot.alt?.[locale] || shot.alt?.en || ''
+
+  const goTo = useCallback((index) => {
+    setActiveIndex((prev) => {
+      const next = index < 0 ? screenshots.length - 1 : index >= screenshots.length ? 0 : index
+      return next
+    })
+  }, [screenshots.length])
+
+  const openLightbox = useCallback((index) => {
+    setActiveIndex(index)
+    setLightboxOpen(true)
+  }, [])
+
+  const closeLightbox = useCallback(() => {
+    setLightboxOpen(false)
+  }, [])
+
+  const handleKeyDown = useCallback((e) => {
+    if (!lightboxOpen) return
+    e.preventDefault()
+    if (e.key === 'Escape') closeLightbox()
+    // In RTL: ArrowLeft = forward (next), ArrowRight = backward (prev)
+    // In LTR: ArrowLeft = backward (prev), ArrowRight = forward (next)
+    else if (e.key === 'ArrowLeft') goTo(isRtl ? activeIndex + 1 : activeIndex - 1)
+    else if (e.key === 'ArrowRight') goTo(isRtl ? activeIndex - 1 : activeIndex + 1)
+  }, [lightboxOpen, activeIndex, closeLightbox, goTo, isRtl])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  useEffect(() => {
+    if (lightboxOpen) {
+      document.body.style.overflow = 'hidden'
+      const closeBtn = lightboxRef.current?.querySelector('[aria-label="بستن"]')
+      closeBtn?.focus()
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [lightboxOpen])
+
+  // Mouse wheel navigation on main image (passive: false needed for preventDefault)
+  useEffect(() => {
+    const el = mainImageRef.current
+    if (!el) return
+    const handler = (e) => {
+      if (Math.abs(e.deltaY) < 30) return
+      e.preventDefault()
+      if (e.deltaY > 0) goTo(activeIndex + 1)
+      else goTo(activeIndex - 1)
+    }
+    el.addEventListener('wheel', handler, { passive: false })
+    return () => el.removeEventListener('wheel', handler)
+  }, [activeIndex, goTo])
+
+  const onTouchStart = (e) => { setTouchStart(e.targetTouches[0].clientX) }
+  const onTouchMove = (e) => { setTouchEnd(e.targetTouches[0].clientX) }
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    if (Math.abs(distance) < minDistance) return
+    // In RTL: swipe left (positive distance) = forward, swipe right = backward
+    // In LTR: swipe left (positive distance) = backward, swipe right = forward
+    if (isRtl) {
+      if (distance > 0) goTo(activeIndex + 1)
+      else goTo(activeIndex - 1)
+    } else {
+      if (distance > 0) goTo(activeIndex - 1)
+      else goTo(activeIndex + 1)
+    }
+    setTouchStart(null)
+    setTouchEnd(null)
+  }
 
   if (!screenshots || screenshots.length === 0) return null
 
   return (
-    <div className="space-y-4">
-      <div className="relative aspect-video rounded-2xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-surface)]">
+    <div className="space-y-3">
+      {/* Main image with navigation arrows */}
+      <div
+        ref={mainImageRef}
+        className="relative rounded-2xl overflow-hidden border border-[var(--color-border)] bg-[var(--color-surface)] cursor-zoom-in group select-none"
+        onClick={() => openLightbox(activeIndex)}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        {/* Navigation arrows on main image */}
+        {screenshots.length > 1 && (
+          <>
+            <button
+              className="absolute start-2 sm:start-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white shadow-lg transition-all"
+              onClick={(e) => { e.stopPropagation(); goTo(activeIndex - 1) }}
+              aria-label={isRtl ? 'بعدی' : 'قبلی'}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points={isRtl ? '9 18 15 12 9 6' : '15 18 9 12 15 6'} />
+              </svg>
+            </button>
+            <button
+              className="absolute end-2 sm:end-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white shadow-lg transition-all"
+              onClick={(e) => { e.stopPropagation(); goTo(activeIndex + 1) }}
+              aria-label={isRtl ? 'قبلی' : 'بعدی'}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points={isRtl ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
+              </svg>
+            </button>
+          </>
+        )}
+
         <Image
           src={screenshots[activeIndex].src}
-          alt={screenshots[activeIndex].alt[locale] || screenshots[activeIndex].alt.en}
-          fill
-          sizes="(max-width: 768px) 100vw, 60vw"
-          className="object-contain p-2"
+          alt={altText(screenshots[activeIndex])}
+          width={1200}
+          height={800}
+          sizes="(max-width: 768px) 100vw, 70vw"
+          className="w-full h-auto object-contain transition-transform duration-200 group-hover:scale-[1.01]"
           priority
         />
+
+        {/* Image counter */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
+          {activeIndex + 1} / {screenshots.length}
+        </div>
+
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center pointer-events-none">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm pointer-events-auto">
+            {isRtl ? 'بزرگ‌نمایی' : 'Zoom'}
+          </span>
+        </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        {screenshots.map((shot, i) => (
-          <button
-            key={i}
-            onClick={() => setActiveIndex(i)}
-            className={`relative shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-              i === activeIndex
-                ? 'border-[var(--color-accent)] shadow-md'
-                : 'border-[var(--color-border)] opacity-60 hover:opacity-100'
-            }`}
+      {/* Thumbnail strip - only on desktop */}
+      <div className="hidden sm:block relative">
+        <div
+          className="flex gap-2 overflow-x-auto pb-2 px-10 scroll-smooth"
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--color-accent) transparent' }}
+        >
+          {screenshots.map((shot, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveIndex(i)}
+              className={`relative shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                i === activeIndex
+                  ? 'border-[var(--color-accent)] shadow-lg scale-105 ring-2 ring-[var(--color-accent)]/30'
+                  : 'border-[var(--color-border)] opacity-65 hover:opacity-100 hover:scale-105'
+              }`}
+            >
+              <Image
+                src={shot.src}
+                alt={altText(shot)}
+                fill
+                sizes="96px"
+                className="object-contain bg-[var(--color-bg)]"
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div
+          ref={lightboxRef}
+          className="fixed inset-0 z-50 flex flex-col bg-black/95 backdrop-blur-sm"
+          onClick={(e) => { if (e.target === lightboxRef.current) closeLightbox() }}
+        >
+          {/* Top bar */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+            <span className="text-white/60 text-sm font-mono">
+              {activeIndex + 1} / {screenshots.length}
+            </span>
+            <button
+              onClick={closeLightbox}
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+              aria-label="بستن"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Main image */}
+          <div className="flex-1 flex items-center justify-center p-4 sm:p-8 overflow-hidden"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
             <Image
-              src={shot.src}
-              alt={shot.alt[locale] || shot.alt.en}
-              fill
-              sizes="96px"
-              className="object-cover"
+              src={screenshots[activeIndex].src}
+              alt={altText(screenshots[activeIndex])}
+              width={1200}
+              height={800}
+              className="max-w-full max-h-full object-contain rounded-lg"
             />
-          </button>
-        ))}
-      </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="border-t border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              {/* Prev */}
+              <button
+                onClick={() => goTo(activeIndex - 1)}
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                disabled={activeIndex === 0}
+                aria-label="قبلی"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+
+              {/* Thumbnails */}
+              <div className="flex gap-2 overflow-x-auto flex-1 pb-1" style={{ scrollbarWidth: 'none' }}>
+                {screenshots.map((shot, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveIndex(i)}
+                    className={`relative shrink-0 w-16 h-10 rounded overflow-hidden border transition-all ${
+                      i === activeIndex
+                        ? 'border-white ring-1 ring-white/50'
+                        : 'border-white/20 opacity-50 hover:opacity-80'
+                    }`}
+                  >
+                    <Image
+                      src={shot.src}
+                      alt={altText(shot)}
+                      fill
+                      sizes="64px"
+                      className="object-contain"
+                    />
+                  </button>
+                ))}
+              </div>
+
+              {/* Next */}
+              <button
+                onClick={() => goTo(activeIndex + 1)}
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                disabled={activeIndex === screenshots.length - 1}
+                aria-label="بعدی"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

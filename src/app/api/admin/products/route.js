@@ -62,11 +62,6 @@ function checkCsrf(request) {
 }
 
 export async function GET(request) {
-  const ip = getClientIp(request)
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
-  }
-
   if (!checkAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -80,11 +75,6 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const ip = getClientIp(request)
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
-  }
-
   // CSRF protection
   if (!checkCsrf(request)) {
     return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
@@ -92,6 +82,11 @@ export async function POST(request) {
 
   if (!checkAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const ip = getClientIp(request)
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
   }
 
   try {
@@ -111,11 +106,6 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  const ip = getClientIp(request)
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
-  }
-
   // CSRF protection
   if (!checkCsrf(request)) {
     return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
@@ -123,6 +113,11 @@ export async function PUT(request) {
 
   if (!checkAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const ip = getClientIp(request)
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
   }
 
   try {
@@ -143,11 +138,6 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  const ip = getClientIp(request)
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
-  }
-
   // CSRF protection
   if (!checkCsrf(request)) {
     return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
@@ -155,6 +145,11 @@ export async function DELETE(request) {
 
   if (!checkAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const ip = getClientIp(request)
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
   }
 
   try {

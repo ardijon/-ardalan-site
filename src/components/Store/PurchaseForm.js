@@ -16,14 +16,30 @@ export default function PurchaseForm({ product, selectedPlan }) {
     email: '',
     domain: '',
     hostingInfo: '',
-    message: '',
   })
+  const [validationError, setValidationError] = useState('')
+
+  const isProPlan = selectedPlan === 'pro'
+  const isStarterPlan = selectedPlan === 'starter'
+
+  const validatePhone = (phone) => {
+    const cleaned = phone.replace(/\s/g, '')
+    return /^09\d{9}$/.test(cleaned)
+  }
 
   const planInfo = product.pricing[selectedPlan]
   const priceDisplay = planInfo?.priceDisplay?.[locale] || planInfo?.priceDisplay?.en || ''
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setValidationError('')
+
+    // Validate phone
+    if (!validatePhone(formData.phone)) {
+      setValidationError(locale === 'fa' ? 'شماره تلفن باید ۱۱ رقم و با ۰۹ شروع شود' : 'Phone number must be 11 digits starting with 09')
+      return
+    }
+
     setStatus('submitting')
     setError('')
 
@@ -109,9 +125,21 @@ export default function PurchaseForm({ product, selectedPlan }) {
               <span className="text-[var(--color-text)]/50">{t('store.purchaseForm.amount')}</span>
               <span className="font-bold text-[var(--color-accent)]">{priceDisplay}</span>
             </div>
+            <div className="flex justify-between">
+              <span className="text-[var(--color-text)]/50">{isRtl ? 'دوره پرداخت' : 'Payment Period'}</span>
+              <span className="font-medium text-[var(--color-text)]">
+                {isProPlan
+                  ? (locale === 'fa' ? 'یکبار ( دائمی )' : 'One-time (permanent)')
+                  : (locale === 'fa' ? 'ماهانه' : 'Monthly')
+                }
+              </span>
+            </div>
           </div>
           <p className="mt-3 text-xs text-[var(--color-text)]/40 leading-relaxed">
-            {t('store.purchaseForm.instructions')}
+            {isProPlan
+              ? (locale === 'fa' ? 'پس از پرداخت، کد منبع برای شما ارسال می‌شود.' : 'After payment, source code will be sent to you.')
+              : (locale === 'fa' ? 'اشتراک شما پس از تایید پرداخت فعال می‌شود و هر ماه نیاز به تمدید دارد.' : 'Your subscription will be activated after payment confirmation and needs monthly renewal.')
+            }
           </p>
         </div>
 
@@ -119,7 +147,7 @@ export default function PurchaseForm({ product, selectedPlan }) {
           <h4 className="text-sm font-bold text-[var(--color-primary)] mb-4">
             {t('store.purchaseForm.uploadReceipt')}
           </h4>
-          <ReceiptUpload orderId={orderId} />
+          <ReceiptUpload orderId={orderId} onSuccess={() => setStatus('idle')} expectedAmount={planInfo?.price || 0} />
         </div>
       </div>
     )
@@ -134,6 +162,11 @@ export default function PurchaseForm({ product, selectedPlan }) {
         {error && (
           <div className="px-4 py-3 text-sm rounded-xl bg-red-50 text-red-600 border border-red-200">
             {error}
+          </div>
+        )}
+        {validationError && (
+          <div className="px-4 py-3 text-sm rounded-xl bg-orange-50 text-orange-600 border border-orange-200">
+            {validationError}
           </div>
         )}
 
@@ -155,8 +188,10 @@ export default function PurchaseForm({ product, selectedPlan }) {
             value={formData.phone}
             onChange={handleChange}
             placeholder={`${t('store.purchaseForm.phone')} *`}
+            dir="ltr"
+            pattern="09[0-9]{9}"
+            title={locale === 'fa' ? 'شماره باید ۱۱ رقم و با ۰۹ شروع شود (مثال: ۰۹۱۲۳۴۵۶۷۸۹)' : 'Must be 11 digits starting with 09 (e.g. 09123456789)'}
             className="w-full px-4 py-2.5 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
-            dir={isRtl ? 'rtl' : 'ltr'}
           />
         </div>
 
@@ -164,10 +199,10 @@ export default function PurchaseForm({ product, selectedPlan }) {
           <input
             type="text"
             name="domain"
-            required
+            required={isProPlan}
             value={formData.domain}
             onChange={handleChange}
-            placeholder={`${t('store.purchaseForm.domain')} *`}
+            placeholder={isStarterPlan ? (locale === 'fa' ? 'دامنه اختصاصی (اختیاری)' : 'Custom domain (optional)') : `${t('store.purchaseForm.domain')} *`}
             className="w-full px-4 py-2.5 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
             dir={isRtl ? 'rtl' : 'ltr'}
           />

@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
   const product = getProduct(slug)
   if (!product) return { title: '404' }
 
-  const title = `${product.title.fa} | فروشگاه اردلان`
+  const title = `${product.title.fa} | فروشگاه توانا`
   const description = product.shortDescription.fa
 
   return {
@@ -25,9 +25,10 @@ export async function generateMetadata({ params }) {
       product.title.fa,
       product.title.en,
       ...product.tech,
-      'قالب Next.js',
+      'جذب نماینده بیمه',
       'فروشگاه',
-      'دانلود قالب',
+      'سیستم استخدام',
+      'توانا',
     ],
     openGraph: {
       title,
@@ -62,7 +63,7 @@ export default async function ProductPage({ params }) {
     image: product.screenshots?.[0]?.src,
     brand: {
       '@type': 'Brand',
-      name: 'اردلان',
+      name: 'توانا',
     },
     offers: {
       '@type': 'Offer',
@@ -95,7 +96,7 @@ export default async function ProductPage({ params }) {
       {
         '@type': 'ListItem',
         position: 3,
-        name: product.title.fa,
+        name: product.shortTitle.fa,
         item: `${SITE_URL}/store/${params.slug}`,
       },
     ],

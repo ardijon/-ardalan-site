@@ -26,7 +26,7 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo })
   const now = new Date().toISOString()
 
   try {
-    updateDeployment(orderId, {
+    await updateDeployment(orderId, {
       status: 'building',
       startedAt: now,
       error: null,
@@ -47,7 +47,7 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo })
       timeout: 120000,
     })
 
-    updateDeployment(orderId, { status: 'uploading' })
+    await updateDeployment(orderId, { status: 'uploading' })
 
     if (hostingInfo) {
       const sshMatch = hostingInfo.match(/(?:ssh\s+)?(\S+@[\d.]+)/i)
@@ -73,7 +73,7 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo })
             { stdio: 'pipe', timeout: 60000 }
           )
 
-          updateDeployment(orderId, { status: 'configuring' })
+          await updateDeployment(orderId, { status: 'configuring' })
 
           console.log(`[Deploy] Installing dependencies on remote...`)
           execSync(
@@ -91,13 +91,13 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo })
       await createZipPackage(orderId, productId, domain)
     }
 
-    updateDeployment(orderId, {
+    await updateDeployment(orderId, {
       status: 'completed',
       completedAt: new Date().toISOString(),
       error: null,
     })
 
-    updateOrderStatus(orderId, 'completed', 'دیپلوی با موفقیت انجام شد')
+    await updateOrderStatus(orderId, 'completed', 'دیپلوی با موفقیت انجام شد')
 
     console.log(`[Deploy] Deployment completed for order ${orderId}`)
     return { success: true }
@@ -105,12 +105,12 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo })
   } catch (error) {
     console.error(`[Deploy] Failed for order ${orderId}:`, error.message)
 
-    updateDeployment(orderId, {
+    await updateDeployment(orderId, {
       status: 'failed',
       error: error.message,
     })
 
-    updateOrderStatus(orderId, 'rejected', `خطای دیپلوی: ${error.message}`)
+    await updateOrderStatus(orderId, 'rejected', `خطای دیپلوی: ${error.message}`)
 
     return { success: false, error: error.message }
   }
@@ -136,7 +136,7 @@ async function createZipPackage(orderId, productId, domain) {
     { stdio: 'pipe' }
   )
 
-  updateDeployment(orderId, {
+  await updateDeployment(orderId, {
     downloadUrl: `/uploads/deployments/${orderId}.zip`,
   })
 

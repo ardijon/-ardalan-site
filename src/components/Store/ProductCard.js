@@ -39,7 +39,7 @@ export default function ProductCard({ product, featured = false }) {
 
         <div className="absolute top-3 right-3 flex flex-col gap-2">
           {featured && (
-            <span className="px-3 py-1 text-[10px] font-bold text-white bg-yellow-500 rounded-full shadow-lg">
+            <span className="px-3 py-1 text-[10px] font-bold text-white bg-[var(--color-accent)] rounded-full shadow-lg">
               {locale === 'fa' ? '⭐ ویژه' : '⭐ Featured'}
             </span>
           )}
