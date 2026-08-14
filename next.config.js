@@ -51,6 +51,14 @@ const nextConfig = {
       },
     ]
   },
+  async rewrites() {
+    return [
+      {
+        source: '/tdemo/:slug',
+        destination: '/tdemo/:slug/index.html',
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

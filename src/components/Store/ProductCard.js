@@ -35,7 +35,7 @@ export default function ProductCard({ product, featured = false }) {
           </div>
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
         <div className="absolute top-3 right-3 flex flex-col gap-2">
           {featured && (
@@ -51,7 +51,7 @@ export default function ProductCard({ product, featured = false }) {
         <div className={`absolute bottom-3 ${isRtl ? 'right-3' : 'left-3'}`}>
           <Link
             href={product.demoUrl}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors cursor-pointer"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
