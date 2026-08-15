@@ -110,7 +110,7 @@
         }
       }
     },
-    "demoUrl": "http://localhost:3005",
+    "demoUrl": "https://manager-tavana-demo.netlify.app",
     "screenshots": [
       {
         "src": "/images/insurance-product/scalable-architecture-insurance-industry.webp",
