@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server'
 import { uploadReceipt, getOrderById } from '@/lib/orders'
-import fs from 'fs'
+import { unlinkSync, existsSync, mkdirSync } from 'fs'
 import path from 'path'
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public/uploads/receipts')
 
 function ensureUploadDir() {
-  if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true })
+  if (!existsSync(UPLOAD_DIR)) {
+    mkdirSync(UPLOAD_DIR, { recursive: true })
   }
 }
 
@@ -16,7 +16,17 @@ function isValidOrderId(id) {
   return typeof id === 'string' && /^[a-zA-Z0-9-]+$/.test(id) && id.length <= 50
 }
 
+function sanitizeFilepath(filepath) {
+  const resolved = path.resolve(filepath)
+  const uploadDirResolved = path.resolve(UPLOAD_DIR)
+  if (!resolved.startsWith(uploadDirResolved)) {
+    throw new Error('Invalid filepath')
+  }
+  return resolved
+}
+
 export async function POST(request, { params }) {
+  let filepath = null
   try {
     const { id } = await params
 
@@ -29,13 +39,22 @@ export async function POST(request, { params }) {
     }
 
     // Verify the order exists before allowing upload
-    const existingOrder = getOrderById(id)
+    const existingOrder = await getOrderById(id)
     if (!existingOrder) {
       return NextResponse.json(
         { error: 'سفارش یافت نشد' },
         { status: 404 }
       )
     }
+
+    // Check order status before processing
+    if (existingOrder.status !== 'awaiting_payment') {
+      return NextResponse.json(
+        { error: 'رسید فقط برای سفارشات در انتظار پرداخت قابل آپلود است' },
+        { status: 400 }
+      )
+    }
+
     const formData = await request.formData()
     const file = formData.get('receipt')
     const amount = formData.get('amount')
@@ -71,10 +90,14 @@ export async function POST(request, { params }) {
     const rawExt = (file.name.split('.').pop() || 'jpg').toLowerCase()
     const ext = allowedExtensions.includes(rawExt) ? rawExt : 'jpg'
     const filename = `receipt-${id}-${Date.now()}.${ext}`
-    const filepath = path.join(UPLOAD_DIR, filename)
+    filepath = path.join(UPLOAD_DIR, filename)
+
+    // Validate filepath to prevent path traversal
+    filepath = sanitizeFilepath(filepath)
 
     const bytes = await file.arrayBuffer()
-    fs.writeFileSync(filepath, Buffer.from(bytes))
+    const fs = await import('fs/promises')
+    await fs.writeFile(filepath, Buffer.from(bytes))
 
     const order = await uploadReceipt(id, {
       filename,
@@ -83,6 +106,10 @@ export async function POST(request, { params }) {
     })
 
     if (!order) {
+      // Cleanup: delete the uploaded file if order not found
+      if (filepath && existsSync(filepath)) {
+        unlinkSync(filepath)
+      }
       return NextResponse.json(
         { error: 'سفارش یافت نشد' },
         { status: 404 }
@@ -90,8 +117,12 @@ export async function POST(request, { params }) {
     }
 
     if (order.error === 'receipt_only_allowed_for_pending_orders') {
+      // Cleanup: delete the uploaded file if status is wrong
+      if (filepath && existsSync(filepath)) {
+        unlinkSync(filepath)
+      }
       return NextResponse.json(
-        { error: 'رسید فقط برای سفارشات در انتظار پرداخت قابل آپلود است' },
+        { error: 'رسید فقط برای سفارشات در انتظار پرداخت قابل آپلود است', code: 'receipt_only_allowed_for_pending_orders' },
         { status: 400 }
       )
     }
@@ -102,6 +133,15 @@ export async function POST(request, { params }) {
       filename,
     })
   } catch (error) {
+    console.error('Receipt upload error:', error)
+    // Cleanup: delete the uploaded file on any error
+    if (filepath && existsSync(filepath)) {
+      try {
+        unlinkSync(filepath)
+      } catch (cleanupError) {
+        console.error('Failed to cleanup file:', cleanupError)
+      }
+    }
     return NextResponse.json(
       { error: 'خطا در آپلود رسید' },
       { status: 500 }

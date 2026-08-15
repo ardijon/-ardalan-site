@@ -7,6 +7,8 @@ export default function ProductDetail({ product }) {
   const { t, dir, locale } = useI18n()
   const isRtl = dir === 'rtl'
 
+  if (!product) return null
+
   return (
     <div className="space-y-12">
       <ScreenshotGallery screenshots={product.screenshots} />

@@ -4,7 +4,7 @@ import path from 'path'
 
 const DATA_PATH = path.join(process.cwd(), 'src/data/products.json')
 
-// Rate limiting for admin login
+// Rate limiting for failed admin login attempts only
 const loginAttempts = new Map()
 const MAX_ATTEMPTS = 5
 const LOCKOUT_TIME = 15 * 60 * 1000 // 15 minutes
@@ -22,8 +22,22 @@ function checkRateLimit(ip) {
     return false
   }
 
-  loginAttempts.set(ip, { count: attempts.count + 1, lastAttempt: now })
   return true
+}
+
+function recordFailedAttempt(ip) {
+  const now = Date.now()
+  const attempts = loginAttempts.get(ip) || { count: 0, lastAttempt: 0 }
+
+  if (now - attempts.lastAttempt > LOCKOUT_TIME) {
+    loginAttempts.set(ip, { count: 1, lastAttempt: now })
+  } else {
+    loginAttempts.set(ip, { count: attempts.count + 1, lastAttempt: now })
+  }
+}
+
+function resetAttempts(ip) {
+  loginAttempts.delete(ip)
 }
 
 async function readProducts() {
@@ -55,10 +69,22 @@ function checkCsrf(request) {
   if (!origin || !host) return false
   try {
     const originHost = new URL(origin).host
+    if (process.env.NODE_ENV === 'production' && new URL(origin).protocol !== 'https:') {
+      return false
+    }
     return originHost === host
   } catch {
     return false
   }
+}
+
+function validateProduct(product) {
+  if (!product || typeof product !== 'object') return false
+  if (!product.slug || typeof product.slug !== 'string') return false
+  if (!product.title || typeof product.title !== 'object') return false
+  if (!product.pricing || typeof product.pricing !== 'object') return false
+  if (!product.shortDescription || typeof product.shortDescription !== 'object') return false
+  return true
 }
 
 export async function GET(request) {
@@ -69,28 +95,40 @@ export async function GET(request) {
   try {
     const products = await readProducts()
     return NextResponse.json(products)
-  } catch {
+  } catch (error) {
+    console.error('Failed to read products:', error)
     return NextResponse.json({ error: 'Failed to read products' }, { status: 500 })
   }
 }
 
 export async function POST(request) {
-  // CSRF protection
+  // CSRF protection first
   if (!checkCsrf(request)) {
     return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   }
 
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+  // Rate limit check BEFORE authentication
   const ip = getClientIp(request)
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
   }
 
+  // Authentication check - only increment on failure
+  if (!checkAuth(request)) {
+    recordFailedAttempt(ip)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Auth succeeded - reset attempts
+  resetAttempts(ip)
+
   try {
     const newProduct = await request.json()
+
+    if (!validateProduct(newProduct)) {
+      return NextResponse.json({ error: 'Invalid product data' }, { status: 400 })
+    }
+
     const products = await readProducts()
 
     if (products.find(p => p.slug === newProduct.slug)) {
@@ -100,28 +138,40 @@ export async function POST(request) {
     products.push(newProduct)
     await writeProducts(products)
     return NextResponse.json(newProduct, { status: 201 })
-  } catch {
+  } catch (error) {
+    console.error('Failed to create product:', error)
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
   }
 }
 
 export async function PUT(request) {
-  // CSRF protection
+  // CSRF protection first
   if (!checkCsrf(request)) {
     return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   }
 
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+  // Rate limit check BEFORE authentication
   const ip = getClientIp(request)
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
   }
 
+  // Authentication check - only increment on failure
+  if (!checkAuth(request)) {
+    recordFailedAttempt(ip)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Auth succeeded - reset attempts
+  resetAttempts(ip)
+
   try {
     const updated = await request.json()
+
+    if (!validateProduct(updated)) {
+      return NextResponse.json({ error: 'Invalid product data' }, { status: 400 })
+    }
+
     const products = await readProducts()
     const index = products.findIndex(p => p.slug === updated.slug)
 
@@ -132,25 +182,32 @@ export async function PUT(request) {
     products[index] = updated
     await writeProducts(products)
     return NextResponse.json(updated)
-  } catch {
+  } catch (error) {
+    console.error('Failed to update product:', error)
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
   }
 }
 
 export async function DELETE(request) {
-  // CSRF protection
+  // CSRF protection first
   if (!checkCsrf(request)) {
     return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   }
 
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+  // Rate limit check BEFORE authentication
   const ip = getClientIp(request)
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
   }
+
+  // Authentication check - only increment on failure
+  if (!checkAuth(request)) {
+    recordFailedAttempt(ip)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Auth succeeded - reset attempts
+  resetAttempts(ip)
 
   try {
     const { slug } = await request.json()
@@ -163,7 +220,8 @@ export async function DELETE(request) {
 
     await writeProducts(filtered)
     return NextResponse.json({ success: true })
-  } catch {
+  } catch (error) {
+    console.error('Failed to delete product:', error)
     return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 })
   }
 }

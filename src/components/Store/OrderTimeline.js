@@ -50,6 +50,18 @@ export default function OrderTimeline({ status, statusHistory }) {
 
   const currentIndex = STATUS_STEPS.indexOf(status)
   const isRejected = status === 'rejected'
+  const isUnknown = currentIndex === -1 && !isRejected
+
+  if (isUnknown) {
+    return (
+      <div className="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+        <p className="text-sm text-[var(--color-text)]/60">
+          {locale === 'fa' ? 'وضعیت سفارش: ' : 'Order status: '}
+          <span className="font-medium text-[var(--color-accent)]">{status}</span>
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-1">

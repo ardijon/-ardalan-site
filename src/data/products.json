@@ -110,7 +110,7 @@
         }
       }
     },
-    "demoUrl": "/tdemo/tavana",
+    "demoUrl": "http://localhost:3005",
     "screenshots": [
       {
         "src": "/images/insurance-product/scalable-architecture-insurance-industry.webp",

@@ -13,6 +13,8 @@ export default function ScreenshotGallery({ screenshots }) {
   const [touchEnd, setTouchEnd] = useState(null)
   const lightboxRef = useRef(null)
   const mainImageRef = useRef(null)
+  const closeButtonRef = useRef(null)
+  const previousButtonRef = useRef(null)
   const minDistance = 50
 
   const altText = (shot) => shot.alt?.[locale] || shot.alt?.en || ''
@@ -27,15 +29,54 @@ export default function ScreenshotGallery({ screenshots }) {
   const openLightbox = useCallback((index) => {
     setActiveIndex(index)
     setLightboxOpen(true)
+    setTouchStart(null)
+    setTouchEnd(null)
   }, [])
 
   const closeLightbox = useCallback(() => {
     setLightboxOpen(false)
+    setTouchStart(null)
+    setTouchEnd(null)
   }, [])
+
+  // Focus trap for lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return
+
+    const lightbox = lightboxRef.current
+    if (!lightbox) return
+
+    const focusableElements = lightbox.querySelectorAll(
+      'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+    const firstElement = focusableElements[0]
+    const lastElement = focusableElements[focusableElements.length - 1]
+
+    function handleTabKey(e) {
+      if (e.key !== 'Tab') return
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault()
+          lastElement?.focus()
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault()
+          firstElement?.focus()
+        }
+      }
+    }
+
+    // Focus the close button on mount
+    closeButtonRef.current?.focus()
+
+    document.addEventListener('keydown', handleTabKey)
+    return () => document.removeEventListener('keydown', handleTabKey)
+  }, [lightboxOpen])
 
   const handleKeyDown = useCallback((e) => {
     if (!lightboxOpen) return
-    e.preventDefault()
     if (e.key === 'Escape') closeLightbox()
     // In RTL: ArrowLeft = forward (next), ArrowRight = backward (prev)
     // In LTR: ArrowLeft = backward (prev), ArrowRight = forward (next)
@@ -51,8 +92,6 @@ export default function ScreenshotGallery({ screenshots }) {
   useEffect(() => {
     if (lightboxOpen) {
       document.body.style.overflow = 'hidden'
-      const closeBtn = lightboxRef.current?.querySelector('[aria-label="بستن"]')
-      closeBtn?.focus()
     } else {
       document.body.style.overflow = ''
     }
@@ -111,7 +150,7 @@ export default function ScreenshotGallery({ screenshots }) {
             <button
               className="absolute start-2 sm:start-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white shadow-lg transition-all"
               onClick={(e) => { e.stopPropagation(); goTo(activeIndex - 1) }}
-              aria-label={isRtl ? 'بعدی' : 'قبلی'}
+              aria-label={isRtl ? 'بعدی' : 'Previous'}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points={isRtl ? '9 18 15 12 9 6' : '15 18 9 12 15 6'} />
@@ -120,7 +159,7 @@ export default function ScreenshotGallery({ screenshots }) {
             <button
               className="absolute end-2 sm:end-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white shadow-lg transition-all"
               onClick={(e) => { e.stopPropagation(); goTo(activeIndex + 1) }}
-              aria-label={isRtl ? 'قبلی' : 'بعدی'}
+              aria-label={isRtl ? 'قبلی' : 'Next'}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points={isRtl ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
@@ -183,6 +222,9 @@ export default function ScreenshotGallery({ screenshots }) {
       {lightboxOpen && (
         <div
           ref={lightboxRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={isRtl ? 'نمایشگر اسکرین‌شات' : 'Screenshot viewer'}
           className="fixed inset-0 z-50 flex flex-col bg-black/95 backdrop-blur-sm"
           onClick={(e) => { if (e.target === lightboxRef.current) closeLightbox() }}
         >
@@ -192,9 +234,10 @@ export default function ScreenshotGallery({ screenshots }) {
               {activeIndex + 1} / {screenshots.length}
             </span>
             <button
+              ref={closeButtonRef}
               onClick={closeLightbox}
               className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
-              aria-label="بستن"
+              aria-label={isRtl ? 'بستن' : 'Close'}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -222,10 +265,11 @@ export default function ScreenshotGallery({ screenshots }) {
             <div className="flex items-center justify-between gap-3">
               {/* Prev */}
               <button
+                ref={previousButtonRef}
                 onClick={() => goTo(activeIndex - 1)}
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={activeIndex === 0}
-                aria-label="قبلی"
+                aria-label={isRtl ? 'بعدی' : 'Previous'}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="9 18 15 12 9 6" />
@@ -260,7 +304,7 @@ export default function ScreenshotGallery({ screenshots }) {
                 onClick={() => goTo(activeIndex + 1)}
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={activeIndex === screenshots.length - 1}
-                aria-label="بعدی"
+                aria-label={isRtl ? 'قبلی' : 'Next'}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="15 18 9 12 15 6" />

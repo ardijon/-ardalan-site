@@ -24,6 +24,12 @@ export default function ReceiptUpload({ orderId, onSuccess, expectedAmount }) {
       return
     }
 
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      setError(locale === 'fa' ? 'فرمت فایل معتبر نیست (فقط JPG, PNG, WebP)' : 'Invalid file type (JPG, PNG, WebP only)')
+      return
+    }
+
     const reader = new FileReader()
     reader.onload = (e) => setPreview(e.target.result)
     reader.readAsDataURL(file)
@@ -38,7 +44,7 @@ export default function ReceiptUpload({ orderId, onSuccess, expectedAmount }) {
       return
     }
 
-    // Validate amount against expected price
+    // Validate amount against expected price (lower and upper bounds)
     if (expectedAmount && formData.amount) {
       const paid = Number(formData.amount.replace(/\D/g, ''))
       if (paid < expectedAmount * 0.9) {
@@ -48,15 +54,10 @@ export default function ReceiptUpload({ orderId, onSuccess, expectedAmount }) {
         )
         return
       }
-    }
-
-    // Validate amount against expected price
-    if (expectedAmount && formData.amount) {
-      const paid = Number(formData.amount.replace(/\D/g, ''))
-      if (paid < expectedAmount * 0.9) {
+      if (paid > expectedAmount * 2) {
         setError(locale === 'fa'
-          ? `مبلغ پرداختی (${paid.toLocaleString('fa-IR')} تومان) کمتر از مبلغ مورد انتظار است`
-          : `Paid amount (${paid.toLocaleString('en-US')} Tomans) is less than expected`
+          ? `مبلغ پرداختی (${paid.toLocaleString('fa-IR')} تومان) بیش از حد انتظار است`
+          : `Paid amount (${paid.toLocaleString('en-US')} Tomans) is much higher than expected`
         )
         return
       }

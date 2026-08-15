@@ -67,7 +67,7 @@ export default async function ProductPage({ params }) {
     },
     offers: {
       '@type': 'Offer',
-      price: product.pricing.pro.price,
+      price: product.pricing?.pro?.price || product.pricing?.starter?.price || 0,
       priceCurrency: 'IRR',
       availability: 'https://schema.org/InStock',
       seller: {

@@ -2,6 +2,7 @@
 
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import { useInView } from '@/hooks/useInView'
+import { useEffect, useState } from 'react'
 
 const reasons = [
   {
@@ -41,6 +42,16 @@ const reasons = [
 export default function WhyUs() {
   const { t, locale } = useI18n()
   const [ref, visible] = useInView({ threshold: 0.1 })
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handler = (e) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
 
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden">
@@ -54,7 +65,7 @@ export default function WhyUs() {
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'opacity 0.8s ease, transform 0.8s ease',
+            transition: prefersReducedMotion ? 'none' : 'opacity 0.8s ease, transform 0.8s ease',
           }}
         >
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -75,7 +86,7 @@ export default function WhyUs() {
                 style={{
                   opacity: visible ? 1 : 0,
                   transform: visible ? 'translateY(0)' : 'translateY(20px)',
-                  transition: `opacity 0.6s ease ${0.2 + i * 0.1}s, transform 0.6s ease ${0.2 + i * 0.1}s`,
+                  transition: prefersReducedMotion ? 'none' : `opacity 0.6s ease ${0.2 + i * 0.1}s, transform 0.6s ease ${0.2 + i * 0.1}s`,
                 }}
                 className="group p-6 rounded-3xl bg-[var(--color-bg)] border border-[var(--color-border)] hover:border-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/5 transition-all duration-500"
               >

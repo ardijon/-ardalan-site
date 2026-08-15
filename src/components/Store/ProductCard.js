@@ -8,9 +8,9 @@ export default function ProductCard({ product, featured = false }) {
   const { t, dir, locale } = useI18n()
   const isRtl = dir === 'rtl'
 
-  const price = product.pricing?.pro?.price || 0
-  const priceDisplay = product.pricing?.pro?.priceDisplay?.[locale] || product.pricing?.pro?.priceDisplay?.en || '۰'
-  const freePrice = product.pricing?.free?.priceDisplay?.[locale] || 'Free'
+  const hasPricing = product.pricing?.pro || product.pricing?.starter
+  const priceDisplay = product.pricing?.starter?.priceDisplay?.[locale] || product.pricing?.starter?.priceDisplay?.en || product.pricing?.pro?.priceDisplay?.[locale] || ''
+  const periodDisplay = product.pricing?.starter?.period?.[locale] || product.pricing?.pro?.period?.[locale] || ''
 
   return (
     <div
@@ -31,7 +31,8 @@ export default function ProductCard({ product, featured = false }) {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-7xl opacity-10 group-hover:scale-110 transition-transform duration-500">📦</span>
+            <span className="text-7xl opacity-10 group-hover:scale-110 transition-transform duration-500" aria-hidden="true">📦</span>
+            <span className="sr-only">{locale === 'fa' ? 'پیش‌نمایش موجود نیست' : 'No preview available'}</span>
           </div>
         )}
 
@@ -49,15 +50,17 @@ export default function ProductCard({ product, featured = false }) {
         </div>
 
         <div className={`absolute bottom-3 ${isRtl ? 'right-3' : 'left-3'}`}>
-          <Link
+          <a
             href={product.demoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors cursor-pointer"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
             </svg>
             {t('store.viewDemo')}
-          </Link>
+          </a>
         </div>
       </div>
 
@@ -78,27 +81,31 @@ export default function ProductCard({ product, featured = false }) {
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-[var(--color-accent)]">
                 <path d="M20 6L9 17l-5-5" />
               </svg>
-              {feature.length > 25 ? feature.slice(0, 25) + '...' : feature}
+              <span className="line-clamp-1">{feature}</span>
             </span>
           ))}
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
-          <div>
-            <div className="text-xs text-[var(--color-text)]/40 mb-0.5">
-              {locale === 'fa' ? 'شروع قیمت' : 'Starting at'}
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-black text-[var(--color-accent)]">
-                {priceDisplay}
-              </span>
-              {product.pricing?.pro?.period?.[locale] && (
-                <span className="text-xs text-[var(--color-text)]/40">
-                  {product.pricing.pro.period[locale]}
+          {hasPricing ? (
+            <div>
+              <div className="text-xs text-[var(--color-text)]/40 mb-0.5">
+                {locale === 'fa' ? 'شروع از' : 'Starting from'}
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-black text-[var(--color-accent)]">
+                  {priceDisplay}
                 </span>
-              )}
+                {periodDisplay && (
+                  <span className="text-xs text-[var(--color-text)]/40">
+                    {periodDisplay}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div />
+          )}
 
           <Link
             href={`/store/${product.slug}`}

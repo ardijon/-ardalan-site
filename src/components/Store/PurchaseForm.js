@@ -34,9 +34,21 @@ export default function PurchaseForm({ product, selectedPlan }) {
     e.preventDefault()
     setValidationError('')
 
+    // Validate name
+    if (!formData.name.trim()) {
+      setValidationError(locale === 'fa' ? 'نام را وارد کنید' : 'Please enter your name')
+      return
+    }
+
     // Validate phone
     if (!validatePhone(formData.phone)) {
       setValidationError(locale === 'fa' ? 'شماره تلفن باید ۱۱ رقم و با ۰۹ شروع شود' : 'Phone number must be 11 digits starting with 09')
+      return
+    }
+
+    // Validate domain for pro plan
+    if (isProPlan && !formData.domain.trim()) {
+      setValidationError(locale === 'fa' ? 'دامنه برای پلن حرفه‌ای ضروری است' : 'Domain is required for Pro plan')
       return
     }
 
@@ -63,7 +75,13 @@ export default function PurchaseForm({ product, selectedPlan }) {
       setOrderId(data.orderId)
       setStatus('order_created')
     } catch (err) {
-      setError(err.message || 'خطا در ثبت سفارش')
+      let errorMessage = 'خطا در ثبت سفارش'
+      if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+        errorMessage = locale === 'fa' ? 'خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید' : 'Connection error. Please check your internet connection'
+      } else if (err.message) {
+        errorMessage = err.message
+      }
+      setError(errorMessage)
       setStatus('idle')
     }
   }
@@ -155,17 +173,22 @@ export default function PurchaseForm({ product, selectedPlan }) {
 
   return (
     <div className="p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)]">
-      <h3 className="text-base font-bold text-[var(--color-primary)] mb-4">
+      <h3 className="text-base font-bold text-[var(--color-primary)] mb-1">
         {t('store.purchaseForm.title')}
       </h3>
+      <p className="text-xs text-[var(--color-text)]/50 mb-4">
+        {locale === 'fa'
+          ? 'همین الان سفارشت رو ثبت کن، ظرف چند ساعت باهات تماس می‌گیریم'
+          : 'Place your order now — we\'ll contact you within a few hours'}
+      </p>
       <form onSubmit={handleSubmit} className="space-y-3">
         {error && (
-          <div className="px-4 py-3 text-sm rounded-xl bg-red-50 text-red-600 border border-red-200">
+          <div className="px-4 py-3 text-sm rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
             {error}
           </div>
         )}
         {validationError && (
-          <div className="px-4 py-3 text-sm rounded-xl bg-orange-50 text-orange-600 border border-orange-200">
+          <div className="px-4 py-3 text-sm rounded-xl bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
             {validationError}
           </div>
         )}
@@ -227,6 +250,14 @@ export default function PurchaseForm({ product, selectedPlan }) {
             className="w-full px-4 py-2.5 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all resize-none"
             dir={isRtl ? 'rtl' : 'ltr'}
           />
+        </div>
+
+        <div className="flex items-center justify-center gap-1.5 text-[10px] text-[var(--color-text)]/40">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+          </svg>
+          <span>{locale === 'fa' ? 'پرداخت کارت به کارت — تأیید طی چند ساعت' : 'Card-to-card payment — confirmed within hours'}</span>
         </div>
 
         <button

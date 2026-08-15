@@ -1,17 +1,18 @@
-import fs from 'fs'
+import { readFile, writeFile } from 'fs/promises'
+import { existsSync } from 'fs'
 import path from 'path'
 import crypto from 'crypto'
 
 const ORDERS_FILE = path.join(process.cwd(), 'src/data/orders.json')
 
-// File lock to prevent race conditions on concurrent writes
+// Async-safe in-memory lock with queue
 let writeLock = false
 const lockQueue = []
 
-async function acquireLock() {
+function acquireLock() {
   if (!writeLock) {
     writeLock = true
-    return
+    return Promise.resolve()
   }
   return new Promise(resolve => lockQueue.push(resolve))
 }
@@ -25,30 +26,33 @@ function releaseLock() {
   }
 }
 
-function readOrders() {
+async function readOrders() {
   try {
-    if (!fs.existsSync(ORDERS_FILE)) {
-      fs.writeFileSync(ORDERS_FILE, '[]', 'utf8')
+    if (!existsSync(ORDERS_FILE)) {
+      await writeFile(ORDERS_FILE, '[]', 'utf8')
       return []
     }
-    const data = fs.readFileSync(ORDERS_FILE, 'utf8')
+    const data = await readFile(ORDERS_FILE, 'utf8')
     return JSON.parse(data)
   } catch {
     return []
   }
 }
 
-function writeOrders(orders) {
-  fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8')
+async function writeOrders(orders) {
+  await writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8')
 }
 
 async function readAndWrite(fn) {
   await acquireLock()
   try {
-    const orders = readOrders()
+    const orders = await readOrders()
     const result = fn(orders)
-    writeOrders(orders)
+    await writeOrders(orders)
     return result
+  } catch (error) {
+    console.error('Error in readAndWrite:', error)
+    throw error
   } finally {
     releaseLock()
   }
@@ -60,22 +64,27 @@ function generateOrderId() {
   return `ORD-${timestamp}-${random}`
 }
 
-export function getAllOrders() {
+function sanitize(str) {
+  if (typeof str !== 'string') return ''
+  return str.replace(/[<>]/g, '').trim()
+}
+
+export async function getAllOrders() {
   return readOrders()
 }
 
-export function getOrderById(orderId) {
-  const orders = readOrders()
+export async function getOrderById(orderId) {
+  const orders = await readOrders()
   return orders.find(o => o.id === orderId) || null
 }
 
-export function getOrdersByPhone(phone) {
-  const orders = readOrders()
+export async function getOrdersByPhone(phone) {
+  const orders = await readOrders()
   return orders.filter(o => o.customer?.phone === phone)
 }
 
-export function getOrdersByStatus(status) {
-  const orders = readOrders()
+export async function getOrdersByStatus(status) {
+  const orders = await readOrders()
   if (status === 'all') return orders
   return orders.filter(o => o.status === status)
 }
@@ -94,11 +103,11 @@ export async function createOrder({ productId, plan, customer, receipt }) {
       productId,
       plan,
       customer: {
-        name: customer.name,
+        name: sanitize(customer.name),
         phone: customer.phone,
-        email: customer.email || '',
-        domain: customer.domain || '',
-        hostingInfo: customer.hostingInfo || '',
+        email: sanitize(customer.email || ''),
+        domain: sanitize(customer.domain || ''),
+        hostingInfo: sanitize(customer.hostingInfo || ''),
       },
       receipt: receipt || null,
       status: 'awaiting_payment',
@@ -186,8 +195,8 @@ export async function updateDeployment(orderId, deploymentData) {
   })
 }
 
-export function getOrderStats() {
-  const orders = readOrders()
+export async function getOrderStats() {
+  const orders = await readOrders()
   return {
     total: orders.length,
     pending: orders.filter(o => o.status === 'awaiting_payment').length,
