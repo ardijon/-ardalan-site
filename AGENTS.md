@@ -28,16 +28,16 @@
 
 ### کارهای انجام شده — راه‌اندازی دموی توانا
 
-#### ۱. انتشار دموی توانا روی Netlify
+#### ۱. انتشار دموی توانا روی Cloudflare Workers
 - پروژه `manager-tavana` از `D:\New Projects\Insurance\manager-tavana`
 - ریپازیتوری: https://github.com/ardijon/insurance-recruit-template.git
-- سایت دمو: https://manager-tavana-demo.netlify.app
-- Netlify dashboard: https://app.netlify.com/projects/manager-tavana-demo
+- سایت دمو: https://insurance-recruit-template.ai2ai.workers.dev
+- Cloudflare dashboard: https://dash.cloudflare.com (ورود با modirebours@gmail.com)
+- Workers Builds: اتصال GitHub → build + deploy خودکار
 
 #### ۲. رفع مشکل demoUrl در فروشگاه ArdalaN
-- `demoUrl` از `http://localhost:3005` به `https://manager-tavana-demo.netlify.app` تغییر کرد
+- `demoUrl` از `http://localhost:3005` به `https://insurance-recruit-template.ai2ai.workers.dev` تغییر کرد
 - فایل: `src/data/products.json`
-- commit: `fix: update demoUrl to Netlify deployed demo`
 
 #### ۳. رفع خطاهای build در Netlify
 | مشکل | راه‌حل | فایل |
@@ -68,7 +68,7 @@
 ArdalaN (ai2apps.sbs)
   └── صفحه فروشگاه → دکمه "مشاهده دمو" → لینک به دموی جداگانه
 
-manager-tavana-demo (manager-tavana-demo.netlify.app)
+insurance-recruit-template (insurance-recruit-template.ai2ai.workers.dev)
   └── دموی کامل توانا (صفحه اصلی + پنل ادمین + فرم درخواست)
   └── Hardcoded demo data (بدون نیاز به دیتابیس)
   └── DEMO_MODE=true (auth و rate limiting غیرفعال)
@@ -76,18 +76,18 @@ manager-tavana-demo (manager-tavana-demo.netlify.app)
 
 ### نکات فنی مهم
 1. **Next.js 16**: فایل middleware به `proxy.ts` تغییر نام داده شده و export باید `proxy` باشه
-2. **Netlify Serverless**: SQLite کار نمی‌کنه (filesystem ephemeral هست) → باید از Turso یا hardcoded data استفاده کرد
-3. **Demo Mode**: `DEMO_MODE=true` باید هم build و هم runtime تنظیم بشه
-4. ** SESSION_SECRET**: باید یک مقدار تصادفی 64+ کاراکتری باشه
+2. **Cloudflare Workers**: از `@opennextjs/cloudflare` استفاده می‌کنه (نه Pages)
+3. **Demo Mode**: `DEMO_MODE=true` در `wrangler.toml` [vars] تنظیم شده
+4. **SESSION_SECRET**: باید یک مقدار تصادفی 64+ کاراکتری باشه
 
 ### وضعیت فعلی
 - ✅ سایت اصلی ArdalaN: https://ai2apps.sbs
-- ✅ دموی توانا: https://manager-tavana-demo.netlify.app
+- ✅ دموی توانا: https://insurance-recruit-template.ai2ai.workers.dev
 - ✅ دکمه خرید شناور روی دمو
 - ✅ داده‌های نمونه در صفحه اصلی و دمو
-- ⏳ "Too many attempts" روی login (rate limiting نیاز به reset داره)
+- ✅ بدون فیلترشکن باز میشه
 
 ### دسترسی‌ها
-- Netlify CLI: لاگین شده
+- Cloudflare حساب با Gmail: modirebours@gmail.com
 - GitHub: لاگین شده
-- حساب Netlify: modirebours@gmail.com
+- Workers Builds: اتصال GitHub فعال
