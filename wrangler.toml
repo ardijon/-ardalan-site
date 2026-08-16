@@ -1,4 +1,4 @@
-name = "ardalan-site"
+name = "ai2apps"
 main = ".open-next/worker.js"
 compatibility_date = "2025-08-16"
 compatibility_flags = ["nodejs_compat"]
