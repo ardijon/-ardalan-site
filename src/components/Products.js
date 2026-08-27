@@ -83,12 +83,17 @@ export default function Products({ initialProducts }) {
             <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
               {t('products.badge')}
             </span>
-            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)]">
+            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] whitespace-nowrap">
               {t('products.title')}
             </h2>
             <p className="mt-4 text-sm sm:text-base text-[var(--color-text)]/50 leading-relaxed">
               {t('products.subtitle')}
             </p>
+            {t('products.highlights')?.map((line, i) => (
+              <p key={i} className="mt-2 text-sm text-[var(--color-accent)] font-medium">
+                {line}
+              </p>
+            ))}
           </div>
 
           {loading ? (

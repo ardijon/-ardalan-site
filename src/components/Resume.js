@@ -3,6 +3,12 @@
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
+const TAG_STYLES = {
+  'نرم‌افزار': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+  'بیمه': 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300',
+  'بازار مالی': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+}
+
 export default function Resume() {
   const { t, dir } = useI18n()
   const isRtl = dir === 'rtl'
@@ -51,9 +57,16 @@ export default function Resume() {
                 </div>
 
                 <div className="flex-1 min-w-0 pt-1.5">
-                  <span className="inline-block px-2 py-0.5 text-xs font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded">
-                    {exp.year}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block px-2 py-0.5 text-xs font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded">
+                      {exp.year}
+                    </span>
+                    {exp.tag && (
+                      <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${TAG_STYLES[exp.tag] || ''}`}>
+                        {exp.tag}
+                      </span>
+                    )}
+                  </div>
                   <h3 className="mt-2 text-lg sm:text-xl font-bold text-[var(--color-text)] group-hover:text-[var(--color-accent)] transition-colors">
                     {exp.title}
                   </h3>

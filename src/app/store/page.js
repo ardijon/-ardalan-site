@@ -8,12 +8,12 @@ import { getLiveProducts } from '@/lib/products-server'
 import { SITE_URL, OG_IMAGE_STORE } from '@/lib/constants'
 
 export const metadata = {
-  title: 'فروشگاه | ابزارهای دیجیتال صنعت بیمه عمر',
-  description: 'ابزارهای دیجیتال صنعت بیمه عمر — از سایت اختصاصی یک نماینده تا سامانه‌ی جذب و توسعه‌ی نیروی فروش یک شرکت بیمه',
-  keywords: ['جذب نماینده بیمه', 'سایت نماینده بیمه', 'سیستم استخدام', 'توانا', 'رهیار', 'بیمه عمر', 'ابزار هوش مصنوعی'],
+  title: 'فروشگاه | ابزارهای نرم‌افزاری',
+  description: 'ابزارهایی که از نیاز واقعی شروع شدن — از بیمه تا هر صنعتی',
+  keywords: ['توانا', 'رهیار', 'نرم‌افزار صنعتی', 'ابزار هوش مصنوعی', 'اتوماسیون'],
   openGraph: {
-    title: 'فروشگاه | ابزارهای دیجیتال صنعت بیمه عمر',
-    description: 'از یک نماینده تا یک شرکت بیمه — سه ابزار برای سه اندازه از کار',
+    title: 'فروشگاه | ابزارهای نرم‌افزاری',
+    description: 'ابزارهایی که از نیاز واقعی شروع شدن — از بیمه تا هر صنعتی',
     url: `${SITE_URL}/store`,
     type: 'website',
     images: [OG_IMAGE_STORE],
@@ -21,12 +21,11 @@ export const metadata = {
   // Not duplication of the root layout: Next inherits the parent's `twitter`
   // block only while a child omits it *entirely*. This file defined `openGraph`
   // but no `twitter`, so the store's card on X carried the personal bio —
-  // «توسعه‌دهنده نرم‌افزار | متخصص هوش مصنوعی | ... | مشاور بیمه» — instead of a
-  // word about the store. Deleting this block brings that back.
+  // instead of a word about the store. Deleting this block brings that back.
   twitter: {
     card: 'summary_large_image',
-    title: 'فروشگاه | ابزارهای دیجیتال صنعت بیمه عمر',
-    description: 'از یک نماینده تا یک شرکت بیمه — سه ابزار برای سه اندازه از کار',
+    title: 'فروشگاه | ابزارهای نرم‌افزاری',
+    description: 'ابزارهایی که از نیاز واقعی شروع شدن — از بیمه تا هر صنعتی',
     images: [OG_IMAGE_STORE],
   },
   alternates: {
@@ -43,7 +42,7 @@ export default async function StorePage() {
     '@context': 'https://schema.org',
     '@type': 'Store',
     name: 'فروشگاه اردلان پیری',
-    description: 'ابزارهای دیجیتال صنعت بیمه عمر',
+    description: 'ابزارهایی که از نیاز واقعی شروع شدن',
     url: `${SITE_URL}/store`,
     seller: {
       '@type': 'Person',
