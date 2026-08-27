@@ -39,7 +39,7 @@ if (!product || !domain) {
 پیش‌نیازها:
   - دسترسی SSH به هاست مشتری
   - Node.js روی هاست
-  - Netlify CLI یا Vercel CLI (اختیاری)
+  - Wrangler CLI (اختیاری)
 `)
   process.exit(1)
 }

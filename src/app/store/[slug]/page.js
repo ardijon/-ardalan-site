@@ -1,21 +1,24 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductClient from '@/components/Store/ProductClient'
-import { getProduct, getAllProducts } from '@/lib/products'
+import { getAllProducts } from '@/lib/products'
+import { getLiveProduct, getLiveProducts } from '@/lib/products-server'
 import { notFound } from 'next/navigation'
-import { SITE_URL } from '@/lib/constants'
+import { SITE_URL, OG_IMAGE_STORE } from '@/lib/constants'
 
 export async function generateStaticParams() {
+  // Must stay on the build-time catalogue: this runs during the build, where
+  // durable storage does not exist yet.
   const products = getAllProducts()
   return products.map(p => ({ slug: p.slug }))
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params
-  const product = getProduct(slug)
+  const product = await getLiveProduct(slug)
   if (!product) return { title: '404' }
 
-  const title = `${product.title.fa} | فروشگاه توانا`
+  const title = `${product.title.fa} | فروشگاه اردلان پیری`
   const description = product.shortDescription.fa
 
   return {
@@ -24,20 +27,23 @@ export async function generateMetadata({ params }) {
     keywords: [
       product.title.fa,
       product.title.en,
+      product.shortTitle.fa,
       ...product.tech,
-      'جذب نماینده بیمه',
+      'بیمه عمر',
       'فروشگاه',
-      'سیستم استخدام',
-      'توانا',
     ],
     openGraph: {
       title,
       description,
-      url: `${SITE_URL}/store/${params.slug}`,
+      url: `${SITE_URL}/store/${slug}`,
       type: 'website',
+      // The empty-array branch used to be `[]`, which is why `/store/agent-site`
+      // and `/store/rahyar` shared with no image anywhere: neither has screenshots
+      // yet, and an empty list means Next emits no `og:image` *and* no
+      // `twitter:image` — the twitter card borrows this list when its own is unset.
       images: product.screenshots?.[0]
         ? [{ url: product.screenshots[0].src, alt: product.screenshots[0].alt.fa }]
-        : [],
+        : [OG_IMAGE_STORE],
     },
     twitter: {
       card: 'summary_large_image',
@@ -45,15 +51,19 @@ export async function generateMetadata({ params }) {
       description,
     },
     alternates: {
-      canonical: `${SITE_URL}/store/${params.slug}`,
+      canonical: `${SITE_URL}/store/${slug}`,
     },
   }
 }
 
 export default async function ProductPage({ params }) {
   const { slug } = await params
-  const product = getProduct(slug)
+  const product = await getLiveProduct(slug)
   if (!product) notFound()
+
+  // RelatedProducts used to receive the build-time catalogue, so a product added
+  // from the admin panel stayed invisible until the next deploy.
+  const allProducts = await getLiveProducts()
 
   const productSchema = {
     '@context': 'https://schema.org',
@@ -63,13 +73,17 @@ export default async function ProductPage({ params }) {
     image: product.screenshots?.[0]?.src,
     brand: {
       '@type': 'Brand',
-      name: 'توانا',
+      name: product.shortTitle.fa,
     },
     offers: {
       '@type': 'Offer',
-      price: product.pricing?.pro?.price || product.pricing?.starter?.price || 0,
+      price: product.pricing?.pro?.price || product.pricing?.starter?.price || product.priceSummary?.price || 0,
       priceCurrency: 'IRR',
-      availability: 'https://schema.org/InStock',
+      // An unreleased product is a pre-order; claiming InStock for something that
+      // cannot be bought yet is exactly what Merchant listings get flagged for.
+      availability: product.status === 'coming_soon'
+        ? 'https://schema.org/PreOrder'
+        : 'https://schema.org/InStock',
       seller: {
         '@type': 'Person',
         name: 'اردلان پیری',
@@ -97,7 +111,7 @@ export default async function ProductPage({ params }) {
         '@type': 'ListItem',
         position: 3,
         name: product.shortTitle.fa,
-        item: `${SITE_URL}/store/${params.slug}`,
+        item: `${SITE_URL}/store/${slug}`,
       },
     ],
   }
@@ -105,7 +119,7 @@ export default async function ProductPage({ params }) {
   return (
     <>
       <Header />
-      <ProductClient product={product} />
+      <ProductClient product={product} allProducts={allProducts} />
       <Footer />
       <script
         type="application/ld+json"

@@ -7,16 +7,6 @@ function getNested(obj, path) {
   return path.split('.').reduce((acc, key) => acc?.[key], obj)
 }
 
-function getCookie(name) {
-  if (typeof document === 'undefined') return null
-  const m = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`))
-  return m ? decodeURIComponent(m[1]) : null
-}
-
-function setCookie(name, value) {
-  document.cookie = `${name}=${value};path=/;max-age=31536000;SameSite=Lax`
-}
-
 function getLocalStorage(key) {
   try { return localStorage.getItem(key) } catch { return null }
 }
@@ -32,20 +22,37 @@ function applyDir(locale) {
   document.body.style.direction = dir
 }
 
+/**
+ * The saved locale, or null if the visitor has never picked one.
+ *
+ * localStorage and not the cookie, and that is the whole point. A middleware used
+ * to write NEXT_LOCALE from the Accept-Language header, which meant the cookie
+ * answered "what language is this browser configured in" rather than "what did this
+ * person choose" — and almost every phone in Iran ships with an English UI, so the
+ * Persian site opened in English for its Persian audience. The middleware is gone,
+ * but its cookies are still sitting in returning visitors' browsers.
+ *
+ * Only toggleLocale writes localStorage, so localStorage means a deliberate choice
+ * and nothing else. Reading it alone both fixes the default and ignores every
+ * cookie the old middleware manufactured.
+ */
+function savedLocale() {
+  const saved = getLocalStorage('NEXT_LOCALE')
+  return saved === 'en' || saved === 'fa' ? saved : null
+}
+
 const I18nContext = createContext(null)
 
 export function I18nProvider({ children }) {
+  // Persian unless told otherwise. Server and first client render agree on this,
+  // so there is nothing for React to complain about at hydration.
   const [locale, setLocale] = useState('fa')
   const [transitioning, setTransitioning] = useState(false)
 
   useEffect(() => {
-    const saved = getCookie('NEXT_LOCALE') || getLocalStorage('NEXT_LOCALE')
-    if (saved === 'en' || saved === 'fa') {
-      setLocale(saved)
-      applyDir(saved)
-    } else {
-      applyDir('fa')
-    }
+    const saved = savedLocale()
+    if (saved) setLocale(saved)
+    applyDir(saved || 'fa')
   }, [])
 
   const t = useCallback((key) => {
@@ -63,7 +70,6 @@ export function I18nProvider({ children }) {
     setTransitioning(true)
     setTimeout(() => {
       setLocale(next)
-      setCookie('NEXT_LOCALE', next)
       setLocalStorage('NEXT_LOCALE', next)
       applyDir(next)
 

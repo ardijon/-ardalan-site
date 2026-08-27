@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReceiptUpload from './ReceiptUpload'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
@@ -10,6 +10,8 @@ export default function PurchaseForm({ product, selectedPlan }) {
   const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
   const [orderId, setOrderId] = useState(null)
+  const [paymentInfo, setPaymentInfo] = useState({ bankName: '', cardNumber: '', accountHolder: '' })
+  const [uniqueAmount, setUniqueAmount] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -18,6 +20,13 @@ export default function PurchaseForm({ product, selectedPlan }) {
     hostingInfo: '',
   })
   const [validationError, setValidationError] = useState('')
+
+  useEffect(() => {
+    fetch('/api/payment-info')
+      .then(res => res.json())
+      .then(data => setPaymentInfo(data))
+      .catch(() => {})
+  }, [])
 
   const isProPlan = selectedPlan === 'pro'
   const isStarterPlan = selectedPlan === 'starter'
@@ -73,6 +82,7 @@ export default function PurchaseForm({ product, selectedPlan }) {
       }
 
       setOrderId(data.orderId)
+      setUniqueAmount(data.uniqueAmount)
       setStatus('order_created')
     } catch (err) {
       let errorMessage = 'خطا در ثبت سفارش'
@@ -129,20 +139,27 @@ export default function PurchaseForm({ product, selectedPlan }) {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-[var(--color-text)]/50">{isRtl ? 'نام بانک' : 'Bank'}</span>
-              <span className="font-medium text-[var(--color-text)]">{t('store.purchaseForm.bankName')}</span>
+              <span className="font-medium text-[var(--color-text)]">{paymentInfo.bankName}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--color-text)]/50">{isRtl ? 'شماره کارت' : 'Card Number'}</span>
-              <span className="font-mono font-medium text-[var(--color-text)]" dir="ltr">{t('store.purchaseForm.cardNumber')}</span>
+              <span className="font-mono font-medium text-[var(--color-text)]" dir="ltr">{paymentInfo.cardNumber}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--color-text)]/50">{isRtl ? 'صاحب حساب' : 'Account Holder'}</span>
-              <span className="font-medium text-[var(--color-text)]">{t('store.purchaseForm.holderName')}</span>
+              <span className="font-medium text-[var(--color-text)]">{paymentInfo.accountHolder}</span>
             </div>
             <div className="flex justify-between pt-2 border-t border-[var(--color-border)]">
               <span className="text-[var(--color-text)]/50">{t('store.purchaseForm.amount')}</span>
-              <span className="font-bold text-[var(--color-accent)]">{priceDisplay}</span>
+              <span className="font-bold text-[var(--color-accent)]">
+                {uniqueAmount ? uniqueAmount.toLocaleString('fa-IR') : priceDisplay}
+              </span>
             </div>
+            {uniqueAmount && (
+              <p className="text-xs text-[var(--color-accent)] font-medium">
+                {locale === 'fa' ? 'لطفاً دقیقاً همین مبلغ را واریز کنید' : 'Please pay this exact amount'}
+              </p>
+            )}
             <div className="flex justify-between">
               <span className="text-[var(--color-text)]/50">{isRtl ? 'دوره پرداخت' : 'Payment Period'}</span>
               <span className="font-medium text-[var(--color-text)]">

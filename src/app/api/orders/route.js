@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { createOrder } from '@/lib/orders'
-import { getProduct } from '@/lib/products'
+import { getLiveProduct } from '@/lib/products-server'
+import { notifyAdmin } from '@/lib/telegram'
+import { escapeHtml } from '@/lib/markdown'
 
 // Rate limiting for order creation
 const orderAttempts = new Map()
 const MAX_ORDER_ATTEMPTS = 10
 const ORDER_LOCKOUT_TIME = 15 * 60 * 1000 // 15 minutes
+
+const PLAN_LABELS = { starter: 'استارتر', pro: 'حرفه‌ای' }
 
 function checkOrderRateLimit(ip) {
   const now = Date.now()
@@ -45,6 +49,37 @@ function getClientIp(request) {
   return '127.0.0.1'
 }
 
+/**
+ * Tells the admin an order landed, without waiting to be asked.
+ *
+ * Payment is a manual bank transfer identified by `uniqueAmount`, so until this
+ * existed the only way to learn about a new order was to open the panel and look.
+ * A buyer who transferred money and heard nothing for a day is a buyer who asks
+ * for it back.
+ *
+ * `uniqueAmount` is the headline because it is the number that has to be matched
+ * against a bank statement — that is also why it is grouped with Latin digits
+ * rather than the site's Persian ones: the bank's SMS uses Latin digits, and the
+ * whole point is comparing the two at a glance.
+ */
+async function notifyNewOrder({ order, product, host }) {
+  const title = product.shortTitle?.fa || product.title?.fa || product.slug
+  const lines = [
+    '🛒 <b>سفارش جدید</b>',
+    '',
+    `💰 مبلغ واریز: <b>${Number(order.uniqueAmount || 0).toLocaleString('en-US')}</b> تومان`,
+    `📦 ${escapeHtml(title)} — پلن ${escapeHtml(PLAN_LABELS[order.plan] || order.plan)}`,
+    `👤 ${escapeHtml(order.customer?.name || '—')}`,
+    `📞 ${escapeHtml(order.customer?.phone || '—')}`,
+  ]
+  if (order.customer?.email) lines.push(`✉️ ${escapeHtml(order.customer.email)}`)
+  lines.push('', `🔖 ${escapeHtml(order.id)}`)
+  // Only when the host is known — a relative path is not tappable in Telegram.
+  if (host) lines.push(`🔗 https://${escapeHtml(host)}/admin`)
+
+  await notifyAdmin(lines, 'orders')
+}
+
 export async function POST(request) {
   // CSRF protection - verify origin matches host
   if (!checkCsrf(request)) {
@@ -79,7 +114,7 @@ export async function POST(request) {
       )
     }
 
-    const product = getProduct(productId)
+    const product = await getLiveProduct(productId)
     if (!product) {
       return NextResponse.json(
         { error: 'محصول یافت نشد' },
@@ -102,11 +137,17 @@ export async function POST(request) {
       )
     }
 
-    const order = await createOrder({ productId, plan, customer })
+    const basePrice = product.pricing?.[plan]?.price || 0
+    const order = await createOrder({ productId, plan, customer, basePrice })
+
+    // notifyAdmin swallows its own failures, so a Telegram outage cannot turn a
+    // saved order into a 500 that tells the buyer to try again.
+    await notifyNewOrder({ order, product, host: request.headers.get('host') })
 
     return NextResponse.json({
       success: true,
       orderId: order.id,
+      uniqueAmount: order.uniqueAmount,
       message: 'سفارش با موفقیت ثبت شد',
     })
   } catch (error) {

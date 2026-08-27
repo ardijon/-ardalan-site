@@ -4,6 +4,7 @@ import { useState } from 'react'
 import OrderTimeline from './OrderTimeline'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import products from '@/lib/products'
+import { formatJalali } from '@/lib/jalali'
 
 export default function OrderTracker() {
   const { t, dir, locale } = useI18n()
@@ -120,7 +121,9 @@ export default function OrderTracker() {
             <div className="flex justify-between text-sm">
               <span className="text-[var(--color-text)]/50">{t('store.order.createdAt')}</span>
               <span className="font-medium text-[var(--color-text)]">
-                {new Date(order.createdAt).toLocaleDateString(locale === 'fa' ? 'fa-IR' : 'en-US')}
+                {locale === 'fa'
+                  ? formatJalali(order.createdAt)
+                  : new Date(order.createdAt).toLocaleDateString('en-US')}
               </span>
             </div>
             {order.plan === 'pro' && (

@@ -1,8 +1,8 @@
 import { getAllSlugs } from '@/lib/articles'
-import { getAllProducts } from '@/lib/products'
+import { getLiveProducts } from '@/lib/products-server'
 import { SITE_URL } from '@/lib/constants'
 
-export default function sitemap() {
+export default async function sitemap() {
   const baseUrl = SITE_URL
 
   const staticPages = [
@@ -23,7 +23,7 @@ export default function sitemap() {
     priority: 0.6,
   }))
 
-  const storePages = getAllProducts().map(p => ({
+  const storePages = (await getLiveProducts()).map(p => ({
     url: `${baseUrl}/store/${p.slug}`,
     lastModified: new Date(),
     changeFrequency: 'monthly',

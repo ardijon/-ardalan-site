@@ -52,8 +52,36 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  direction: rtl;
+  /*
+   * No `direction` here on purpose.
+   *
+   * It said `rtl` unconditionally, which overrode <html dir="ltr"> and left English
+   * with an RTL body. The head script tried to correct that by assigning
+   * document.body.style.direction — from inside <head>, where document.body is still
+   * null, so it threw instead. `direction` is inherited, so the dir attribute on
+   * <html> reaches every element on its own and neither line was ever needed.
+   */
   transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/**
+ * No element may make the whole page scroll sideways.
+ *
+ * `clip`, never `hidden`. `overflow-x: hidden` turns the element into a scroll
+ * container, which silently kills every `position: sticky` inside it — and the
+ * pricing panel on a product page is sticky. `clip` clips without scrolling, and
+ * unlike every other value it leaves `overflow-y: visible` alone.
+ *
+ * This is a net, not a fix: a child wider than the viewport is still a bug (see the
+ * min-w-0 note in ScreenshotGallery). But it is a bug that reads very differently in
+ * the two directions, which is why it went unreported in English for so long. In LTR
+ * the overflow trails off the right, past where anyone looks; in RTL the page's
+ * scroll origin *is* the right edge, so the same box extends leftward across the
+ * layout and the overflow lands on top of the content instead of behind the reader.
+ */
+html,
+body {
+  overflow-x: clip;
 }
 
 html[lang="en"] body {

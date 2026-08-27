@@ -1,7 +1,6 @@
 'use client'
 
 import TrustSeal from './TrustSeal'
-import VisitorCounter from './VisitorCounter'
 import QRCodeSVG from './QRCodeSVG'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import { socialLinks } from '@/lib/socials'
@@ -53,12 +52,13 @@ export default function Footer() {
           <p className="text-sm text-[var(--color-text)]/50">
             &copy; {currentYear} &mdash; Ardalan. {t('site.copyright')}
           </p>
-          <div className="flex items-center gap-4">
-            <a href="/store/track" className="text-sm text-[var(--color-accent)] hover:underline">
-              {t('store.trackOrder')}
-            </a>
-            <VisitorCounter />
-          </div>
+          {/* Order tracking is the only thing that belongs in this row. A visitor
+              counter used to sit beside it; it was removed rather than fixed —
+              the number was never load-bearing, and the endpoint behind it wrote
+              to the filesystem, which does nothing on Workers. */}
+          <a href="/store/track" className="text-sm text-[var(--color-accent)] hover:underline">
+            {t('store.trackOrder')}
+          </a>
           <p className="text-xs text-[var(--color-text)]/40">
             {t('site.madeWith')}
           </p>

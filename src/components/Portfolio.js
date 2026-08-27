@@ -24,10 +24,10 @@ const projectStyles = [
   { color: 'from-emerald-500 to-[var(--color-tech)]' },
 ]
 
-const projectStoreLinks = {
-  'سامانه جامع مشاوره و فروش بیمه': '/store/insurance-recruit-template',
-  'Comprehensive Insurance Platform': '/store/insurance-recruit-template',
-}
+// A portfolio entry that is also a purchasable product carries `storeSlug` in
+// dictionary.js. Keying off that instead of the (translated) title means the
+// link cannot silently rot when a title is reworded, and `__tests__/
+// portfolio-links.test.js` fails the build if a slug stops existing.
 
 export default function Portfolio() {
   const { t, dir } = useI18n()
@@ -121,7 +121,7 @@ export default function Portfolio() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {visibleProjects.map((project, i) => {
-              const storeLink = projectStoreLinks[project.title]
+              const storeLink = project.storeSlug ? `/store/${project.storeSlug}` : null
               return (
                 <div
                   key={project.title}

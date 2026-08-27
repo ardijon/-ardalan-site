@@ -2,6 +2,7 @@
 
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import ScreenshotGallery from './ScreenshotGallery'
+import Testimonials from './Testimonials'
 
 export default function ProductDetail({ product }) {
   const { t, dir, locale } = useI18n()
@@ -9,17 +10,39 @@ export default function ProductDetail({ product }) {
 
   if (!product) return null
 
+  // Was a single shared dictionary key, so Tavana's pitch would have rendered on
+  // every product page once the store held more than one product.
+  const valueProposition = product.valueProposition?.[locale] || product.valueProposition?.en || ''
+  const legalNote = product.legalNote?.[locale] || product.legalNote?.en || ''
+  const tech = product.tech || []
+
   return (
     <div className="space-y-12">
-      <ScreenshotGallery screenshots={product.screenshots} />
+      {valueProposition && (
+        <div style={{ direction: isRtl ? 'rtl' : 'ltr', textAlign: 'justify' }}>
+          {valueProposition.split('\n\n').map((paragraph, i) => (
+            <p
+              key={i}
+              className={
+                // The opening line is the strongest sentence on the page, so it
+                // reads as a lead rather than as body copy.
+                i === 0
+                  ? 'text-lg sm:text-xl font-bold leading-relaxed text-[var(--color-primary)]'
+                  : 'mt-3 text-sm leading-relaxed text-[var(--color-text)]/70'
+              }
+            >
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      )}
 
-      <div className="p-5 rounded-2xl bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/10" style={{ direction: isRtl ? 'rtl' : 'ltr', textAlign: 'justify' }}>
-        {t('store.valueProposition').split('\n\n').map((paragraph, i) => (
-          <p key={i} className={`text-sm leading-relaxed text-[var(--color-text)]/70 ${i > 0 ? 'mt-3' : ''}`}>
-            {paragraph}
-          </p>
-        ))}
-      </div>
+      {product.screenshots?.length > 0 && <ScreenshotGallery screenshots={product.screenshots} />}
+
+      {/* After the pitch and the screenshots: the visitor has seen what it is,
+          now someone other than the seller vouches for it. Renders nothing while
+          the array is empty. */}
+      <Testimonials testimonials={product.testimonials} />
 
       <div>
         <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
@@ -37,21 +60,35 @@ export default function ProductDetail({ product }) {
         </ul>
       </div>
 
-      <div>
-        <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
-          {t('store.techStack')}
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {(product.tech || []).map((tech) => (
-            <span
-              key={tech}
-              className="px-3 py-1.5 text-xs font-medium text-[var(--color-tech)] bg-[var(--color-tech)]/10 rounded-full border border-[var(--color-tech)]/20"
-            >
-              {tech}
-            </span>
-          ))}
+      {legalNote && (
+        <div
+          className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)]"
+          style={{ direction: isRtl ? 'rtl' : 'ltr' }}
+        >
+          <h3 className="text-sm font-bold text-[var(--color-primary)] mb-1.5">
+            {t('store.legalNote')}
+          </h3>
+          <p className="text-sm leading-relaxed text-[var(--color-text)]/60">{legalNote}</p>
         </div>
-      </div>
+      )}
+
+      {tech.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
+            {t('store.techStack')}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {tech.map((item) => (
+              <span
+                key={item}
+                className="px-3 py-1.5 text-xs font-medium text-[var(--color-tech)] bg-[var(--color-tech)]/10 rounded-full border border-[var(--color-tech)]/20"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

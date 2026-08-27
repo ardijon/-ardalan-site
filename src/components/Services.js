@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useRef } from 'react'
+import Link from 'next/link'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
@@ -125,6 +126,24 @@ export default function Services() {
               </div>
               )
             })}
+          </div>
+
+          {/* Custom work and ready-made products are two different asks, and a
+              visitor reading a services grid has no signal that the second one
+              exists. This closes that exit. */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 text-center">
+            <span className="text-sm text-[var(--color-text)]/50">
+              {t('services.storeBridge')}
+            </span>
+            <Link
+              href="/store"
+              className="group inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-accent)] hover:underline"
+            >
+              {t('services.storeBridgeCta')}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" className="rtl:rotate-180">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
         </div>
       </div>

@@ -1,43 +1,32 @@
 import { NextResponse } from 'next/server'
 import { getAllOrders, getOrdersByStatus, updateOrderStatus, getOrderStats } from '@/lib/orders'
-
-const ADMIN_USER = process.env.ADMIN_USER
-const ADMIN_PASS = process.env.ADMIN_PASS
-
-function checkAuth(request) {
-  const auth = request.headers.get('authorization')
-  if (!auth || !auth.startsWith('Basic ')) return false
-  const decoded = Buffer.from(auth.split(' ')[1], 'base64').toString()
-  const [user, pass] = decoded.split(':')
-  return user === ADMIN_USER && pass === ADMIN_PASS
-}
-
-function checkCsrf(request) {
-  const origin = request.headers.get('origin')
-  const host = request.headers.get('host')
-  if (!origin || !host) return false
-  try {
-    const originHost = new URL(origin).host
-    return originHost === host
-  } catch {
-    return false
-  }
-}
+import { ORDER_STATUS_KEYS } from '@/lib/order-status'
+import { guardAdminRoute } from '@/lib/admin-auth'
 
 export async function GET(request) {
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = await guardAdminRoute(request)
+  if (denied) return denied
 
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status') || 'all'
-  const stats = getOrderStats()
+  const search = searchParams.get('search') || ''
+
+  const stats = await getOrderStats()
 
   let orders
   if (status === 'all') {
-    orders = getAllOrders()
+    orders = await getAllOrders()
   } else {
-    orders = getOrdersByStatus(status)
+    orders = await getOrdersByStatus(status)
+  }
+
+  if (search.trim()) {
+    const q = search.trim().toLowerCase()
+    orders = orders.filter(o =>
+      o.id.toLowerCase().includes(q) ||
+      o.customer?.phone?.includes(q) ||
+      o.customer?.name?.toLowerCase().includes(q)
+    )
   }
 
   orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -46,14 +35,8 @@ export async function GET(request) {
 }
 
 export async function PATCH(request) {
-  // CSRF protection
-  if (!checkCsrf(request)) {
-    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
-  }
-
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = await guardAdminRoute(request, { mutating: true })
+  if (denied) return denied
 
   try {
     const body = await request.json()
@@ -66,14 +49,16 @@ export async function PATCH(request) {
       )
     }
 
-    const validStatuses = ['pending', 'awaiting_payment', 'receipt_uploaded', 'approved', 'rejected', 'deploying', 'completed']
-    if (!validStatuses.includes(status)) {
+    // Shared with the panel's labels, so a status this route accepts is always a
+    // status the panel can name. The two lists used to be written out separately.
+    if (!ORDER_STATUS_KEYS.includes(status)) {
       return NextResponse.json(
         { error: 'وضعیت نامعتبر است' },
         { status: 400 }
       )
     }
 
+    // The audit entry is written inside updateOrderStatus — see the note there.
     const order = await updateOrderStatus(orderId, status, note || '')
     if (!order) {
       return NextResponse.json(
@@ -87,6 +72,7 @@ export async function PATCH(request) {
       order,
     })
   } catch (error) {
+    console.error('Failed to update order:', error)
     return NextResponse.json(
       { error: 'خطا در بروزرسانی سفارش' },
       { status: 500 }

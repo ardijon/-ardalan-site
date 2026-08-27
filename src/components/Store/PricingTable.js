@@ -65,10 +65,16 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
   const { t, dir, locale } = useI18n()
   const isRtl = dir === 'rtl'
 
+  // Only the plans that actually exist. Spreading an absent one produced
+  // `{ key: 'starter' }` with no priceDisplay, and reading .priceDisplay[locale]
+  // threw — which is exactly what happened once the catalogue gained products
+  // that carry `pricing: {}` because they cannot be bought yet.
   const plans = [
-    { key: 'starter', ...pricing.starter, highlighted: false },
-    { key: 'pro', ...pricing.pro, highlighted: true },
-  ]
+    pricing?.starter && { key: 'starter', ...pricing.starter, highlighted: false },
+    pricing?.pro && { key: 'pro', ...pricing.pro, highlighted: true },
+  ].filter(Boolean)
+
+  if (plans.length === 0) return null
 
   return (
     <div className="space-y-6">
@@ -113,9 +119,9 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
 
               <div className="mb-4 whitespace-nowrap">
                 <span className="text-3xl font-black text-[var(--color-primary)]">
-                  {plan.priceDisplay[locale] || plan.priceDisplay.en}
+                  {plan.priceDisplay?.[locale] || plan.priceDisplay?.en || ''}
                 </span>
-                {plan.period[locale] && (
+                {plan.period?.[locale] && (
                   <span className={`text-sm text-[var(--color-text)]/50 ${isRtl ? 'ml-1' : 'mr-1'}`}>
                     {plan.period[locale]}
                   </span>
@@ -123,7 +129,7 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
               </div>
 
               <ul className="space-y-2 mb-6" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
-                {(plan.features[locale] || plan.features.en || []).map((feature, i) => (
+                {(plan.features?.[locale] || plan.features?.en || []).map((feature, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-[var(--color-text)]/70">
                     <span className="mt-0.5 w-4 h-4 shrink-0 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center text-[10px]">
                       ✓
@@ -147,7 +153,7 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
                         : 'text-[var(--color-accent)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/10'
                   }`}
                 >
-                  {plan.cta[locale] || plan.cta.en}
+                  {plan.cta?.[locale] || plan.cta?.en || t('store.buyNow')}
                 </button>
               </div>
             </div>
@@ -155,7 +161,8 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
         })}
       </div>
 
-      {/* Comparison table */}
+      {/* A starter-vs-pro comparison says nothing when only one of them exists. */}
+      {plans.length === 2 && (
       <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)]">
         <h4 className="text-sm font-bold text-[var(--color-primary)] mb-3 text-center">
           {locale === 'fa' ? 'مقایسه دو پلن' : 'Compare Plans'}
@@ -201,6 +208,7 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
           </table>
         </div>
       </div>
+      )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import './globals.css'
 import { I18nProvider } from '@/lib/i18n/I18nProvider'
+import Analytics from '@/components/Analytics'
 import { SITE_URL } from '@/lib/constants'
 
 export const viewport = {
@@ -96,13 +97,24 @@ export default function RootLayout({ children }) {
               var meta = document.querySelector('meta[name="theme-color"]');
               if (meta) meta.content = dark ? '#0B1120' : '#F8F6F3';
 
-              var c = document.cookie.match(/(?:^|; )NEXT_LOCALE=([^;]*)/);
-              var ls = localStorage.getItem('NEXT_LOCALE');
-              var lang = (c && c[1]) || ls || 'fa';
+              // localStorage only, never the cookie: the cookie was written by a
+              // middleware that guessed from Accept-Language, so it says what the
+              // browser is set to rather than what this person chose. See
+              // savedLocale() in I18nProvider.
+              var lang = localStorage.getItem('NEXT_LOCALE');
               if (lang !== 'fa' && lang !== 'en') lang = 'fa';
               document.documentElement.lang = lang;
+              // The html element only. This script runs inside head, where
+              // document.body is still null — the line that used to set
+              // document.body.style.direction here threw a TypeError on every single
+              // page load, and because it was the last statement in the IIFE the
+              // throw was invisible except in the console. Direction is an inherited
+              // property, so the attribute set below is all that is needed; see the
+              // note on body in globals.css.
+              //
+              // No backticks in this comment: the whole script is a template literal,
+              // and one backtick in a comment ends it and breaks the build.
               document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
-              document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
             })();
           `
         }} />
@@ -112,6 +124,8 @@ export default function RootLayout({ children }) {
         <I18nProvider>
           {children}
         </I18nProvider>
+        {/* Last in body, per Cloudflare's install instructions. */}
+        <Analytics />
       </body>
     </html>
   )

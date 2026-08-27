@@ -101,7 +101,7 @@ export default function Hero() {
               }`}
             >
               <a
-                href="#services"
+                href="#products"
                 className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-accent)] text-white text-sm sm:text-base font-medium rounded-xl shadow-lg shadow-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/40 hover:-translate-y-1 hover:scale-105 transition-all duration-300"
               >
                 {t('hero.cta1')}

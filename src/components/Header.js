@@ -2,16 +2,32 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import ThemeToggle from './ThemeToggle'
 import { LogoV1 } from './Logo'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import LanguageSwitcher from '@/lib/i18n/languageSwitcher'
 import { socialLinks } from '@/lib/socials'
 
-const navHrefs = ['#about', '#services', '#portfolio', '/store', '/store/track', '#resume', '#blog', '#contact']
+/**
+ * Anchor sections only, in the order they appear on the landing page.
+ *
+ * The store used to be the fourth of eight equal-weight items here, which is how
+ * the only page that sells anything ended up looking like a footnote. It now gets
+ * a CTA button of its own (STORE_HREF below) and is deliberately absent from this
+ * list.
+ *
+ * `#resume` is also gone: a résumé is proof, not a destination, so it is reached
+ * from inside About instead of competing with the six real stops. Order tracking
+ * left too — it is an after-sale tool and lives in the footer.
+ */
+const navSections = ['about', 'products', 'services', 'portfolio', 'blog', 'contact']
+
+const STORE_HREF = '/store'
 
 export default function Header() {
   const { t } = useI18n()
+  const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
@@ -25,17 +41,16 @@ export default function Header() {
     }
   }, [])
 
-  const navItems = navHrefs.map(href => {
-    const isPage = href.startsWith('/')
-    let key = isPage ? href.replace('/', '').replace('/', '.') : href.replace('#', '')
-    if (key === 'store.track') key = 'trackOrder'
-    if (key === 'store') key = 'store'
-    return {
-      label: t(`header.nav.${key}`),
-      href,
-      isPage,
-    }
-  })
+  const isHome = pathname === '/'
+  const storeActive = Boolean(pathname?.startsWith('/store'))
+
+  // Off the landing page a bare `#about` resolves against the current route, so
+  // clicking it on /store asked for /store#about and did nothing.
+  const navItems = navSections.map(id => ({
+    id,
+    href: isHome ? `#${id}` : `/#${id}`,
+    label: t(`header.nav.${id}`),
+  }))
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -65,8 +80,10 @@ export default function Header() {
   }, [menuOpen])
 
   useEffect(() => {
-    const ids = navHrefs.map(h => h.replace('#', ''))
-    const sections = ids.map(id => document.getElementById(id)).filter(Boolean)
+    // Anchors only. The old version mapped the full nav list, so on /store it
+    // called getElementById('/store'), observed nothing, and left every item
+    // unhighlighted while the store button had no active state at all.
+    const sections = navSections.map(id => document.getElementById(id)).filter(Boolean)
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) setActiveSection(entry.target.id)
@@ -113,9 +130,9 @@ export default function Header() {
               <LanguageSwitcher />
             </div>
 
-            <nav className="flex items-center gap-8" aria-label={t('header.menuLabel')}>
+            <nav className="flex items-center gap-6 lg:gap-8" aria-label={t('header.menuLabel')}>
               {navItems.map((item) => {
-                const isActive = !item.isPage && activeSection === item.href.replace('#', '')
+                const isActive = isHome && activeSection === item.id
                 return (
                   <Link
                     key={item.href}
@@ -131,6 +148,23 @@ export default function Header() {
                   </Link>
                 )
               })}
+
+              {/* The one visually loud element in the header. Everything else is
+                  navigation; this is the conversion path. */}
+              <Link
+                href={STORE_HREF}
+                aria-current={storeActive ? 'page' : undefined}
+                className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-xl transition-all active:scale-95 ${
+                  storeActive
+                    ? 'text-white bg-[var(--color-accent)] shadow-md shadow-[var(--color-accent)]/25'
+                    : 'text-[var(--color-accent)] border border-[var(--color-accent)]/40 hover:text-white hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)]'
+                }`}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
+                </svg>
+                {t('header.nav.store')}
+              </Link>
             </nav>
 
             <a href="/" className="shrink-0"><LogoV1 /></a>
@@ -166,8 +200,26 @@ export default function Header() {
           </div>
 
           <nav className="flex-1 overflow-y-auto p-4 space-y-1" aria-label={t('header.menuLabel')}>
+            {/* The store CTA leads on mobile too: on a phone the visitor sees
+                three items before scrolling, so burying it sixth would hide it. */}
+            <Link
+              href={STORE_HREF}
+              onClick={() => setMenuOpen(false)}
+              aria-current={storeActive ? 'page' : undefined}
+              className={`mb-3 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-bold transition-all ${
+                storeActive
+                  ? 'text-white bg-[var(--color-accent)]'
+                  : 'text-[var(--color-accent)] border border-[var(--color-accent)]/40 hover:text-white hover:bg-[var(--color-accent)]'
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
+              </svg>
+              {t('header.nav.store')}
+            </Link>
+
             {navItems.map((item) => {
-              const isActive = !item.isPage && activeSection === item.href.replace('#', '')
+              const isActive = isHome && activeSection === item.id
               return (
                 <Link
                   key={item.href}

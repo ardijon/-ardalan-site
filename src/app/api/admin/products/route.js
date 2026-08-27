@@ -1,86 +1,51 @@
 import { NextResponse } from 'next/server'
-import { readFile, writeFile } from 'fs/promises'
-import path from 'path'
+import { revalidatePath } from 'next/cache'
+import bundledProducts from '@/data/products.json'
+import { readCollection, writeCollection } from '@/lib/storage'
+import { guardAdminRoute } from '@/lib/admin-auth'
+import { recordAudit, auditSummary } from '@/lib/audit'
 
-const DATA_PATH = path.join(process.cwd(), 'src/data/products.json')
+/**
+ * Product CRUD for the admin panel.
+ *
+ * Reads and writes go through the storage layer instead of fs, because on
+ * Cloudflare Workers `writeFile` does not persist and `src/data/products.json`
+ * is not present at the path `process.cwd()` resolves to — every request here
+ * failed with a 500 in production.
+ *
+ * When storage is empty (first run, or before the KV namespace is created) we
+ * fall back to the JSON bundled at build time, so the panel always shows the
+ * real catalogue rather than an empty list.
+ */
 
-// Rate limiting for failed admin login attempts only
-const loginAttempts = new Map()
-const MAX_ATTEMPTS = 5
-const LOCKOUT_TIME = 15 * 60 * 1000 // 15 minutes
-
-function checkRateLimit(ip) {
-  const now = Date.now()
-  const attempts = loginAttempts.get(ip) || { count: 0, lastAttempt: 0 }
-
-  if (now - attempts.lastAttempt > LOCKOUT_TIME) {
-    loginAttempts.set(ip, { count: 0, lastAttempt: now })
-    return true
-  }
-
-  if (attempts.count >= MAX_ATTEMPTS) {
-    return false
-  }
-
-  return true
-}
-
-function recordFailedAttempt(ip) {
-  const now = Date.now()
-  const attempts = loginAttempts.get(ip) || { count: 0, lastAttempt: 0 }
-
-  if (now - attempts.lastAttempt > LOCKOUT_TIME) {
-    loginAttempts.set(ip, { count: 1, lastAttempt: now })
-  } else {
-    loginAttempts.set(ip, { count: attempts.count + 1, lastAttempt: now })
-  }
-}
-
-function resetAttempts(ip) {
-  loginAttempts.delete(ip)
-}
+const COLLECTION = 'products'
 
 async function readProducts() {
-  const data = await readFile(DATA_PATH, 'utf-8')
-  return JSON.parse(data)
+  const stored = await readCollection(COLLECTION, null)
+  if (Array.isArray(stored) && stored.length > 0) return stored
+  return bundledProducts
 }
 
 async function writeProducts(products) {
-  await writeFile(DATA_PATH, JSON.stringify(products, null, 2), 'utf-8')
-}
+  await writeCollection(COLLECTION, products)
 
-function checkAuth(request) {
-  const auth = request.headers.get('authorization')
-  if (!auth || !auth.startsWith('Basic ')) return false
-  const decoded = Buffer.from(auth.split(' ')[1], 'base64').toString()
-  const [user, pass] = decoded.split(':')
-  return user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS
-}
-
-function getClientIp(request) {
-  const forwarded = request.headers.get('x-forwarded-for')
-  if (forwarded) return forwarded.split(',')[0].trim()
-  return '127.0.0.1'
-}
-
-function checkCsrf(request) {
-  const origin = request.headers.get('origin')
-  const host = request.headers.get('host')
-  if (!origin || !host) return false
+  // The public store pages are prerendered from the catalogue, so without this
+  // an admin edit would not appear until the next deploy.
   try {
-    const originHost = new URL(origin).host
-    if (process.env.NODE_ENV === 'production' && new URL(origin).protocol !== 'https:') {
-      return false
-    }
-    return originHost === host
-  } catch {
-    return false
+    revalidatePath('/store')
+    revalidatePath('/store/[slug]', 'page')
+    revalidatePath('/sitemap.xml')
+  } catch (error) {
+    // Revalidation is best-effort — never fail the write because of it.
+    console.error('[products] revalidate failed:', error)
   }
 }
 
 function validateProduct(product) {
   if (!product || typeof product !== 'object') return false
   if (!product.slug || typeof product.slug !== 'string') return false
+  // Slug ends up in URLs and on disk paths — keep it strict.
+  if (!/^[a-z0-9-]+$/i.test(product.slug)) return false
   if (!product.title || typeof product.title !== 'object') return false
   if (!product.pricing || typeof product.pricing !== 'object') return false
   if (!product.shortDescription || typeof product.shortDescription !== 'object') return false
@@ -88,9 +53,8 @@ function validateProduct(product) {
 }
 
 export async function GET(request) {
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = await guardAdminRoute(request)
+  if (denied) return denied
 
   try {
     const products = await readProducts()
@@ -102,25 +66,8 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  // CSRF protection first
-  if (!checkCsrf(request)) {
-    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
-  }
-
-  // Rate limit check BEFORE authentication
-  const ip = getClientIp(request)
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
-  }
-
-  // Authentication check - only increment on failure
-  if (!checkAuth(request)) {
-    recordFailedAttempt(ip)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Auth succeeded - reset attempts
-  resetAttempts(ip)
+  const denied = await guardAdminRoute(request, { mutating: true })
+  if (denied) return denied
 
   try {
     const newProduct = await request.json()
@@ -135,8 +82,17 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Slug already exists' }, { status: 400 })
     }
 
-    products.push(newProduct)
-    await writeProducts(products)
+    await writeProducts([...products, newProduct])
+
+    // Audited in the route rather than in a lib the way orders are, because there is
+    // no product lib — the handlers are the only writers. Always after the write:
+    // a log entry for a save that then failed is worse than no entry at all.
+    await recordAudit({
+      action: 'product.create',
+      entityId: newProduct.slug,
+      summary: auditSummary.product('محصول جدید', newProduct),
+    })
+
     return NextResponse.json(newProduct, { status: 201 })
   } catch (error) {
     console.error('Failed to create product:', error)
@@ -145,25 +101,8 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  // CSRF protection first
-  if (!checkCsrf(request)) {
-    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
-  }
-
-  // Rate limit check BEFORE authentication
-  const ip = getClientIp(request)
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
-  }
-
-  // Authentication check - only increment on failure
-  if (!checkAuth(request)) {
-    recordFailedAttempt(ip)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Auth succeeded - reset attempts
-  resetAttempts(ip)
+  const denied = await guardAdminRoute(request, { mutating: true })
+  if (denied) return denied
 
   try {
     const updated = await request.json()
@@ -179,8 +118,16 @@ export async function PUT(request) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    products[index] = updated
-    await writeProducts(products)
+    const next = [...products]
+    next[index] = updated
+    await writeProducts(next)
+
+    await recordAudit({
+      action: 'product.update',
+      entityId: updated.slug,
+      summary: auditSummary.product('ویرایش', updated),
+    })
+
     return NextResponse.json(updated)
   } catch (error) {
     console.error('Failed to update product:', error)
@@ -189,29 +136,15 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  // CSRF protection first
-  if (!checkCsrf(request)) {
-    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
-  }
-
-  // Rate limit check BEFORE authentication
-  const ip = getClientIp(request)
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
-  }
-
-  // Authentication check - only increment on failure
-  if (!checkAuth(request)) {
-    recordFailedAttempt(ip)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Auth succeeded - reset attempts
-  resetAttempts(ip)
+  const denied = await guardAdminRoute(request, { mutating: true })
+  if (denied) return denied
 
   try {
     const { slug } = await request.json()
     const products = await readProducts()
+    // Kept before the filter: after the delete the title is gone, and a log row
+    // that says حذف «insurance-recruit» is a slug, not the thing you deleted.
+    const removed = products.find(p => p.slug === slug)
     const filtered = products.filter(p => p.slug !== slug)
 
     if (filtered.length === products.length) {
@@ -219,6 +152,13 @@ export async function DELETE(request) {
     }
 
     await writeProducts(filtered)
+
+    await recordAudit({
+      action: 'product.delete',
+      entityId: slug,
+      summary: auditSummary.product('حذف', removed),
+    })
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Failed to delete product:', error)

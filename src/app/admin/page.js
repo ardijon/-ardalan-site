@@ -1,60 +1,125 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import AdminShell from '@/components/Admin/AdminShell'
+import Dashboard from '@/components/Admin/Dashboard'
+import Leads from '@/components/Admin/Leads'
+import Customers from '@/components/Admin/Customers'
 import OrderManagement from '@/components/Admin/OrderManagement'
+import ProductForm from '@/components/Admin/ProductForm'
 
-const EMPTY_PRODUCT = {
-  slug: '',
-  title: { fa: '', en: '' },
-  shortTitle: { fa: '', en: '' },
-  description: { fa: '', en: '' },
-  shortDescription: { fa: '', en: '' },
-  features: { fa: [''], en: [''] },
-  tech: [''],
-  pricing: {
-    free: { price: 0, priceDisplay: { fa: '', en: '' }, period: { fa: '', en: '' }, features: { fa: [''], en: [''] }, cta: { fa: '', en: '' } },
-    starter: { price: 0, priceDisplay: { fa: '', en: '' }, period: { fa: '', en: '' }, features: { fa: [''], en: [''] }, cta: { fa: '', en: '' } },
-    pro: { price: 0, priceDisplay: { fa: '', en: '' }, period: { fa: '', en: '' }, features: { fa: [''], en: [''] }, cta: { fa: '', en: '' } },
-  },
-  demoUrl: '',
-  screenshots: [],
-  github: '',
+// The API rejects anything else, and it does so with a generic message. Checking
+// here means the reason arrives before the round trip.
+const SLUG_PATTERN = /^[a-z0-9-]+$/i
+
+const STATUS_BADGES = {
+  available: { label: 'موجود', className: 'bg-green-50 text-green-600 border-green-200' },
+  coming_soon: { label: 'به‌زودی', className: 'bg-amber-50 text-amber-600 border-amber-200' },
 }
 
 export default function AdminPage() {
-  const [auth, setAuth] = useState(null)
+  const [mounted, setMounted] = useState(false)
+  const [authed, setAuthed] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
   const [loginForm, setLoginForm] = useState({ user: '', pass: '' })
+  const [otpStep, setOtpStep] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const [otpLoading, setOtpLoading] = useState(false)
   const [products, setProducts] = useState([])
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState(EMPTY_PRODUCT)
+  // Bumped to force ProductForm to remount when the `editing` slug alone does not
+  // change — clicking "محصول جدید" twice, for instance, has to clear the form.
+  const [formNonce, setFormNonce] = useState(0)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
-  const [activeTab, setActiveTab] = useState('products')
+  // Opens on the dashboard: the first question on logging in is "is there anything
+  // waiting for me", not "let me edit a product".
+  const [activeTab, setActiveTab] = useState('dashboard')
+  // Only for the rail badge. Whichever of the two tabs loads first reports it, so
+  // the badge costs no request of its own.
+  const [orderStats, setOrderStats] = useState({})
+  // Same idea for the leads badge, reported by the leads tab itself. The dashboard
+  // does not fetch leads, so this badge only appears after the tab is opened once —
+  // acceptable, because a waitlist is not time-critical the way a new receipt is.
+  const [leadStats, setLeadStats] = useState({})
 
-  function getAuthHeader() {
-    if (!auth) return {}
-    return { Authorization: `Basic ${btoa(`${auth.user}:${auth.pass}`)}` }
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  function basicHeader() {
+    return { Authorization: `Basic ${btoa(`${loginForm.user}:${loginForm.pass}`)}` }
   }
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/products', { credentials: 'same-origin' })
+      if (!res.ok) {
+        if (res.status === 401) setAuthed(false)
+        setMessage('خطا در بارگذاری محصولات')
+        return
+      }
+      const data = await res.json()
+      // Guard: on an error payload this used to receive an object and then
+      // crash on products.map(...)
+      setProducts(Array.isArray(data) ? data : [])
+    } catch {
+      setMessage('خطا در بارگذاری محصولات')
+    }
+  }, [])
+
+  // Restore an existing session cookie so a refresh does not force a full
+  // user + pass + OTP re-login.
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch('/api/admin/session', { credentials: 'same-origin' })
+        if (!cancelled && res.ok) {
+          const data = await res.json()
+          if (data.authenticated) {
+            setAuthed(true)
+            await fetchProducts()
+          }
+        }
+      } catch {
+        // no existing session — show the login form
+      } finally {
+        if (!cancelled) setCheckingSession(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [fetchProducts])
 
   async function handleLogin(e) {
     e.preventDefault()
     setLoading(true)
     setMessage('')
     try {
-      const res = await fetch('/api/admin/products', {
-        headers: { Authorization: `Basic ${btoa(`${loginForm.user}:${loginForm.pass}`)}` },
+      // This single call both validates the credentials and sends the OTP.
+      const res = await fetch('/api/admin/otp', {
+        method: 'POST',
+        headers: basicHeader(),
+        credentials: 'same-origin',
       })
-      if (res.status === 401) {
-        setMessage('نام کاربری یا رمز عبور اشتباه است')
-        setLoading(false)
+
+      // Previously only status 401 was treated as failure, so a 429 or 500
+      // advanced the user to the OTP step as if the password had been correct.
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setMessage(data.error || 'ورود ناموفق بود')
         return
       }
-      const data = await res.json()
-      setAuth(loginForm)
-      setProducts(data)
+
+      const data = await res.json().catch(() => ({}))
+      setOtpStep(true)
+      // The server's own wording, not a hardcoded "sent to Telegram": when
+      // Telegram is unreachable in dev the code goes to the terminal instead, and
+      // only the server knows which happened.
+      setMessage(data.message || 'کد تایید ارسال شد')
     } catch {
       setMessage('خطا در اتصال')
     } finally {
@@ -62,89 +127,109 @@ export default function AdminPage() {
     }
   }
 
-  async function fetchProducts() {
+  async function resendOtp() {
+    setMessage('')
     try {
-      const res = await fetch('/api/admin/products', { headers: getAuthHeader() })
-      const data = await res.json()
-      setProducts(data)
+      const res = await fetch('/api/admin/otp', {
+        method: 'POST',
+        headers: basicHeader(),
+        credentials: 'same-origin',
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setMessage(data.error || 'خطا در ارسال کد تایید')
+      } else {
+        setMessage(data.message || 'کد تایید ارسال شد')
+      }
     } catch {
-      setMessage('خطا در بارگذاری محصولات')
+      setMessage('خطا در ارسال کد تایید')
     }
   }
 
-  function setNested(obj, path, value) {
-    const clone = JSON.parse(JSON.stringify(obj))
-    const keys = path.split('.')
-    const last = keys.pop()
-    const target = keys.reduce((o, k) => o[k], clone)
-    target[last] = value
-    return clone
+  async function handleVerifyOtp(e) {
+    e.preventDefault()
+    setOtpLoading(true)
+    setMessage('')
+    try {
+      const res = await fetch('/api/admin/otp', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...basicHeader() },
+        credentials: 'same-origin',
+        body: JSON.stringify({ code: otpCode }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setMessage(data.error || 'کد تایید نادرست است')
+        return
+      }
+
+      // The server has now set the session cookie; the password is no longer
+      // needed client-side, so drop it from memory.
+      setLoginForm(p => ({ ...p, pass: '' }))
+      setOtpCode('')
+      setOtpStep(false)
+      setMessage('')
+      setAuthed(true)
+      await fetchProducts()
+    } catch {
+      setMessage('خطا در تایید کد')
+    } finally {
+      setOtpLoading(false)
+    }
   }
 
-  function handleChange(path, value) {
-    setForm(prev => setNested(prev, path, value))
-  }
-
-  function handleArrayChange(path, index, value) {
-    setForm(prev => {
-      const clone = JSON.parse(JSON.stringify(prev))
-      const keys = path.split('.')
-      const last = keys.pop()
-      const target = keys.reduce((o, k) => o[k], clone)
-      target[last][index] = value
-      return clone
-    })
-  }
-
-  function addArrayItem(path) {
-    setForm(prev => {
-      const clone = JSON.parse(JSON.stringify(prev))
-      const keys = path.split('.')
-      const last = keys.pop()
-      const target = keys.reduce((o, k) => o[k], clone)
-      target[last].push('')
-      return clone
-    })
-  }
-
-  function removeArrayItem(path, index) {
-    setForm(prev => {
-      const clone = JSON.parse(JSON.stringify(prev))
-      const keys = path.split('.')
-      const last = keys.pop()
-      const target = keys.reduce((o, k) => o[k], clone)
-      target[last] = target[last].filter((_, i) => i !== index)
-      return clone
-    })
+  async function handleLogout() {
+    try {
+      await fetch('/api/admin/session', { method: 'DELETE', credentials: 'same-origin' })
+    } catch {
+      // fall through — clear local state regardless
+    }
+    setAuthed(false)
+    setProducts([])
+    setLoginForm({ user: '', pass: '' })
+    handleNew()
+    setMessage('')
   }
 
   function handleEdit(product) {
     setEditing(product.slug)
-    setForm(JSON.parse(JSON.stringify(product)))
+    setMessage('')
   }
 
   function handleNew() {
     setEditing(null)
-    setForm(JSON.parse(JSON.stringify(EMPTY_PRODUCT)))
+    // The nonce, not `editing`, is what actually clears a half-filled new form:
+    // `editing` is already null in that case, so the key would not change.
+    setFormNonce(n => n + 1)
+    setMessage('')
   }
 
-  async function handleSave() {
+  async function handleSave(payload) {
+    if (!SLUG_PATTERN.test(payload.slug)) {
+      setMessage('خطا: Slug فقط می‌تواند شامل حروف انگلیسی، عدد و خط تیره باشد')
+      return
+    }
+
     setSaving(true)
     setMessage('')
     try {
       const method = editing ? 'PUT' : 'POST'
       const res = await fetch('/api/admin/products', {
         method,
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify(form),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(payload),
       })
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Save failed')
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'ذخیره ناموفق بود')
       }
       setMessage(editing ? 'محصول ویرایش شد' : 'محصول جدید اضافه شد')
-      setEditing(null)
-      setForm(EMPTY_PRODUCT)
+      // Stay on the product that was just created rather than clearing the form:
+      // the warning list is still on screen, so whatever is missing can be filled
+      // in without hunting for the product in the list again.
+      setEditing(payload.slug)
       await fetchProducts()
     } catch (e) {
       setMessage('خطا: ' + e.message)
@@ -156,76 +241,38 @@ export default function AdminPage() {
   async function handleDelete(slug) {
     if (!confirm('مطمئنید می‌خواهید این محصول را حذف کنید؟')) return
     try {
-      await fetch('/api/admin/products', {
+      const res = await fetch('/api/admin/products', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({ slug }),
       })
+      // This used to report success unconditionally, even on a failed delete.
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'حذف ناموفق بود')
+      }
+      if (editing === slug) handleNew()
       setMessage('محصول حذف شد')
       await fetchProducts()
-    } catch {
-      setMessage('خطا در حذف محصول')
+    } catch (e) {
+      setMessage('خطا در حذف محصول: ' + e.message)
     }
   }
 
-  function InputField({ label, value, onChange, multiline }) {
+  if (!mounted || checkingSession) {
     return (
-      <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
-        {multiline ? (
-          <textarea
-            value={value || ''}
-            onChange={e => onChange(e.target.value)}
-            rows={3}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none"
-          />
-        ) : (
-          <input
-            type="text"
-            value={value || ''}
-            onChange={e => onChange(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-          />
-        )}
-      </div>
+      <>
+        <Header />
+        <main className="pt-24 pb-16 min-h-screen flex items-center justify-center">
+          <div className="text-[var(--color-text)]/60">در حال بارگذاری...</div>
+        </main>
+        <Footer />
+      </>
     )
   }
 
-  function ArrayField({ label, items, path }) {
-    return (
-      <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
-        <div className="space-y-1">
-          {items.map((item, i) => (
-            <div key={i} className="flex gap-1">
-              <input
-                type="text"
-                value={item}
-                onChange={e => handleArrayChange(`${path}`, i, e.target.value)}
-                className="flex-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => removeArrayItem(path, i)}
-                className="px-2 text-red-400 hover:text-red-600"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => addArrayItem(path)}
-            className="text-xs text-orange-500 hover:text-orange-600"
-          >
-            + افزودن
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  if (!auth) {
+  if (!authed) {
     return (
       <>
         <Header />
@@ -241,45 +288,110 @@ export default function AdminPage() {
               <p className="mt-2 text-sm text-[var(--color-text)]/50">فقط مدیران سیستم</p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4 p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg">
-              {message && (
-                <div className="px-4 py-3 text-sm rounded-xl bg-red-50 text-red-600 border border-red-200">
-                  {message}
+            {!otpStep ? (
+              <form onSubmit={handleLogin} className="space-y-4 p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg">
+                {message && (
+                  <div className="px-4 py-3 text-sm rounded-xl bg-red-50 text-red-600 border border-red-200">
+                    {message}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-medium text-[var(--color-text)]/50 mb-2">نام کاربری</label>
+                  <input
+                    type="text"
+                    placeholder="نام کاربری"
+                    value={loginForm.user}
+                    onChange={e => setLoginForm(p => ({ ...p, user: e.target.value }))}
+                    className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
+                    dir="ltr"
+                    autoComplete="username"
+                  />
                 </div>
-              )}
 
-              <div>
-                <label className="block text-xs font-medium text-[var(--color-text)]/50 mb-2">نام کاربری</label>
-                <input
-                  type="text"
-                  placeholder="نام کاربری"
-                  value={loginForm.user}
-                  onChange={e => setLoginForm(p => ({ ...p, user: e.target.value }))}
-                  className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
-                  dir="ltr"
-                />
-              </div>
+                <div>
+                  <label className="block text-xs font-medium text-[var(--color-text)]/50 mb-2">رمز عبور</label>
+                  <input
+                    type="password"
+                    placeholder="رمز عبور"
+                    value={loginForm.pass}
+                    onChange={e => setLoginForm(p => ({ ...p, pass: e.target.value }))}
+                    className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
+                    dir="ltr"
+                    autoComplete="current-password"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs font-medium text-[var(--color-text)]/50 mb-2">رمز عبور</label>
-                <input
-                  type="password"
-                  placeholder="رمز عبور"
-                  value={loginForm.pass}
-                  onChange={e => setLoginForm(p => ({ ...p, pass: e.target.value }))}
-                  className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all"
-                  dir="ltr"
-                />
-              </div>
+                <button
+                  type="submit"
+                  disabled={loading || !loginForm.user || !loginForm.pass}
+                  className="w-full py-3 px-6 text-sm font-bold text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-[var(--color-accent)]/20"
+                >
+                  {loading ? 'در حال بررسی...' : 'ورود'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="space-y-4 p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg">
+                {message && (
+                  <div className={`px-4 py-3 text-sm rounded-xl border ${
+                    message.includes('ارسال شد') || message.includes('تایید شد')
+                      ? 'bg-green-50 text-green-600 border-green-200'
+                      : 'bg-red-50 text-red-600 border-red-200'
+                  }`}>
+                    {message}
+                  </div>
+                )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 px-6 text-sm font-bold text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-[var(--color-accent)]/20"
-              >
-                {loading ? 'در حال بررسی...' : 'ورود'}
-              </button>
-            </form>
+                <div className="text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--color-accent)]">
+                      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-[var(--color-text)]/60">کد ۶ رقمی به تلگرام شما ارسال شد</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-[var(--color-text)]/50 mb-2">کد تایید</label>
+                  <input
+                    type="text"
+                    placeholder="۶ رقمی"
+                    value={otpCode}
+                    onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    maxLength={6}
+                    className="w-full px-4 py-3 text-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/50 focus:border-[var(--color-accent)] transition-all text-center font-mono text-lg tracking-[0.5em]"
+                    dir="ltr"
+                    autoFocus
+                    inputMode="numeric"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={otpLoading || otpCode.length !== 6}
+                  className="w-full py-3 px-6 text-sm font-bold text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-[var(--color-accent)]/20"
+                >
+                  {otpLoading ? 'در حال تایید...' : 'تایید'}
+                </button>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setOtpStep(false); setMessage(''); setOtpCode('') }}
+                    className="flex-1 py-2 text-sm font-medium text-[var(--color-text)]/60 border border-[var(--color-border)] rounded-xl hover:bg-[var(--color-text)]/5 transition-colors"
+                  >
+                    بازگشت
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resendOtp}
+                    className="flex-1 py-2 text-sm font-medium text-[var(--color-accent)] border border-[var(--color-accent)]/30 rounded-xl hover:bg-[var(--color-accent)]/5 transition-colors"
+                  >
+                    ارسال مجدد
+                  </button>
+                </div>
+              </form>
+            )}
 
             <p className="mt-6 text-center text-xs text-[var(--color-text)]/30">
               اطلاعات ورود از متغیرهای محیطی خوانده می‌شود
@@ -291,205 +403,113 @@ export default function AdminPage() {
     )
   }
 
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <main className="pt-24 pb-16 min-h-screen flex items-center justify-center">
-          <div className="text-[var(--color-text)]/60">در حال بارگذاری...</div>
-        </main>
-        <Footer />
-      </>
-    )
-  }
-
   return (
-    <>
-      <Header />
-      <main className="pt-24 pb-16">
-        <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-[var(--color-primary)]">پنل مدیریت فروشگاه</h1>
-              <p className="text-sm text-[var(--color-text)]/50 mt-1">مدیریت محصولات، سفارشات و قیمت‌ها</p>
-            </div>
-            <div className="flex gap-2">
-              {activeTab === 'products' && (
-                <button
-                  onClick={handleNew}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 transition-colors"
-                >
-                  + محصول جدید
-                </button>
-              )}
-              <button
-                onClick={() => { setAuth(null); setProducts([]) }}
-                className="px-4 py-2 text-sm font-medium text-[var(--color-text)]/60 border border-[var(--color-border)] rounded-xl hover:bg-[var(--color-text)]/5 transition-colors"
-              >
-                خروج
-              </button>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-1 p-1 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] mb-8">
-            {[
-              { key: 'products', label: 'محصولات' },
-              { key: 'orders', label: 'سفارشات' },
-            ].map(tab => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all ${
-                  activeTab === tab.key
-                    ? 'bg-[var(--color-accent)] text-white shadow-sm'
-                    : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)]'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {message && (
-            <div className="mb-6 px-4 py-3 text-sm rounded-lg bg-orange-50 text-orange-700 border border-orange-200">
-              {message}
-            </div>
-          )}
-
-          {activeTab === 'orders' ? (
-            <OrderManagement auth={auth} />
-          ) : (
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 space-y-3">
-              <h2 className="text-sm font-semibold text-[var(--color-text)]/60 mb-3">لیست محصولات</h2>
-              {products.map(p => (
-                <div
-                  key={p.slug}
-                  className={`p-4 rounded-xl border transition-all cursor-pointer ${
-                    editing === p.slug
-                      ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5'
-                      : 'border-[var(--color-border)] hover:border-[var(--color-accent)]/30'
-                  }`}
-                  onClick={() => handleEdit(p)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-bold text-sm text-[var(--color-primary)]">{p.title.fa}</h3>
-                      <p className="text-xs text-[var(--color-text)]/50 mt-0.5">{p.title.en}</p>
-                    </div>
-                    <button
-                      onClick={e => { e.stopPropagation(); handleDelete(p.slug) }}
-                      className="text-red-400 hover:text-red-600 text-sm"
-                    >
-                      حذف
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="lg:col-span-2">
-              <div className="p-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)]">
-                <h2 className="text-lg font-bold text-[var(--color-primary)] mb-6">
-                  {editing ? 'ویرایش محصول' : 'محصول جدید'}
-                </h2>
-
-                <div className="space-y-6">
-                  <InputField label="Slug (شناسه URL)" value={form.slug} onChange={v => handleChange('slug', v)} />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <InputField label="عنوان فارسی" value={form.title.fa} onChange={v => handleChange('title.fa', v)} />
-                    <InputField label="عنوان انگلیسی" value={form.title.en} onChange={v => handleChange('title.en', v)} />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <InputField label="توضیح کوتاه فارسی" value={form.shortDescription.fa} onChange={v => handleChange('shortDescription.fa', v)} />
-                    <InputField label="توضیح کوتاه انگلیسی" value={form.shortDescription.en} onChange={v => handleChange('shortDescription.en', v)} />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <InputField label="توضیح کامل فارسی" value={form.description.fa} onChange={v => handleChange('description.fa', v)} multiline />
-                    <InputField label="توضیح کامل انگلیسی" value={form.description.en} onChange={v => handleChange('description.en', v)} multiline />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-2">تکنولوژی‌ها</label>
-                    <div className="flex flex-wrap gap-2">
-                      {form.tech.map((t, i) => (
-                        <div key={i} className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg text-sm">
-                          <input
-                            type="text"
-                            value={t}
-                            onChange={e => handleArrayChange('tech', i, e.target.value)}
-                            className="bg-transparent outline-none w-20"
-                          />
-                          <button onClick={() => removeArrayItem('tech', i)} className="text-gray-400 hover:text-red-500 text-xs">✕</button>
-                        </div>
-                      ))}
-                      <button onClick={() => addArrayItem('tech')} className="text-xs text-orange-500 hover:text-orange-600">+ افزودن</button>
-                    </div>
-                  </div>
-
-                  <InputField label="آدرس دمو" value={form.demoUrl} onChange={v => handleChange('demoUrl', v)} />
-                  <InputField label="لینک GitHub" value={form.github} onChange={v => handleChange('github', v)} />
-
-                  <div>
-                    <h3 className="text-sm font-semibold text-[var(--color-text)]/60 mb-3">ویژگی‌ها</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <ArrayField label="فارسی" items={form.features.fa} path="features.fa" />
-                      <ArrayField label="انگلیسی" items={form.features.en} path="features.en" />
-                    </div>
-                  </div>
-
-                  {['free', 'starter', 'pro'].map(plan => (
-                    <div key={plan} className="p-4 rounded-xl border border-[var(--color-border)] space-y-3">
-                      <h3 className="text-sm font-bold text-[var(--color-primary)] capitalize">{plan}</h3>
-                      <div className="grid grid-cols-3 gap-3">
-                        <InputField label="قیمت (عدد)" value={form.pricing[plan].price} onChange={v => handleChange(`pricing.${plan}.price`, Number(v))} />
-                        <InputField label="قیمت نمایشی فارسی" value={form.pricing[plan].priceDisplay.fa} onChange={v => handleChange(`pricing.${plan}.priceDisplay.fa`, v)} />
-                        <InputField label="قیمت نمایشی انگلیسی" value={form.pricing[plan].priceDisplay.en} onChange={v => handleChange(`pricing.${plan}.priceDisplay.en`, v)} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <InputField label="دوره فارسی" value={form.pricing[plan].period.fa} onChange={v => handleChange(`pricing.${plan}.period.fa`, v)} />
-                        <InputField label="دوره انگلیسی" value={form.pricing[plan].period.en} onChange={v => handleChange(`pricing.${plan}.period.en`, v)} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <ArrayField label="ویژگی‌ها فارسی" items={form.pricing[plan].features.fa} path={`pricing.${plan}.features.fa`} />
-                        <ArrayField label="ویژگی‌ها انگلیسی" items={form.pricing[plan].features.en} path={`pricing.${plan}.features.en`} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <InputField label="دکمه فارسی" value={form.pricing[plan].cta.fa} onChange={v => handleChange(`pricing.${plan}.cta.fa`, v)} />
-                        <InputField label="دکمه انگلیسی" value={form.pricing[plan].cta.en} onChange={v => handleChange(`pricing.${plan}.cta.en`, v)} />
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="flex gap-3 pt-4">
-                    <button
-                      onClick={handleSave}
-                      disabled={saving || !form.slug}
-                      className="px-6 py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 transition-colors disabled:opacity-50"
-                    >
-                      {saving ? 'در حال ذخیره...' : 'ذخیره'}
-                    </button>
-                    {editing && (
-                      <button
-                        onClick={handleNew}
-                        className="px-6 py-2.5 text-sm font-medium text-[var(--color-text)]/60 border border-[var(--color-border)] rounded-xl hover:bg-[var(--color-text)]/5 transition-colors"
-                      >
-                        انصراف
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          )}
+    // No Header/Footer and no max-w wrapper here on purpose: the panel is an app,
+    // not a page of the site. AdminShell owns the viewport instead, so the content
+    // gets the full width a table wants and the full height a list wants.
+    <AdminShell
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      counts={{ orders: orderStats.receiptUploaded || 0, leads: leadStats.pending || 0 }}
+      onLogout={handleLogout}
+      actions={
+        activeTab === 'products' && (
+          <button
+            onClick={handleNew}
+            className="h-9 px-3 text-xs font-medium text-white bg-[var(--color-accent)] rounded-lg hover:bg-[var(--color-accent)]/90 transition-colors shrink-0"
+          >
+            + محصول جدید
+          </button>
+        )
+      }
+    >
+      {message && (
+        <div className="mb-3 px-4 py-2.5 text-sm rounded-xl bg-orange-50 text-orange-700 border border-orange-200">
+          {message}
         </div>
-      </main>
-      <Footer />
-    </>
+      )}
+
+      {activeTab === 'dashboard' && (
+        <Dashboard
+          auth={authed}
+          products={products}
+          onStats={setOrderStats}
+          onGoToOrders={() => setActiveTab('orders')}
+        />
+      )}
+
+      {activeTab === 'orders' && <OrderManagement auth={authed} onStats={setOrderStats} />}
+
+      {activeTab === 'leads' && (
+        // products is passed so the filter chips can show real product names
+        // instead of slugs — the catalogue is already loaded for the products tab.
+        <Leads auth={authed} products={products} onStats={setLeadStats} />
+      )}
+
+      {activeTab === 'customers' && <Customers auth={authed} products={products} />}
+
+      {activeTab === 'products' && (
+        // 4/8 rather than thirds: the form is the working surface and the list is
+        // only for picking what to work on, so on a wide monitor the extra pixels
+        // belong to the form's paired fa/en fields.
+        <div className="grid xl:grid-cols-12 gap-4">
+          <div className="xl:col-span-4 space-y-2">
+            {/* Sorted by tier so the list reads in the same order as the store
+                ladder — an untiered product sorts last there too. */}
+            {[...products]
+              .sort((a, b) => (a.tier ?? 99) - (b.tier ?? 99))
+              .map(p => {
+                const badge = STATUS_BADGES[p.status] || STATUS_BADGES.available
+                return (
+                  <div
+                    key={p.slug}
+                    className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                      editing === p.slug
+                        ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5'
+                        : 'border-[var(--color-border)] hover:border-[var(--color-accent)]/30'
+                    }`}
+                    onClick={() => handleEdit(p)}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-sm text-[var(--color-primary)] truncate">{p.title?.fa || p.slug}</h3>
+                        <p className="text-xs text-[var(--color-text)]/50 mt-0.5 truncate" dir="ltr">{p.title?.en}</p>
+                        <div className="flex items-center gap-1.5 mt-1.5">
+                          <span className={`px-1.5 py-0.5 text-[10px] rounded border ${badge.className}`}>{badge.label}</span>
+                          {p.featured && (
+                            <span className="px-1.5 py-0.5 text-[10px] rounded border bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/30">شاخص</span>
+                          )}
+                          {p.tier != null && (
+                            <span className="text-[10px] text-[var(--color-text)]/40">سطح {p.tier}</span>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={e => { e.stopPropagation(); handleDelete(p.slug) }}
+                        className="text-red-400 hover:text-red-600 text-xs shrink-0"
+                      >
+                        حذف
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+          </div>
+
+          <div className="xl:col-span-8">
+            {/* Remounted on key change instead of syncing props into state:
+                a useEffect doing that reruns on every parent render and would
+                overwrite whatever was half-typed. */}
+            <ProductForm
+              key={`${editing || 'new'}-${formNonce}`}
+              initial={editing ? products.find(p => p.slug === editing) : null}
+              saving={saving}
+              onSave={handleSave}
+              onCancel={handleNew}
+            />
+          </div>
+        </div>
+      )}
+    </AdminShell>
   )
 }

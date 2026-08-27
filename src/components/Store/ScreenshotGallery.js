@@ -168,13 +168,21 @@ export default function ScreenshotGallery({ screenshots }) {
           </>
         )}
 
+        {/*
+          max-h caps the image against the *viewport*, which is the whole point of
+          rotating a phone. Without it `w-full h-auto` makes a 3:2 shot 505px tall in
+          a 375px-tall landscape window: turning the phone sideways to see the picture
+          bigger showed strictly less of it. `svh` and not `vh` so a mobile URL bar
+          appearing does not reflow the page, and not `dvh` so it does not animate.
+          object-contain letterboxes the difference against the surface colour.
+        */}
         <Image
           src={screenshots[activeIndex].src}
           alt={altText(screenshots[activeIndex])}
           width={1200}
           height={800}
           sizes="(max-width: 768px) 100vw, 70vw"
-          className="w-full h-auto object-contain transition-transform duration-200 group-hover:scale-[1.01]"
+          className="w-full h-auto max-h-[70svh] object-contain transition-transform duration-200 group-hover:scale-[1.01]"
           priority
         />
 
@@ -190,7 +198,16 @@ export default function ScreenshotGallery({ screenshots }) {
         </div>
       </div>
 
-      {/* Thumbnail strip - only on desktop */}
+      {/*
+        Thumbnail strip. Hidden on portrait phones, which means a landscape phone gets
+        it — `sm:` is a width query and a rotated phone is 812px wide.
+
+        This strip cannot contain itself: a nowrap flex row of N thumbnails has a
+        min-content width of N × 96px, and `overflow-x: auto` makes it scrollable
+        without making it shrinkable. Whatever flex or grid item this component sits
+        in has to carry `min-w-0`, or that min-content propagates all the way up and
+        the strip's width becomes the page's width. See the note in ProductClient.
+      */}
       <div className="hidden sm:block relative">
         <div
           className="flex gap-2 overflow-x-auto pb-2 px-10 scroll-smooth"
@@ -229,7 +246,7 @@ export default function ScreenshotGallery({ screenshots }) {
           onClick={(e) => { if (e.target === lightboxRef.current) closeLightbox() }}
         >
           {/* Top bar */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+          <div className="flex items-center justify-between px-4 py-3 short:py-1.5 border-b border-white/10">
             <span className="text-white/60 text-sm font-mono">
               {activeIndex + 1} / {screenshots.length}
             </span>
@@ -245,8 +262,13 @@ export default function ScreenshotGallery({ screenshots }) {
             </button>
           </div>
 
-          {/* Main image */}
-          <div className="flex-1 flex items-center justify-center p-4 sm:p-8 overflow-hidden"
+          {/*
+            Main image. The `short:` overrides exist because a landscape phone is the
+            one case where the lightbox is worse than the page it covers: two 57px bars
+            plus 64px of `sm:p-8` left a 375px-tall window only ~197px of image. The
+            bars are what makes it navigable, so the padding gives way instead.
+          */}
+          <div className="flex-1 flex items-center justify-center p-4 sm:p-8 short:p-2 overflow-hidden"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -261,7 +283,7 @@ export default function ScreenshotGallery({ screenshots }) {
           </div>
 
           {/* Bottom bar */}
-          <div className="border-t border-white/10 px-4 py-3">
+          <div className="border-t border-white/10 px-4 py-3 short:py-1.5">
             <div className="flex items-center justify-between gap-3">
               {/* Prev */}
               <button
@@ -276,8 +298,14 @@ export default function ScreenshotGallery({ screenshots }) {
                 </svg>
               </button>
 
-              {/* Thumbnails */}
-              <div className="flex gap-2 overflow-x-auto flex-1 pb-1" style={{ scrollbarWidth: 'none' }}>
+              {/*
+                min-w-0 for the same reason as the product grid: `flex-1` leaves
+                `min-width: auto`, so this item refuses to shrink below the 1648px
+                min-content of its own thumbnail row and shoves the Next button off
+                the screen. overflow-x-auto is not enough on its own — it makes the
+                box scrollable, not shrinkable.
+              */}
+              <div className="flex gap-2 overflow-x-auto flex-1 min-w-0 pb-1" style={{ scrollbarWidth: 'none' }}>
                 {screenshots.map((shot, i) => (
                   <button
                     key={i}

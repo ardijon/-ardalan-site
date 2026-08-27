@@ -1,4 +1,8 @@
-name = "ai2apps"
+# The live Worker has been called "ardalan-site" since the first Cloudflare
+# deploy, and the ai2apps.sbs custom domain is attached to it. Renaming here
+# would not rename the Worker — it would create a second, empty one and leave
+# the domain serving the old code, so the name stays as deployed.
+name = "ardalan-site"
 main = ".open-next/worker.js"
 compatibility_date = "2025-08-16"
 compatibility_flags = ["nodejs_compat"]
@@ -10,3 +14,73 @@ binding = "ASSETS"
 
 [build]
 command = "npx @opennextjs/cloudflare build"
+
+# ---------------------------------------------------------------------------
+# Durable storage (KV)  —  REQUIRED for the admin panel to work in production
+# ---------------------------------------------------------------------------
+# Workers have no writable filesystem and each request may run in a different
+# isolate, so orders, product edits and login OTP codes cannot be kept in files
+# or in module memory. src/lib/storage.js writes them to KV instead.
+#
+# When this binding is absent, storage falls back to local JSON files — correct
+# for `next dev`, but in production it would silently lose orders.
+
+[[kv_namespaces]]
+binding = "SITE_KV"
+id = "76de247968e348f5818c9947b464d93d"
+# preview_id is only needed to run `wrangler dev` / `opennextjs-cloudflare
+# preview` against a throwaway namespace. Create one and paste the id here:
+#
+#   npx wrangler kv namespace create SITE_KV --preview
+#
+# preview_id = "<id from the command above>"
+
+# ---------------------------------------------------------------------------
+# Receipt images  —  REQUIRED for the admin to verify payments
+# ---------------------------------------------------------------------------
+# Payment receipts used to be written to public/uploads/receipts/. Workers has
+# no writable filesystem, so the upload returned 200 but stored nothing and the
+# admin saw «تصویر رسید موجود نیست» — payment could not be verified at all.
+#
+# src/lib/blob.js stores them durably instead, picking the best driver available:
+# R2 if the RECEIPTS binding exists, otherwise SITE_KV (binary values up to
+# 25 MiB; uploads are capped at 5 MB), otherwise the old public/uploads/receipts/
+# path for `next dev` and plain Node hosts. Objects are served through
+# /api/admin/receipt/<filename>, which requires an admin session.
+#
+# R2 IS NOT ENABLED ON THIS ACCOUNT YET. `wrangler r2 bucket create` prints a
+# success line but the API rejects every R2 call with
+#   "Please enable R2 through the Cloudflare Dashboard" [code: 10042]
+# and leaving the binding uncommented makes `deploy` fail outright. So receipts
+# currently live in KV, which works today and needs no payment method.
+#
+# To move to R2 later: enable R2 in the dashboard (R2 → Overview), run
+#   npx wrangler r2 bucket create ardalan-receipts
+# then uncomment the block below and redeploy. Migrate any real receipts out of
+# KV first — the drivers do not read each other's data.
+#
+# [[r2_buckets]]
+# binding = "RECEIPTS"
+# bucket_name = "ardalan-receipts"
+
+# ---------------------------------------------------------------------------
+# Secrets  —  set with `npx wrangler secret put <NAME>` (never commit them)
+# ---------------------------------------------------------------------------
+# These used to live in the Netlify dashboard. Netlify is no longer used, so
+# they must be set on the Worker or the corresponding feature fails closed:
+#
+#   ADMIN_USER              admin panel username
+#   ADMIN_PASS              admin panel password
+#   ADMIN_SESSION_SECRET    signs the admin session cookie (optional; falls back
+#                           to ADMIN_USER:ADMIN_PASS, which invalidates every
+#                           session whenever the password changes)
+#   TELEGRAM_BOT_TOKEN      bot used for the contact form and admin login OTP
+#   TELEGRAM_CHAT_ID        chat that receives contact-form messages
+#   ADMIN_TELEGRAM_ID       chat that receives admin login OTP codes
+#
+# Non-secret display values can go in [vars] instead:
+#
+# [vars]
+# BANK_NAME = "..."
+# CARD_NUMBER = "..."
+# ACCOUNT_HOLDER = "..."

@@ -6,6 +6,14 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        // Landscape phones. They are wide enough to satisfy `sm:` while being only
+        // ~375px tall, so every vertical padding that reads as generous on a desktop
+        // is eating the image instead. Declared here rather than inline so the
+        // threshold has one home; extend appends it after the width breakpoints,
+        // which is what lets `short:p-2` win over `sm:p-8`.
+        short: { raw: '(max-height: 600px)' },
+      },
       colors: {
         primary: {
           50: '#f0f1f9',

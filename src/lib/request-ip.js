@@ -1,15 +1,24 @@
 /**
  * Shared utility to extract a trusted visitor key from a request.
  *
- * Precedence (most trusted first):
- *   1. Netlify: x-nf-client-connection-ip
- *   2. Cloudflare: cf-connecting-ip
- *   3. x-forwarded-for — first public IP (client, not last proxy)
- *   4. x-real-ip
- *   5. request.ip (Node built-in)
+ * TRUST MODEL
+ * -----------
+ * This app runs behind Cloudflare (see wrangler.toml). Cloudflare's edge sets
+ * `cf-connecting-ip` itself and overwrites any value the client tried to send,
+ * so it is the only header here that cannot be forged. When it is present we
+ * use it and stop — deliberately never falling through to the headers below,
+ * because doing so would let a caller pick their own rate-limit bucket.
  *
- * Returns 'unknown' as a last resort so rate-limit / dedupe buckets
- * never collide on a falsy value.
+ * The remaining headers are client-controllable and exist only so that local
+ * development and non-Cloudflare hosts still produce a usable key.
+ *
+ * (An earlier version checked Netlify's `x-nf-client-connection-ip` *before*
+ * Cloudflare's header. Once the site left Netlify nothing set that header
+ * any more, so anyone could send it and be handed a fresh rate-limit bucket on
+ * every request. It has been removed along with the rest of the Netlify setup.)
+ *
+ * Returns 'unknown' as a last resort so rate-limit / dedupe buckets never
+ * collide on a falsy value.
  */
 
 const PRIVATE_RANGES = [
@@ -27,15 +36,14 @@ function isPrivate(ip) {
 }
 
 export function extractClientKey(request) {
-  // 1. Netlify
-  const nf = request.headers.get('x-nf-client-connection-ip')
-  if (nf && !isPrivate(nf)) return nf
-
-  // 2. Cloudflare
+  // Trusted: set by the Cloudflare edge, unforgeable by the client.
+  // Used unconditionally when present — no fallback, by design.
   const cf = request.headers.get('cf-connecting-ip')
-  if (cf && !isPrivate(cf)) return cf
+  if (cf) return cf
 
-  // 3. x-forwarded-for — first entry is the original client
+  // --- Untrusted fallbacks: local dev / non-Cloudflare hosts only ---
+
+  // x-forwarded-for — first entry is the original client
   const xff = request.headers.get('x-forwarded-for')
   if (xff) {
     const candidates = xff.split(',').map((s) => s.trim()).filter(Boolean)
@@ -44,11 +52,9 @@ export function extractClientKey(request) {
     }
   }
 
-  // 4. x-real-ip
   const real = request.headers.get('x-real-ip')
   if (real && !isPrivate(real)) return real
 
-  // 5. request.ip (Vercel / Node built-in)
   if (request.ip) return request.ip
 
   return 'unknown'

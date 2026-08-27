@@ -1,6 +1,7 @@
 'use client'
 
 import { useI18n } from '@/lib/i18n/I18nProvider'
+import { formatJalali } from '@/lib/jalali'
 
 const STATUS_STEPS = [
   'awaiting_payment',
@@ -113,7 +114,9 @@ export default function OrderTimeline({ status, statusHistory }) {
                 const historyEntry = statusHistory?.findLast(h => h.status === step)
                 return historyEntry && (
                   <p className="text-xs text-[var(--color-text)]/40 mt-0.5">
-                    {new Date(historyEntry.at).toLocaleDateString(locale === 'fa' ? 'fa-IR' : 'en-US')}
+                    {locale === 'fa'
+                      ? formatJalali(historyEntry.at)
+                      : new Date(historyEntry.at).toLocaleDateString('en-US')}
                   </p>
                 )
               })()}

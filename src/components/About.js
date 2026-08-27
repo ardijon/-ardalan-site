@@ -89,10 +89,18 @@ export default function About() {
             }}
           >
             <h2 className="text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)] leading-tight min-h-[1.2em]">
-              <span>
+              {/* The typed layer is decoration, so it is hidden from assistive
+                  tech and the real heading sits beside it. Two things were wrong
+                  with typing alone: on the server `visible` is false and
+                  `charIndex` is 0, so this <h2> went out empty and the section's
+                  own title was missing from the HTML crawlers read; and a screen
+                  reader was announcing a heading that mutated one letter at a
+                  time. One span fixes both, with no visual change. */}
+              <span aria-hidden="true">
                 {visible ? titleText.slice(0, charIndex) : ''}
                 {!typingDone && visible && <span className="animate-pulse text-[var(--color-accent)]">|</span>}
               </span>
+              <span className="sr-only">{titleText}</span>
             </h2>
             <div className="flex items-center gap-3 mt-6 mb-6">
               <div className="w-16 h-1 bg-[var(--color-accent)] rounded-full" />
@@ -108,6 +116,18 @@ export default function About() {
               } border-[var(--color-accent)]/30`}>
                 <p className="text-lg sm:text-xl leading-relaxed text-[var(--color-text)]/70" dangerouslySetInnerHTML={{ __html: renderBold(t('about.quote')) }} />
               </div>
+
+              {/* The résumé left the header nav — it is proof, not a destination —
+                  so this is now the only way in. */}
+              <a
+                href="#resume"
+                className="group inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-accent)] hover:underline"
+              >
+                {t('about.resumeLink')}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" className="rtl:rotate-180">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </a>
             </div>
           </div>
 

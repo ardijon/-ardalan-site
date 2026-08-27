@@ -13,6 +13,7 @@ const dictionary = {
     header: {
       nav: {
         about: 'درباره من',
+        products: 'محصولات',
         services: 'خدمات',
         portfolio: 'نمونه‌کارها',
         store: 'فروشگاه',
@@ -40,7 +41,7 @@ const dictionary = {
       name: 'اردلان پیری',
       subtitle: 'نوآوری با فناوری و هوش مصنوعی',
       description: 'توسعه نرم‌افزار  ·  هوش مصنوعی  ·  تحلیل بازارهای مالی  ·  مشاوره بیمه',
-      cta1: 'مشاهده خدمات',
+      cta1: 'محصولات من',
       cta2: 'دریافت مشاوره',
     },
     about: {
@@ -55,10 +56,20 @@ const dictionary = {
       p2: 'بیش از ۱۰ سال تجربه در بازارهای مالی و صنعت بیمه دارم — از تحلیل تکنیکال و ترید تا مدیریت ارشد فروش.',
       p3: 'از **۱۴۰۱**، هوش مصنوعی مسیرم رو تغییر داد. الان تمام‌وقت محصولات هوشمند می‌سازم.',
       quote: 'باور من اینه که **اعتماد** پایه‌ای‌ترین عنصر هر رابطه حرفه‌ای است — چه توی کدهایی که می‌نویسم، چه محصولاتی که می‌سازم.',
+      resumeLink: 'مشاهده رزومه کامل',
+    },
+    products: {
+      badge: 'محصولات من',
+      title: 'ابزارهای دیجیتال صنعت بیمه عمر',
+      subtitle: 'سه ابزار برای سه اندازه از کار — از یک نماینده تا یک شرکت بیمه',
+      levelLabel: 'سطح',
+      viewAll: 'مشاهده فروشگاه',
     },
     services: {
       badge: 'خدمات من',
       title: 'چه کاری می‌تونم برات انجام بدم؟',
+      storeBridge: 'یا اگر به‌جای پروژه‌ی سفارشی، یک محصول آماده می‌خواهی:',
+      storeBridgeCta: 'محصولات آماده',
       items: [
         { title: 'توسعه نرم‌افزار', desc: 'طراحی و ساخت وب‌سایت، اپلیکیشن اندروید، نرم‌افزار ویندوز و ربات‌های هوشمند' },
         { title: 'هوش مصنوعی و اتوماسیون', desc: 'راهکارهای عملی AI برای کسب‌وکارها — اتوماسیون فرآیندها، تحلیل داده و افزایش بهره‌وری' },
@@ -77,7 +88,7 @@ const dictionary = {
         { title: 'سامانه هوشمند مدیریت فروش', cat: 'CRM', desc: 'سیستم مدیریت ارتباط با مشتری (CRM) با قابلیت رهگیری تعاملات، اتوماسیون پیگیری و داشبورد تحلیلی.' },
         { title: 'اپلیکیشن مدیریت سرمایه و ریسک', cat: 'توسعه اندروید', desc: 'اپلیکیشن موبایل برای مدیریت سرمایه، محاسبه ریسک، ثبت معاملات و تحلیل عملکرد در بازارهای مالی.' },
         { title: 'ابزار تحلیل تکنیکال پیشرفته', cat: 'تحلیل بازار', desc: 'نرم‌افزار ویندوز با اندیکاتورهای اختصاصی، شناسایی الگوهای قیمتی و سیگنال‌های ترکیبی.' },
-        { title: 'سامانه جامع مشاوره و فروش بیمه', cat: 'توسعه وب', desc: 'پلتفرم آنلاین مشاوره و صدور بیمه‌نامه با مقایسه هوشمند پوشش‌ها، قیمت‌ها و مدیریت مشتریان.' },
+        { title: 'سامانه جامع مشاوره و فروش بیمه', cat: 'توسعه وب', storeSlug: 'tavana', desc: 'پلتفرم آنلاین مشاوره و صدور بیمه‌نامه با مقایسه هوشمند پوشش‌ها، قیمت‌ها و مدیریت مشتریان.' },
         { title: 'پکیج اتوماسیون فروش بیمه', cat: 'اتوماسیون', desc: 'اتوماسیون هوشمند فرآیندهای فروش، پیگیری مشتریان، یادآوری تمدید و گزارش‌گیری لحظه‌ای.' },
       ],
     },
@@ -138,9 +149,6 @@ const dictionary = {
     footer: {
       social: 'شبکه‌های اجتماعی',
     },
-    visitor: {
-      label: 'بازدیدکننده',
-    },
     countdown: {
       days: 'روز',
       hours: 'ساعت',
@@ -155,11 +163,23 @@ const dictionary = {
     store: {
       badge: 'فروشگاه',
       title: 'محصولات آماده',
-      subtitle: 'قالب‌ها و ابزارهای حرفه‌ای برای شروع سریع کسب‌وکار',
-      valueProposition: '«آیا آماده‌اید از یک استخدام‌کننده معمولی به یک رهبر جریان‌ساز تبدیل شوید؟»\n\nدر دنیای شلوغ بیمه، تفاوت بین یک مدیر موفق و یک مدیر معمولی، در سیستمی است که دارند. شما سالها تجربه را در کوله‌پشتی خود دارید، اما آیا متقاضیان شما در نگاه اول، این شکوه و تخصص را حس می‌کنند؟\n\nوب‌اپلیکیشن توانا، تنها یک سایت نیست؛ میراث دیجیتال شماست. تصور کنید متقاضی وارد قلمرو اختصاصی شما می‌شود؛ جایی که دامنه سایت به نام شماست، تندیس‌های افتخارتان می‌درخشند و داستان‌های موفقیت تیم‌تان، قلب او را به تپش می‌اندازد. اینجا دیگر شما به دنبال نیرو نمی‌گردید، بلکه افراد باکیفیت برای پیوستن به امپراتوری شما صف می‌کشند.\n\nبا این ابزار، شما زمانتان را که گران‌بها‌ترین دارایی شماست صرف هر کسی نمی‌کنید. سیستم هوشمند شما، افراد را از فیلترهای تخصصی رد می‌کند و فقط کسانی را به میز مصاحبه شما می‌رساند که پتانسیل ستاره شدن را دارند. نظم، پرستیژ و قدرت؛ این سه کلمه تعریف جدید کسب‌وکار شما با این وب‌اپلیکیشن خواهد بود. زمان آن رسیده که با ابزارهای سنتی خداحافظی کنید و به عصر مدیریت هوشمند سلام کنید.',
+      subtitle: 'از یک نماینده تا یک سازمان — ساخته‌شده با بیش از یک دهه تجربه‌ی فروش، نبوغ و نوآوری',
+      // `*` علامت تأکید است؛ StoreHero آن را به رنگ accent درمی‌آورد و `\n` را
+      // شکست خط می‌گیرد. تیتر قبلاً در کامپوننت هاردکد بود و قابل ترجمه نبود.
+      heroTitle: 'ابزارهای دیجیتال\n*صنعت بیمه عمر*',
+      // هر سه ادعا باید برای کل فروشگاه راست باشند و هیچ‌کدام تعهد مالی نباشند.
+      heroFeatures: ['دموی زنده قبل از خرید', 'پشتیبانی مستقیم از سازنده', 'هاست و دامنه ایران'],
       viewDemo: 'مشاهده دمو',
       buyNow: 'خرید',
+      // محصولی که هنوز منتشر نشده نه دکمه‌ی خرید می‌گیرد و نه قیمت قابل پرداخت.
+      comingSoon: 'به‌زودی',
+      notifyMe: 'خبرم کن',
+      moreInfo: 'جزئیات و ثبت‌نام',
+      ladderTitle: 'کدام سطح برای شماست؟',
+      ladderSubtitle: 'سه ابزار برای سه اندازه از کار — از یک نماینده تا یک شرکت بیمه',
+      legalNote: 'نکته‌ی مقرراتی',
       features: 'ویژگی‌ها',
+      testimonialsTitle: 'مشتری‌ها چه می‌گویند',
       techStack: 'تکنولوژی‌ها',
       pricing: 'قیمت‌گذاری',
       free: 'رایگان',
@@ -176,6 +196,20 @@ const dictionary = {
       backToStore: 'بازگشت به فروشگاه',
       trackOrder: 'پیگیری سفارش',
       qr: { scan: 'اسکن QR Code' },
+      // یک تایمر تنها هیچ چیزی تولید نمی‌کند؛ تایمر به‌همراه لیست انتظار یعنی روز
+      // انتشار یک مخاطب آماده وجود دارد.
+      notify: {
+        title: 'وقتی منتشر شد خبرت کنم؟',
+        subtitle: 'شماره‌ات را بگذار — روز انتشار اول به تو خبر می‌دهم.',
+        phone: 'شماره موبایل',
+        email: 'ایمیل (اختیاری)',
+        submit: 'خبرم کن',
+        submitting: 'در حال ثبت...',
+        success: 'ثبت شد. روز انتشار خبرت می‌کنم.',
+        error: 'ثبت نشد — لطفاً دوباره تلاش کن.',
+        contactTitle: 'برای گفتگوی مستقیم تماس بگیرید',
+        contactCta: 'تماس با من',
+      },
       purchaseForm: {
         title: 'فرم خرید',
         name: 'نام و نام خانوادگی',
@@ -189,9 +223,6 @@ const dictionary = {
         success: 'سفارش شما ثبت شد — کد پیگیری شما:',
         error: 'خطا در ثبت سفارش — لطفاً دوباره تلاش کنید.',
         bankInfo: 'اطلاعات پرداخت',
-        bankName: 'بلوبانک سامان',
-        cardNumber: '6219-8618-7624-0465',
-        holderName: 'اردلان پیری',
         amount: 'مبلغ قابل پرداخت (تومان)',
         instructions: 'لطفاً مبلغ بالا را به کارت زیر واریز کنید و رسید پرداخت را آپلود کنید.',
         uploadReceipt: 'آپلود رسید پرداخت',
@@ -233,7 +264,7 @@ const dictionary = {
     trust: {
       secure: { title: 'امنیت کامل', desc: 'پرداخت امن و رمزنگاری شده' },
       payment: { title: 'پرداخت آسان', desc: 'پرداخت با کارت بانکی' },
-      refund: { title: 'بازگشت وجه', desc: 'ضمانت ۷ روزه بازگشت وجه' },
+      demo: { title: 'دموی زنده', desc: 'قبل از خرید، نسخه‌ی کامل را امتحان کن' },
       instant: { title: 'تحویل فوری', desc: 'بلافاصله پس از خرید' },
     },
     faq: {
@@ -243,23 +274,25 @@ const dictionary = {
       a1: 'بله، کد کاملاً قابل ویرایش و سفارشی‌سازی است. شما می‌توانید هر بخشی را تغییر دهید.',
       q2: 'پشتیبانی فنی چگونه است؟',
       a2: 'تا ۶ ماه پس از خرید، پشتیبانی فنی رایگان از طریق تلگرام و واتساپ دریافت می‌کنید.',
-      q3: 'آیا امکان بازگشت وجه وجود دارد؟',
-      a3: 'بله، تا ۷ روز پس از خرید در صورت عدم رضایت، وجه کامل بازگشت داده می‌شود.',
+      q3: 'قبل از خرید می‌توانم محصول را ببینم؟',
+      a3: 'بله. یک دموی زنده و کامل از محصول در دسترس است — همان چیزی که تحویل می‌گیرید، نه یک پیش‌نمایش محدود.',
       q4: 'آپدیت‌ها رایگان است؟',
       a4: 'بله، تمام آپدیت‌های آتی به صورت رایگان قابل دریافت است.',
       q5: 'نیاز به هاست دارم؟',
       a5: 'بله، برای اجرای پروژه به یک هاست Node.js (مثل Vercel یا Railway) نیاز دارید.',
     },
     whyUs: {
-      fast: { title: 'تحویل فوری', desc: 'بلافاصله پس از خرید، کد منبع دانلود کنید' },
+      // پلن استارتر یک اشتراک با هاست و دامنه است، نه یک دانلود. متن قبلی فقط
+      // مسیر کد منبع را می‌گفت و خریدار اشتراک منتظر فایلی می‌ماند که نمی‌آید.
+      fast: { title: 'دو مسیر تحویل', desc: 'اشتراک با هاست و دامنه‌ی آماده، یا خرید یکجای کد منبع' },
       customizable: { title: 'قابل سفارشی‌سازی', desc: 'کد کاملاً قابل ویرایش و تطبیق با نیاز شما' },
       quality: { title: 'کیفیت تضمینی', desc: 'با استانداردهای روز دنیا و بهترین practices' },
       support: { title: 'پشتیبانی ۶ ماهه', desc: 'پشتیبانی رایگان از طریق تلگرام و واتساپ' },
     },
     howItWorks: {
-      browse: { title: 'محصول رو انتخاب کنید', desc: 'از بین قالب‌ها و ابزارهای حرفه‌ای، بهترین رو پیدا کنید' },
+      browse: { title: 'محصول رو انتخاب کنید', desc: 'از بین ابزارهای صنعت بیمه عمر، اون سطحی که به کارتون میاد رو پیدا کنید' },
       purchase: { title: 'خرید رو انجام بدید', desc: 'از طریق کارت بانکی پرداخت کنید و سفارش رو ثبت کنید' },
-      download: { title: 'دانلود و راه‌اندازی', desc: 'کد منبع رو دانلود کنید و روی هاست خودتون راه‌اندازی کنید' },
+      download: { title: 'راه‌اندازی', desc: 'اشتراک گرفتید؟ سایت رو براتون بالا میاریم. کد منبع خریدید؟ تحویلش می‌گیرید و روی هاست خودتون میارید' },
     },
   },
 
@@ -277,6 +310,7 @@ const dictionary = {
     header: {
       nav: {
         about: 'About',
+        products: 'Products',
         services: 'Services',
         portfolio: 'Portfolio',
         store: 'Store',
@@ -304,7 +338,7 @@ const dictionary = {
       name: 'Ardalan Piri',
       subtitle: 'Innovation through Technology & AI',
       description: 'Software Development  ·  Artificial Intelligence  ·  Financial Markets  ·  Insurance Consulting',
-      cta1: 'View Services',
+      cta1: 'My Products',
       cta2: 'Get Consultation',
     },
     about: {
@@ -319,10 +353,20 @@ const dictionary = {
       p2: 'With over 10 years of experience in financial markets and insurance — from technical analysis and trading to senior sales management.',
       p3: 'Since **2022**, AI has transformed my path. Now I build intelligent products full-time.',
       quote: 'I believe **trust** is the most fundamental element of any professional relationship — whether in the code I write or the products I build.',
+      resumeLink: 'View full résumé',
+    },
+    products: {
+      badge: 'My Products',
+      title: 'Digital Tools for the Life Insurance Industry',
+      subtitle: 'Three tools for three sizes of work — from a single agent to an insurance company',
+      levelLabel: 'Level',
+      viewAll: 'Visit the Store',
     },
     services: {
       badge: 'My Services',
       title: 'How can I help you?',
+      storeBridge: 'Or if you want a ready-made product instead of a custom project:',
+      storeBridgeCta: 'Ready-made products',
       items: [
         { title: 'Software Development', desc: 'Design and build websites, Android apps, Windows software, and intelligent bots' },
         { title: 'AI & Automation', desc: 'Practical AI solutions for businesses — process automation, data analysis, and productivity' },
@@ -341,7 +385,7 @@ const dictionary = {
         { title: 'Intelligent Sales Management System', cat: 'CRM', desc: 'CRM system with interaction tracking, follow-up automation, and analytical dashboard.' },
         { title: 'Capital & Risk Management App', cat: 'Android', desc: 'Mobile app for capital management, risk calculation, trade logging, and performance analysis.' },
         { title: 'Advanced Technical Analysis Tool', cat: 'Market Analysis', desc: 'Windows software with custom indicators, price pattern recognition, and hybrid signals.' },
-        { title: 'Comprehensive Insurance Platform', cat: 'Web Development', desc: 'Online consultation and insurance issuance platform with smart comparison and customer management.' },
+        { title: 'Comprehensive Insurance Platform', cat: 'Web Development', storeSlug: 'tavana', desc: 'Online consultation and insurance issuance platform with smart comparison and customer management.' },
         { title: 'Insurance Sales Automation Pack', cat: 'Automation', desc: 'Smart automation for sales processes, customer follow-ups, renewal reminders, and real-time reporting.' },
       ],
     },
@@ -402,9 +446,6 @@ const dictionary = {
     footer: {
       social: 'Social Media',
     },
-    visitor: {
-      label: 'visitors',
-    },
     countdown: {
       days: 'Days',
       hours: 'Hours',
@@ -419,11 +460,19 @@ const dictionary = {
     store: {
       badge: 'Store',
       title: 'Ready-Made Products',
-      subtitle: 'Tavana — Smart Insurance Agent Recruitment System',
-      valueProposition: '«Are you ready to transform from an ordinary recruiter into a trendsetting leader?»\n\nIn the crowded world of insurance, the difference between a successful manager and an average one lies in the system they wield. You carry years of experience on your shoulders, but can your candidates sense that greatness and expertise at first glance?\n\nThe Tavana web application is more than a website — it\'s your digital legacy. Imagine an applicant stepping into your exclusive realm, where the domain bears your name, your award trophies shine bright, and your team\'s success stories make their heart race. Here, you no longer chase after talent — quality candidates line up to join your empire.\n\nWith this tool, you won\'t waste your most precious asset — your time — on just anyone. Your smart system filters candidates through professional gates and only delivers those with star potential to your interview table. Discipline, prestige, and power — these three words will define your new business identity with this web application. It\'s time to say goodbye to traditional tools and welcome the era of smart management.',
+      subtitle: 'From a single agent to a whole organization — built on over a decade of sales experience, ingenuity and innovation',
+      heroTitle: 'Digital Tools for the\n*Life Insurance Industry*',
+      heroFeatures: ['Live demo before you buy', 'Support direct from the builder', 'Iranian hosting and domain'],
       viewDemo: 'View Demo',
       buyNow: 'Buy Now',
+      comingSoon: 'Coming Soon',
+      notifyMe: 'Notify Me',
+      moreInfo: 'Details & Sign Up',
+      ladderTitle: 'Which level fits you?',
+      ladderSubtitle: 'Three tools for three sizes of work — from a single agent to an insurance company',
+      legalNote: 'Regulatory note',
       features: 'Features',
+      testimonialsTitle: 'What customers say',
       techStack: 'Technologies',
       pricing: 'Pricing',
       free: 'Free',
@@ -440,6 +489,18 @@ const dictionary = {
       backToStore: 'Back to Store',
       trackOrder: 'Track Order',
       qr: { scan: 'Scan QR Code' },
+      notify: {
+        title: 'Want a heads-up at launch?',
+        subtitle: 'Leave your number — you will hear from me the day it ships.',
+        phone: 'Mobile number',
+        email: 'Email (optional)',
+        submit: 'Notify Me',
+        submitting: 'Submitting...',
+        success: 'You are on the list. I will let you know at launch.',
+        error: 'Could not save that — please try again.',
+        contactTitle: 'Get in touch for a direct conversation',
+        contactCta: 'Contact me',
+      },
       purchaseForm: {
         title: 'Purchase Form',
         name: 'Full Name',
@@ -453,9 +514,6 @@ const dictionary = {
         success: 'Your order has been placed — Your tracking code:',
         error: 'Error placing order — please try again.',
         bankInfo: 'Payment Info',
-        bankName: 'Bluet Bank (Saman)',
-        cardNumber: '6219-8618-7624-0465',
-        holderName: 'Ardalan Piri',
         amount: 'Amount to Pay (Toman)',
         instructions: 'Please transfer the amount to the card below and upload the receipt.',
         uploadReceipt: 'Upload Payment Receipt',
@@ -497,7 +555,7 @@ const dictionary = {
     trust: {
       secure: { title: 'Fully Secure', desc: 'Encrypted & safe payment' },
       payment: { title: 'Easy Payment', desc: 'Pay with bank card' },
-      refund: { title: 'Money Back', desc: '7-day money-back guarantee' },
+      demo: { title: 'Live Demo', desc: 'Try the full version before you buy' },
       instant: { title: 'Instant Delivery', desc: 'Immediately after purchase' },
     },
     faq: {
@@ -507,23 +565,23 @@ const dictionary = {
       a1: 'Yes, the code is fully editable and customizable. You can modify any part of it.',
       q2: 'How does technical support work?',
       a2: 'You receive free technical support for 6 months via Telegram and WhatsApp after purchase.',
-      q3: 'Is there a refund policy?',
-      a3: 'Yes, within 7 days of purchase, if you\'re not satisfied, a full refund is provided.',
+      q3: 'Can I see the product before buying?',
+      a3: 'Yes. A complete live demo is available — the same thing you receive, not a limited preview.',
       q4: 'Are updates free?',
       a4: 'Yes, all future updates are available for free.',
       q5: 'Do I need hosting?',
       a5: 'Yes, you need a Node.js hosting (like Vercel or Railway) to run the project.',
     },
     whyUs: {
-      fast: { title: 'Instant Delivery', desc: 'Download source code immediately after purchase' },
+      fast: { title: 'Two Delivery Paths', desc: 'A subscription with hosting and domain ready to go, or a one-time source-code purchase' },
       customizable: { title: 'Fully Customizable', desc: 'Code is fully editable and adaptable to your needs' },
       quality: { title: 'Quality Guaranteed', desc: 'Built with modern standards and best practices' },
       support: { title: '6-Month Support', desc: 'Free support via Telegram and WhatsApp' },
     },
     howItWorks: {
-      browse: { title: 'Choose a Product', desc: 'Find the best template or tool from our professional collection' },
+      browse: { title: 'Choose a Product', desc: 'Find the level that fits you among these life-insurance industry tools' },
       purchase: { title: 'Make a Purchase', desc: 'Pay with bank card and place your order' },
-      download: { title: 'Download & Deploy', desc: 'Download source code and deploy on your own hosting' },
+      download: { title: 'Get Set Up', desc: 'On a subscription we deploy the site for you; with source code you receive it and host it yourself' },
     },
   },
 }

@@ -1,10 +1,33 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import OrderTracker from '@/components/Store/OrderTracker'
+import { SITE_URL, OG_IMAGE_STORE } from '@/lib/constants'
 
+// This page used to declare only a title and a description, and inheriting the
+// rest was not harmless: the root layout's `alternates.canonical` points at the
+// site root, so every crawler was told this URL is a duplicate of the homepage.
+// A canonical is a directive, not a hint — that one missing line was actively
+// asking Google to drop the page. The social block was wrong for the same
+// reason, showing the personal bio when someone shared the tracking link.
 export const metadata = {
   title: 'پیگیری سفارش | فروشگاه',
   description: 'وضعیت سفارش خود را پیگیری کنید',
+  openGraph: {
+    title: 'پیگیری سفارش | فروشگاه اردلان پیری',
+    description: 'با شماره موبایل و کد پیگیری، وضعیت سفارش خود را ببینید',
+    url: `${SITE_URL}/store/track`,
+    type: 'website',
+    images: [OG_IMAGE_STORE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'پیگیری سفارش | فروشگاه اردلان پیری',
+    description: 'با شماره موبایل و کد پیگیری، وضعیت سفارش خود را ببینید',
+    images: [OG_IMAGE_STORE],
+  },
+  alternates: {
+    canonical: `${SITE_URL}/store/track`,
+  },
 }
 
 export default function TrackOrderPage() {

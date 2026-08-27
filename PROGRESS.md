@@ -1,6 +1,6 @@
 # پروژه سایت شخصی اردلان پیری
 
-## آخرین بروزرسانی: ۲۶ تیر ۱۴۰۴ — انتشار روی Netlify
+## آخرین بروزرسانی: ۲۰ آگوست ۲۰۲۶ — انتشار روی Cloudflare Workers
 
 ---
 
@@ -135,9 +135,9 @@ npm start            # اجرای بیلد شده
 - [ ] پس‌زمینه متحرک اختصاصی برای هر سکشن
 
 ### فنی
-- [x] استقرار روی Netlify (۲۶ تیر ۱۴۰۴)
+- [x] استقرار روی Cloudflare Workers (۲۰ آگوست ۲۰۲۶ — جایگزین Netlify)
 - [x] GitHub repository: https://github.com/ardijon/-ardalan-site.git
-- [x] آدرس سایت: https://ardalanpiri.netlify.app
+- [x] آدرس سایت: https://ai2apps.sbs
 - [ ] دامنه شخصی (اختیاری)
 - [ ] Backend برای فرم تماس (API route)
 - [ ] استفاده از `AnimateOnScroll` برای حذف کد تکراری IntersectionObserver
