@@ -28,6 +28,17 @@ command = "npx @opennextjs/cloudflare build"
 [[kv_namespaces]]
 binding = "SITE_KV"
 id = "76de247968e348f5818c9947b464d93d"
+
+# ---------------------------------------------------------------------------
+# D1 Tag Cache  —  OpenNext incremental cache invalidation
+# ---------------------------------------------------------------------------
+# Required by OpenNext's d1TagCache to invalidate SSG/ISR pages when products
+# are edited from the admin panel. Without this, cached pages serve stale
+# content indefinitely.
+[[d1_databases]]
+binding = "NEXT_TAG_CACHE_D1"
+database_name = "ai2apps-cache"
+database_id = "afeda141-fcde-40d7-9ee5-1a120e9f12bc"
 # preview_id is only needed to run `wrangler dev` / `opennextjs-cloudflare
 # preview` against a throwaway namespace. Create one and paste the id here:
 #
