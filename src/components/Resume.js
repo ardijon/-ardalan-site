@@ -7,6 +7,9 @@ const TAG_STYLES = {
   'نرم‌افزار': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
   'بیمه': 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300',
   'بازار مالی': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+  'Software': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+  'Insurance': 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300',
+  'Financial': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
 }
 
 export default function Resume() {
