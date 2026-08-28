@@ -19,7 +19,6 @@ export default function ProductCard({ product, featured = false }) {
   const summaryLabel = product.priceSummary?.display?.[locale] || product.priceSummary?.display?.en || ''
 
   const audience = product.audience?.[locale] || product.audience?.en || ''
-  const techBadge = (product.tech || []).slice(0, 2).join(' · ')
 
   return (
     <div
@@ -47,22 +46,15 @@ export default function ProductCard({ product, featured = false }) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-        <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
+        <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
           {featured && (
-            <span className="px-3 py-1 text-[10px] font-bold text-white bg-[var(--color-accent)] rounded-full shadow-lg">
-              {locale === 'fa' ? '⭐ ویژه' : '⭐ Featured'}
+            <span className="pointer-events-auto px-4 py-2 text-xs font-bold tracking-wide text-white bg-[var(--color-accent)]/90 backdrop-blur-sm rounded-lg shadow-lg shadow-[var(--color-accent)]/20">
+              {locale === 'fa' ? 'ویژه' : 'Featured'}
             </span>
           )}
           {isComingSoon && (
-            <span className="px-3 py-1 text-[10px] font-bold text-white bg-[var(--color-tech)] rounded-full shadow-lg">
+            <span className="pointer-events-auto px-4 py-2 text-xs font-bold tracking-wide text-white bg-[var(--color-tech)]/90 backdrop-blur-sm rounded-lg shadow-lg shadow-[var(--color-tech)]/20">
               {t('store.comingSoon')}
-            </span>
-          )}
-          {techBadge && (
-            // Dark scrim, not accent: over an empty gradient (a product with no
-            // screenshot yet) white-on-light was unreadable.
-            <span className="px-3 py-1 text-[10px] font-medium text-white whitespace-nowrap bg-black/45 rounded-full backdrop-blur-sm">
-              {techBadge}
             </span>
           )}
         </div>
@@ -75,7 +67,7 @@ export default function ProductCard({ product, featured = false }) {
               href={product.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-black/40 backdrop-blur-sm rounded-full hover:bg-black/60 transition-colors cursor-pointer"
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-black/40 backdrop-blur-sm rounded-lg hover:bg-black/60 transition-colors cursor-pointer"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />

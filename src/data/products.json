@@ -365,7 +365,67 @@
     "testimonials": [],
     "demoUrl": null,
     "screenshots": [],
-    "github": null
+    "github": null,
+    "featureGroups": {
+      "fa": [
+        {
+          "icon": "🛠",
+          "title": "ابزارهای جذب مشتری",
+          "items": [
+            "ماشین‌حساب «چقدر بیمه نیاز دارید؟» بر پایه‌ی درآمد، افراد تحت تکفل و بدهی",
+            "کارت ویزیت دیجیتال با QR و دکمه‌ی افزودن به مخاطبین",
+            "دکمه‌ی شناور واتساپ و تلگرام با پیام آماده"
+          ]
+        },
+        {
+          "icon": "🧠",
+          "title": "ابزارهای اعتمادسازی",
+          "items": [
+            "پروفایل حرفه‌ای با سابقه و تعداد بیمه‌گذاران",
+            "دستیار پرسش و پاسخ با پاسخ‌های تأییدشده توسط شما",
+            "دو تم روشن و تیره، راست‌چین، مناسب موبایل"
+          ]
+        },
+        {
+          "icon": "📊",
+          "title": "ابزارهای رشد",
+          "items": [
+            "سیستم ارجاع خودکار با لینک اختصاصی هر بیمه‌گذار",
+            "جدول برترین معرف‌ها برای پیگیری ارجاع‌ها",
+            "گزارش خودکار سرنخ‌های جدید از هر معرف"
+          ]
+        }
+      ],
+      "en": [
+        {
+          "icon": "🛠",
+          "title": "Client Attraction Tools",
+          "items": [
+            "Coverage calculator based on income, dependents, and debt",
+            "Digital business card with QR code and add-to-contacts button",
+            "Floating WhatsApp and Telegram button with a pre-filled message"
+          ]
+        },
+        {
+          "icon": "🧠",
+          "title": "Trust Building Tools",
+          "items": [
+            "Professional profile with track record and policyholder count",
+            "Q&A assistant with answers approved by you",
+            "Light and dark themes, RTL, mobile-optimized"
+          ]
+        },
+        {
+          "icon": "📊",
+          "title": "Growth Tools",
+          "items": [
+            "Auto-referral system with a unique link per policyholder",
+            "Top-referrers table for tracking referral chains",
+            "Automatic lead reports from each referrer"
+          ]
+        }
+      ]
+    }
   },
   {
     "slug": "rahyar",

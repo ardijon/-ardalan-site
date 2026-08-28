@@ -36,23 +36,43 @@ function applyDir(locale) {
  * and nothing else. Reading it alone both fixes the default and ignores every
  * cookie the old middleware manufactured.
  */
+/**
+ * Read the locale that the inline layout script stored in `window.__LOCALE`
+ * BEFORE React hydrated. The script reads localStorage('NEXT_LOCALE') and
+ * writes it to a global variable so React can read it during its first render
+ * without touching DOM attributes that React owns.
+ *
+ * On the server `window` does not exist, so this returns null and
+ * useState falls back to 'fa' — matching the server-rendered HTML.
+ * On the client the inline script already set the variable, so we read
+ * it back. We do NOT read localStorage directly here because that would
+ * produce a different value than the server, breaking hydration.
+ */
 function savedLocale() {
-  const saved = getLocalStorage('NEXT_LOCALE')
-  return saved === 'en' || saved === 'fa' ? saved : null
+  try {
+    const v = window.__LOCALE
+    if (v === 'en' || v === 'fa') return v
+  } catch {}
+  return null
 }
 
 const I18nContext = createContext(null)
 
 export function I18nProvider({ children }) {
-  // Persian unless told otherwise. Server and first client render agree on this,
-  // so there is nothing for React to complain about at hydration.
+  // Always start with 'fa' so the server render and the first client render
+  // agree. After hydration, useEffect applies the real locale from localStorage.
   const [locale, setLocale] = useState('fa')
   const [transitioning, setTransitioning] = useState(false)
 
   useEffect(() => {
     const saved = savedLocale()
-    if (saved) setLocale(saved)
-    applyDir(saved || 'fa')
+    if (saved && saved !== locale) {
+      setLocale(saved)
+      applyDir(saved)
+    } else {
+      applyDir(locale)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const t = useCallback((key) => {

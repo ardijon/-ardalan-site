@@ -48,16 +48,39 @@ export default function ProductDetail({ product }) {
         <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-4">
           {t('store.features')}
         </h2>
-        <ul className="grid sm:grid-cols-2 gap-3" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
-          {(product.features[locale] || product.features.en || []).map((feature, i) => (
-            <li key={i} className="flex items-start gap-3 text-[var(--color-text)]/80">
-              <span className="mt-1 w-5 h-5 shrink-0 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center text-xs">
-                ✓
-              </span>
-              <span className="text-sm leading-relaxed">{feature}</span>
-            </li>
-          ))}
-        </ul>
+        {product.featureGroups?.[locale] || product.featureGroups?.en ? (
+          <div className="grid sm:grid-cols-3 gap-6" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+            {(product.featureGroups[locale] || product.featureGroups.en).map((group, gi) => (
+              <div key={gi} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/50 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">{group.icon}</span>
+                  <h3 className="text-sm font-bold text-[var(--color-primary)]">{group.title}</h3>
+                </div>
+                <ul className="space-y-2.5">
+                  {group.items.map((item, ii) => (
+                    <li key={ii} className="flex items-start gap-2 text-[var(--color-text)]/80">
+                      <span className="mt-1 w-4 h-4 shrink-0 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center text-[10px]">
+                        ✓
+                      </span>
+                      <span className="text-xs leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <ul className="grid sm:grid-cols-2 gap-3" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+            {(product.features[locale] || product.features.en || []).map((feature, i) => (
+              <li key={i} className="flex items-start gap-3 text-[var(--color-text)]/80">
+                <span className="mt-1 w-5 h-5 shrink-0 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center text-xs">
+                  ✓
+                </span>
+                <span className="text-sm leading-relaxed">{feature}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {legalNote && (

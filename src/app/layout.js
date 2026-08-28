@@ -103,18 +103,27 @@ export default function RootLayout({ children }) {
               // savedLocale() in I18nProvider.
               var lang = localStorage.getItem('NEXT_LOCALE');
               if (lang !== 'fa' && lang !== 'en') lang = 'fa';
-              document.documentElement.lang = lang;
-              // The html element only. This script runs inside head, where
-              // document.body is still null — the line that used to set
-              // document.body.style.direction here threw a TypeError on every single
-              // page load, and because it was the last statement in the IIFE the
-              // throw was invisible except in the console. Direction is an inherited
-              // property, so the attribute set below is all that is needed; see the
-              // note on body in globals.css.
+
+              // Expose to I18nProvider via window.__LOCALE so React reads the
+              // saved locale BEFORE its first render — avoiding the hydration
+              // mismatch that occurred when useState('fa') disagreed with the
+              // DOM attribute the script had already set to 'en'.
+              // DO NOT set documentElement.lang or .dir here — React owns those
+              // attributes during hydration and would overwrite them, causing a
+              // flash. I18nProvider's useEffect applies them after hydration.
+              window.__LOCALE = lang;
+
+              // Set direction for FOUC prevention. The <html dir="rtl"> from JSX
+              // is correct for Persian (the default), but English users would see
+              // a brief RTL flash before useEffect applies LTR. We set the inline
+              // style on <html> (not the dir attribute, which React owns) so the
+              // first paint uses the correct direction. CSS style.direction
+              // overrides the dir attribute for layout purposes.
               //
-              // No backticks in this comment: the whole script is a template literal,
-              // and one backtick in a comment ends it and breaks the build.
-              document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+              // This script runs in <head> where document.body is still null, so
+              // we use documentElement instead. The inline style does not conflict
+              // with React's dir attribute management.
+              document.documentElement.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
             })();
           `
         }} />

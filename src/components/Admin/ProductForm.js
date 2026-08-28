@@ -563,7 +563,14 @@ export default function ProductForm({ initial, saving, onSave, onCancel }) {
 
         <div className="flex gap-3 pt-2">
           <button
-            onClick={() => onSave(serializeProduct(form))}
+            onClick={() => {
+              const serialized = serializeProduct(form)
+              // Preserve featureGroups from the original product — the admin
+              // panel has no editor for it, so the form never carries it and
+              // serializeProduct would strip it on save.
+              if (initial?.featureGroups) serialized.featureGroups = initial.featureGroups
+              onSave(serialized)
+            }}
             disabled={saving || !form.slug.trim()}
             className="px-6 py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 transition-colors disabled:opacity-50"
           >
