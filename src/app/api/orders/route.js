@@ -3,30 +3,16 @@ import { createOrder } from '@/lib/orders'
 import { getLiveProduct } from '@/lib/products-server'
 import { notifyAdmin } from '@/lib/telegram'
 import { escapeHtml } from '@/lib/markdown'
-
-// Rate limiting for order creation
-const orderAttempts = new Map()
-const MAX_ORDER_ATTEMPTS = 10
-const ORDER_LOCKOUT_TIME = 15 * 60 * 1000 // 15 minutes
+import { createRateLimiter } from '@/lib/rate-limit'
+import { extractClientKey } from '@/lib/request-ip'
 
 const PLAN_LABELS = { starter: 'استارتر', pro: 'حرفه‌ای' }
 
-function checkOrderRateLimit(ip) {
-  const now = Date.now()
-  const attempts = orderAttempts.get(ip) || { count: 0, lastAttempt: 0 }
-
-  if (now - attempts.lastAttempt > ORDER_LOCKOUT_TIME) {
-    orderAttempts.set(ip, { count: 0, lastAttempt: now })
-    return true
-  }
-
-  if (attempts.count >= MAX_ORDER_ATTEMPTS) {
-    return false
-  }
-
-  orderAttempts.set(ip, { count: attempts.count + 1, lastAttempt: now })
-  return true
-}
+const orderRateLimiter = createRateLimiter({
+  namespace: 'order',
+  maxAttempts: 10,
+  windowMs: 15 * 60 * 1000,
+})
 
 function checkCsrf(request) {
   const origin = request.headers.get('origin')
@@ -44,9 +30,7 @@ function checkCsrf(request) {
 }
 
 function getClientIp(request) {
-  const forwarded = request.headers.get('x-forwarded-for')
-  if (forwarded) return forwarded.split(',')[0].trim()
-  return '127.0.0.1'
+  return extractClientKey(request)
 }
 
 /**
@@ -88,10 +72,11 @@ export async function POST(request) {
 
   // Rate limiting
   const ip = getClientIp(request)
-  if (!checkOrderRateLimit(ip)) {
+  const rateLimitResult = await orderRateLimiter.check(ip)
+  if (!rateLimitResult.allowed) {
     return NextResponse.json(
       { error: 'تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید' },
-      { status: 429 }
+      { status: 429, headers: { 'Retry-After': String(rateLimitResult.retryAfter) } }
     )
   }
 

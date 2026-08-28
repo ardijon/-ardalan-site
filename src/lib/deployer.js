@@ -1,4 +1,5 @@
 import path from 'path'
+import { putBlob } from '@/lib/blob'
 import { updateOrderStatus, updateDeployment, getOrderById } from './orders'
 
 /**
@@ -35,11 +36,32 @@ function validateIdentifier(value) {
 }
 
 function validateDomain(value) {
-  // Only allow valid domain characters
-  if (!value || !/^[a-zA-Z0-9._-]+$/.test(value)) {
+  // Only allow valid domain characters (hostname format)
+  if (!value || !/^[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?$/.test(value)) {
     throw new Error(`Invalid domain: ${value}`)
   }
   return value
+}
+
+function validateSshUser(value) {
+  // SSH username: alphanumeric, underscore, hyphen, dot (no @)
+  if (!value || !/^[a-zA-Z0-9._-]+$/.test(value)) {
+    throw new Error(`Invalid SSH user: ${value}`)
+  }
+  return value
+}
+
+function validateSshHost(value) {
+  // SSH host: hostname or IP
+  if (!value || !/^[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?$/.test(value)) {
+    throw new Error(`Invalid SSH host: ${value}`)
+  }
+  return value
+}
+
+function sanitizeForShell(value) {
+  // Escape single quotes for safe use in '...' quoting
+  return String(value).replace(/'/g, "'\\''")
 }
 
 /**
@@ -142,17 +164,17 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo, p
       const hostMatch = hostingInfo.match(/host:\s*(\S+)/i)
       const userMatch = hostingInfo.match(/user:\s*(\S+)/i)
 
-      const sshUser = userMatch?.[1] || sshMatch?.[1]
-      const sshHost = hostMatch?.[1] || sshMatch?.[1]?.split('@')?.[1]
+      const sshUserRaw = userMatch?.[1] || sshMatch?.[1]
+      const sshHostRaw = hostMatch?.[1] || sshMatch?.[1]?.split('@')?.[1]
 
-      // Validate SSH credentials to prevent command injection
-      if (sshUser) validateIdentifier(sshUser.replace(/@/g, ''))
-      if (sshHost) validateDomain(sshHost)
+      // Validate and sanitize SSH credentials to prevent command injection
+      const sshUser = sshUserRaw ? validateSshUser(sshUserRaw.replace(/@/g, '')) : null
+      const sshHost = sshHostRaw ? validateSshHost(sshHostRaw) : null
       if (domain) validateDomain(domain)
 
       if (sshUser && sshHost) {
         console.log(`[Deploy] Uploading to ${sshHost}...`)
-        const remotePath = `${sshUser}:${domain ? `/var/www/${domain}/` : '/var/www/'}`
+        const remotePath = `${sshUser}:${domain ? `/var/www/${sanitizeForShell(domain)}/` : '/var/www/'}`
 
         try {
           node.execSync(
@@ -163,8 +185,11 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo, p
           await updateDeployment(orderId, { status: 'configuring' })
 
           console.log(`[Deploy] Installing dependencies on remote...`)
+          const safeDomain = sanitizeForShell(domain || 'app')
+          const safeUser = sanitizeForShell(sshUser)
+          const safeHost = sanitizeForShell(sshHost)
           node.execSync(
-            `ssh ${sshUser}@${sshHost} "cd /var/www/${domain || 'app'} && npm install --production && pm2 restart ${domain || 'app'}"`,
+            `ssh ${safeUser}@${safeHost} "cd /var/www/${safeDomain} && npm install --production && pm2 restart ${safeDomain}"`,
             { stdio: 'pipe', timeout: 60000 }
           )
         } catch (sshError) {
@@ -221,24 +246,22 @@ async function createZipPackage(node, orderId, productId) {
   validateIdentifier(productId)
 
   const productDir = path.join(PRODUCTS_DIR, productId)
-  const outputDir = path.join(process.cwd(), 'public/uploads/deployments')
-  const outputFile = path.join(outputDir, `${orderId}.zip`)
-
-  if (!node.fs.existsSync(outputDir)) {
-    node.fs.mkdirSync(outputDir, { recursive: true })
-  }
 
   console.log(`[Deploy] Creating ZIP package...`)
   // Paths are validated above, so interpolation here is safe.
-  node.execSync(
-    `cd "${productDir}" && zip -r "${outputFile}" .next public package.json package-lock.json -x "node_modules/*"`,
-    { stdio: 'pipe' }
+  const zipBuffer = node.execSync(
+    `cd "${productDir}" && zip -r - .next public package.json package-lock.json -x "node_modules/*"`,
+    { stdio: 'pipe', encoding: 'buffer' }
   )
 
-  const downloadUrl = `/uploads/deployments/${orderId}.zip`
+  const filename = `deploy-${orderId}.zip`
+  await putBlob(filename, zipBuffer, { contentType: 'application/zip' })
+
+  // The download URL points to the admin receipt route which serves blobs
+  const downloadUrl = `/api/admin/receipt/${filename}`
   await updateDeployment(orderId, { downloadUrl })
 
-  console.log(`[Deploy] ZIP package created: ${outputFile}`)
+  console.log(`[Deploy] ZIP package created and stored in blob storage: ${filename}`)
   return downloadUrl
 }
 

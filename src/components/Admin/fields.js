@@ -57,7 +57,7 @@ export function TranslateButton({ onClick, busy, disabled }) {
   )
 }
 
-export function InputField({ label, value, onChange, multiline, placeholder, hint, dir, onTranslate, translating, canTranslate = true }) {
+export function InputField({ label, value, onChange, multiline, placeholder, hint, dir, onTranslate, translating, canTranslate = true, disabled }) {
   return (
     <div>
       <div className="flex items-center justify-between gap-2 mb-1">
@@ -67,20 +67,26 @@ export function InputField({ label, value, onChange, multiline, placeholder, hin
       {multiline ? (
         <textarea
           value={value ?? ''}
-          onChange={e => onChange(e.target.value)}
+          onChange={e => onChange?.(e.target.value)}
           rows={3}
           placeholder={placeholder}
           dir={dir}
-          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none"
+          disabled={disabled}
+          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none ${
+            disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'border-gray-200'
+          }`}
         />
       ) : (
         <input
           type="text"
           value={value ?? ''}
-          onChange={e => onChange(e.target.value)}
+          onChange={e => onChange?.(e.target.value)}
           placeholder={placeholder}
           dir={dir}
-          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+          disabled={disabled}
+          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+            disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'border-gray-200'
+          }`}
         />
       )}
       {hint && <p className="mt-1 text-[11px] text-gray-400">{hint}</p>}

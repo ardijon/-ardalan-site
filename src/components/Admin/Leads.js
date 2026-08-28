@@ -101,7 +101,7 @@ export default function Leads({ auth, products = [], onStats }) {
     }
   }
 
-  async function markNotified(ids) {
+  async function markNotified(ids, action = 'mark') {
     if (ids.length === 0) return
     setBusy(true)
     setMessage('')
@@ -110,11 +110,15 @@ export default function Leads({ auth, products = [], onStats }) {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ leadIds: ids }),
+        body: JSON.stringify({ leadIds: ids, action }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || 'بروزرسانی ناموفق بود')
-      setMessage(`${data.changed} سرنخ به‌عنوان اطلاع‌داده‌شده ثبت شد`)
+      if (action === 'unmark') {
+        setMessage(`${data.changed} سرنخ به حالت «در انتظار» بازگردانده شد`)
+      } else {
+        setMessage(`${data.changed} سرنخ به‌عنوان اطلاع‌داده‌شده ثبت شد`)
+      }
       await fetchLeads()
     } catch (e) {
       setMessage('خطا: ' + e.message)
@@ -126,13 +130,19 @@ export default function Leads({ auth, products = [], onStats }) {
   function markAllShown() {
     const ids = leads.filter(l => !l.notifiedAt).map(l => l.id)
     if (ids.length === 0) return
-    // Confirmed because it is a claim about the real world — that these people were
-    // actually contacted — and there is no undo for it in the panel.
     if (!confirm(`${ids.length} سرنخ نمایش‌داده‌شده به‌عنوان «اطلاع داده شده» ثبت شود؟`)) return
-    markNotified(ids)
+    markNotified(ids, 'mark')
+  }
+
+  function unmarkAllNotified() {
+    const ids = leads.filter(l => l.notifiedAt).map(l => l.id)
+    if (ids.length === 0) return
+    if (!confirm(`${ids.length} سرنخ «اطلاع داده شده» به حالت «در انتظار» بازگردانده شود؟`)) return
+    markNotified(ids, 'unmark')
   }
 
   const pendingShown = leads.filter(l => !l.notifiedAt).length
+  const notifiedShown = leads.filter(l => l.notifiedAt).length
 
   return (
     <div className="space-y-3">
@@ -164,7 +174,7 @@ export default function Leads({ auth, products = [], onStats }) {
           prefix="leads"
           columns={leadColumns(productLabels)}
           rows={leads}
-          disabled={leads.length === 0}
+          disabled={loading}
         />
       </div>
 
@@ -194,6 +204,7 @@ export default function Leads({ auth, products = [], onStats }) {
           <span className="text-xs text-[var(--color-text)]/50">
             {leads.length} نتیجه
             {pendingShown > 0 && ` · ${pendingShown} در انتظار`}
+            {notifiedShown > 0 && ` · ${notifiedShown} اطلاع‌داده‌شده`}
           </span>
           <div className="flex-1" />
           <button
@@ -208,6 +219,13 @@ export default function Leads({ auth, products = [], onStats }) {
             className="h-8 px-3 text-xs font-medium text-white bg-[var(--color-accent)] rounded-lg hover:bg-[var(--color-accent)]/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             علامت‌زدن {pendingShown} مورد
+          </button>
+          <button
+            onClick={unmarkAllNotified}
+            disabled={busy || notifiedShown === 0}
+            className="h-8 px-3 text-xs font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            بازگرداندن {notifiedShown} مورد
           </button>
         </div>
       )}

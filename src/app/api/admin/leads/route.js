@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getAllLeads, getLeadStats, markLeadsNotified } from '@/lib/leads'
+import { getAllLeads, getLeadStats, markLeadsNotified, unmarkLeadsNotified } from '@/lib/leads'
 import { guardAdminRoute } from '@/lib/admin-auth'
 
 /**
@@ -10,7 +10,6 @@ import { guardAdminRoute } from '@/lib/admin-auth'
  * shipping every lead for every product just to filter five of them in the browser
  * is wasted payload on a connection that may be a phone tether.
  */
-
 export async function GET(request) {
   const denied = await guardAdminRoute(request)
   if (denied) return denied
@@ -46,11 +45,10 @@ export async function GET(request) {
 }
 
 /**
- * Marks leads as notified.
+ * Marks leads as notified (or unmarks them).
  *
- * Takes an array, not a single id, because the announcement goes out as one bulk
- * SMS and the panel has to be able to record that in one action — see
- * markLeadsNotified() for why the batch is a single write.
+ * Takes an array of lead IDs and an optional action ('mark' or 'unmark').
+ * The default is 'mark' for backward compatibility.
  */
 export async function PATCH(request) {
   const denied = await guardAdminRoute(request, { mutating: true })
@@ -74,14 +72,18 @@ export async function PATCH(request) {
     return NextResponse.json({ error: 'شناسه‌ای ارسال نشد' }, { status: 400 })
   }
 
+  const action = body.action === 'unmark' ? 'unmark' : 'mark'
+
   try {
-    const changed = await markLeadsNotified(clean)
-    // `changed` can legitimately be less than what was sent — ids that no longer
-    // exist, or leads someone else already marked. The caller is told the real
-    // number rather than being led to believe every row moved.
-    return NextResponse.json({ success: true, changed })
+    let changed
+    if (action === 'unmark') {
+      changed = await unmarkLeadsNotified(clean)
+    } else {
+      changed = await markLeadsNotified(clean)
+    }
+    return NextResponse.json({ success: true, changed, action })
   } catch (error) {
-    console.error('Failed to mark leads notified:', error)
+    console.error('Failed to update leads notified status:', error)
     return NextResponse.json({ error: 'خطا در بروزرسانی سرنخ‌ها' }, { status: 500 })
   }
 }

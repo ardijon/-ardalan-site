@@ -111,6 +111,29 @@ export async function markLeadsNotified(leadIds) {
   }, [])
 }
 
+/**
+ * Undo notified status for leads.
+ * Clears the notifiedAt field so leads appear in the pending list again.
+ */
+export async function unmarkLeadsNotified(leadIds) {
+  const wanted = new Set(leadIds)
+  if (wanted.size === 0) return 0
+
+  return mutateCollection(COLLECTION, leads => {
+    const now = new Date().toISOString()
+    let changed = 0
+
+    for (const lead of leads) {
+      if (!wanted.has(lead.id) || !lead.notifiedAt) continue
+      lead.notifiedAt = null
+      lead.updatedAt = now
+      changed += 1
+    }
+
+    return changed
+  }, [])
+}
+
 export async function getLeadStats() {
   const leads = await getAllLeads()
 

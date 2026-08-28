@@ -5,6 +5,7 @@ import OrderTimeline from './OrderTimeline'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import products from '@/lib/products'
 import { formatJalali } from '@/lib/jalali'
+import { toman } from '@/components/Admin/shared'
 
 export default function OrderTracker() {
   const { t, dir, locale } = useI18n()
@@ -130,7 +131,7 @@ export default function OrderTracker() {
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text)]/50">{locale === 'fa' ? 'مبلغ' : 'Amount'}</span>
                 <span className="font-bold text-[var(--color-accent)]">
-                  {locale === 'fa' ? '۱۴,۹۰۰,۰۰۰ تومان' : '$149'}
+                  {order.uniqueAmount ? toman(order.uniqueAmount) + ' تومان' : (locale === 'fa' ? '۱۴,۹۰۰,۰۰۰ تومان' : '$149')}
                 </span>
               </div>
             )}
@@ -138,7 +139,7 @@ export default function OrderTracker() {
               <div className="flex justify-between text-sm">
                 <span className="text-[var(--color-text)]/50">{locale === 'fa' ? 'مبلغ ماهانه' : 'Monthly Amount'}</span>
                 <span className="font-bold text-[var(--color-accent)]">
-                  {locale === 'fa' ? '۴۹۰,۰۰۰ تومان/ماه' : '$5/month'}
+                  {order.uniqueAmount ? toman(order.uniqueAmount) + ' تومان' : (locale === 'fa' ? '۴۹۰,۰۰۰ تومان/ماه' : '$5/month')}
                 </span>
               </div>
             )}

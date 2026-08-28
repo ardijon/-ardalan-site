@@ -27,8 +27,9 @@ describe('Orders', () => {
       expect(order.status).toBe('awaiting_payment')
       expect(order.customer.name).toBe('علی رضایی')
       expect(order.customer.phone).toBe('09123456789')
-      expect(order.uniqueAmount).toBeGreaterThanOrEqual(490100)
-      expect(order.uniqueAmount).toBeLessThanOrEqual(490999)
+      // New range: basePrice + 1000 to 999999 (to avoid collisions)
+      expect(order.uniqueAmount).toBeGreaterThanOrEqual(491000)
+      expect(order.uniqueAmount).toBeLessThanOrEqual(1489999)
     })
 
     it('should reject order with invalid phone', async () => {

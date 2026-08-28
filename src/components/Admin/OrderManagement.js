@@ -207,7 +207,7 @@ export default function OrderManagement({ auth, onStats }) {
           prefix="orders"
           columns={ORDER_COLUMNS}
           rows={orders}
-          disabled={orders.length === 0}
+          disabled={loading}
         />
       </div>
 

@@ -20,6 +20,30 @@ function isValidOrderId(id) {
   return typeof id === 'string' && /^[a-zA-Z0-9-]+$/.test(id) && id.length <= 50
 }
 
+/**
+ * Validate receipt amount against order's uniqueAmount.
+ * Allows ±10% tolerance for bank fees/rounding, but rejects wildly different amounts.
+ */
+function validateReceiptAmount(receiptAmount, expectedAmount) {
+  if (!receiptAmount || receiptAmount <= 0) {
+    return { valid: false, error: 'مبلغ رسید باید بزرگتر از صفر باشد' }
+  }
+  if (!expectedAmount || expectedAmount <= 0) {
+    return { valid: false, error: 'مبلغ انتظاری سفارش نامعتبر است' }
+  }
+
+  const diff = Math.abs(receiptAmount - expectedAmount)
+  const tolerance = expectedAmount * 0.1 // 10% tolerance
+
+  if (diff > tolerance) {
+    return {
+      valid: false,
+      error: `مبلغ رسید (${receiptAmount.toLocaleString('fa-IR')} تومان) با مبلغ سفارش (${expectedAmount.toLocaleString('fa-IR')} تومان) مطابقت ندارد. تفاوت مجاز: ±${tolerance.toLocaleString('fa-IR')} تومان`
+    }
+  }
+  return { valid: true }
+}
+
 export async function POST(request, { params }) {
   // Tracked so any failure after the write removes the orphaned blob.
   let storedName = null
@@ -65,6 +89,14 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'فایل رسید را انتخاب کنید' }, { status: 400 })
     }
 
+    // Server-side amount validation against order's uniqueAmount
+    const receiptAmount = amount ? parseInt(amount) : 0
+    const expectedAmount = existingOrder.uniqueAmount || 0
+    const amountValidation = validateReceiptAmount(receiptAmount, expectedAmount)
+    if (!amountValidation.valid) {
+      return NextResponse.json({ error: amountValidation.error }, { status: 400 })
+    }
+
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
         { error: 'فرمت فایل معتبر نیست (فقط JPG, PNG, WebP)' },
@@ -87,7 +119,7 @@ export async function POST(request, { params }) {
 
     const order = await uploadReceipt(id, {
       filename,
-      amount: amount ? parseInt(amount) : 0,
+      amount: receiptAmount,
       trackingCode: trackingCode || '',
     })
 

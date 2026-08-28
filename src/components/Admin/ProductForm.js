@@ -337,10 +337,13 @@ export default function ProductForm({ initial, saving, onSave, onCancel }) {
           <InputField
             label="Slug (شناسه URL)"
             value={form.slug}
-            onChange={v => change('slug', v)}
+            onChange={isEditing ? undefined : v => change('slug', v)}
             dir="ltr"
             placeholder="my-product"
-            hint={isEditing ? 'تغییر این مقدار یک محصول جدید نمی‌سازد — آدرس فعلی محصول را می‌شکند' : 'فقط حروف کوچک انگلیسی، عدد و خط تیره'}
+            disabled={isEditing}
+            hint={isEditing
+              ? 'شناسه در حالت ویرایش قابل تغییر نیست — برای تغییر آن، محصول جدید بسازید'
+              : 'فقط حروف کوچک انگلیسی، عدد و خط تیره'}
           />
 
           <div className="grid grid-cols-2 gap-4">

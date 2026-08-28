@@ -11,6 +11,7 @@ const PLAN_LABELS = {
 
 export default function ReceiptViewer({ order, onClose }) {
   const [imageError, setImageError] = useState(false)
+  const [imageLoading, setImageLoading] = useState(true)
 
   if (!order?.receipt) return null
 
@@ -18,6 +19,15 @@ export default function ReceiptViewer({ order, onClose }) {
   const expectedAmount = order.uniqueAmount || 0
   const hasMismatch = receiptAmount > 0 && expectedAmount > 0 && receiptAmount !== expectedAmount
   const diff = receiptAmount - expectedAmount
+
+  const handleImageError = () => {
+    setImageError(true)
+    setImageLoading(false)
+  }
+
+  const handleImageLoad = () => {
+    setImageLoading(false)
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={onClose}>
@@ -41,11 +51,27 @@ export default function ReceiptViewer({ order, onClose }) {
                 src={`/api/admin/receipt/${order.receipt.filename}`}
                 alt="رسید پرداخت"
                 className="w-full h-auto object-contain max-h-[60vh]"
-                onError={() => setImageError(true)}
+                onError={handleImageError}
+                onLoad={handleImageLoad}
               />
             ) : (
-              <div className="flex items-center justify-center h-48 text-[var(--color-text)]/30 text-sm">
-                تصویر رسید موجود نیست
+              <div className="flex flex-col items-center justify-center h-48 gap-2 p-4 text-center">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-[var(--color-text)]/20">
+                  <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <div className="space-y-1 text-sm">
+                  <span className="text-[var(--color-text)]/50">
+                    {imageLoading ? 'در حال بارگذاری...' : 'تصویر رسید موجود نیست'}
+                  </span>
+                  {!imageLoading && (
+                    <button
+                      onClick={() => setImageError(false)}
+                      className="text-xs text-[var(--color-accent)] hover:underline"
+                    >
+                      تلاش مجدد
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>

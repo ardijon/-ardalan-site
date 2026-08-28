@@ -36,9 +36,38 @@ function generateOrderId() {
   return `ORD-${timestamp}-${random}`
 }
 
-function generateUniqueAmount(basePrice) {
-  const randomSuffix = Math.floor(Math.random() * 900) + 100
-  return basePrice + randomSuffix
+/**
+ * Generates a unique amount by adding a random suffix to the base price.
+ * Uses a larger range (1000-999999) to minimize collisions, and retries on collision.
+ * The suffix is chosen so the total amount uniquely identifies the order for bank transfer matching.
+ */
+async function generateUniqueAmount(basePrice) {
+  const maxRetries = 10
+  const existingAmounts = new Set()
+
+  // Pre-fetch existing unique amounts to avoid collisions
+  try {
+    const orders = await readOrders()
+    for (const order of orders) {
+      if (order.uniqueAmount) existingAmounts.add(order.uniqueAmount)
+    }
+  } catch {
+    // If we can't read orders, proceed without collision check
+  }
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    // Use crypto.randomInt for better randomness, range 1000-999999 (6 digits)
+    const randomSuffix = crypto.randomInt(1000, 1000000)
+    const uniqueAmount = basePrice + randomSuffix
+
+    if (!existingAmounts.has(uniqueAmount)) {
+      return uniqueAmount
+    }
+  }
+
+  // Fallback: use timestamp-based suffix if all retries collide (extremely unlikely)
+  const fallbackSuffix = Date.now() % 1000000
+  return basePrice + fallbackSuffix
 }
 
 function sanitize(str) {
@@ -67,6 +96,9 @@ export async function getOrdersByStatus(status) {
 }
 
 export async function createOrder({ productId, plan, customer, receipt, basePrice }) {
+  // Generate unique amount before the write transaction to avoid async in callback
+  const uniqueAmount = await generateUniqueAmount(basePrice || 0)
+
   return readAndWrite(orders => {
     const now = new Date().toISOString()
 
@@ -74,8 +106,6 @@ export async function createOrder({ productId, plan, customer, receipt, basePric
     const expiresAt = plan === 'starter'
       ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
       : null
-
-    const uniqueAmount = generateUniqueAmount(basePrice || 0)
 
     const order = {
       id: generateOrderId(),

@@ -98,6 +98,14 @@ function uploadRequest(fields = {}) {
   return new Request('https://ai2apps.sbs/api/orders/x/receipt', { method: 'POST', body })
 }
 
+/** Helper to upload a receipt for an order using its uniqueAmount. */
+async function uploadReceiptForOrder(upload, order, receiptFile = new File([PNG_BYTES], 'slip.png', { type: 'image/png' })) {
+  return upload.POST(
+    uploadRequest({ receipt: receiptFile, amount: String(order.uniqueAmount) }),
+    params({ id: order.id })
+  )
+}
+
 function params(value) {
   return { params: Promise.resolve(value) }
 }
@@ -218,10 +226,7 @@ describe('POST /api/orders/[id]/receipt', () => {
     const { bucket, upload, orders } = await loadRoutes()
     const order = await pendingOrder(orders)
 
-    const res = await upload.POST(
-      uploadRequest({ receipt: new File([PNG_BYTES], 'slip.php', { type: 'image/png' }) }),
-      params({ id: order.id })
-    )
+    const res = await uploadReceiptForOrder(upload, order, new File([PNG_BYTES], 'slip.php', { type: 'image/png' }))
     const { filename } = await res.json()
 
     expect(filename.endsWith('.jpg')).toBe(true)
@@ -233,9 +238,7 @@ describe('GET /api/admin/receipt/[filename]', () => {
   it('serves the uploaded receipt back to a logged-in admin', async () => {
     const { orders, upload, serve } = await loadRoutes()
     const order = await pendingOrder(orders)
-    const { filename } = await (
-      await upload.POST(uploadRequest(), params({ id: order.id }))
-    ).json()
+    const { filename } = await (await uploadReceiptForOrder(upload, order)).json()
 
     const res = await serve.GET(
       new Request(`https://ai2apps.sbs/api/admin/receipt/${filename}`),
@@ -250,9 +253,7 @@ describe('GET /api/admin/receipt/[filename]', () => {
   it('never lets a shared cache keep a bank slip', async () => {
     const { orders, upload, serve } = await loadRoutes()
     const order = await pendingOrder(orders)
-    const { filename } = await (
-      await upload.POST(uploadRequest(), params({ id: order.id }))
-    ).json()
+    const { filename } = await (await uploadReceiptForOrder(upload, order)).json()
 
     const res = await serve.GET(
       new Request(`https://ai2apps.sbs/api/admin/receipt/${filename}`),
@@ -268,9 +269,7 @@ describe('GET /api/admin/receipt/[filename]', () => {
     // filename derived from the order id the customer is given plus a timestamp.
     const { orders, upload, serve } = await loadRoutes({ authenticated: true })
     const order = await pendingOrder(orders)
-    const { filename } = await (
-      await upload.POST(uploadRequest(), params({ id: order.id }))
-    ).json()
+    const { filename } = await (await uploadReceiptForOrder(upload, order)).json()
 
     const anonymous = await loadRoutes({ authenticated: false })
     const res = await anonymous.serve.GET(

@@ -264,17 +264,33 @@ export async function checkRateLimit(ip) {
     blockedUntil.delete(ip)
   }
 
+  let kvBlocked = false
   try {
-    const doc = await getDoc(blockKey(ip))
-    if (doc && typeof doc.until === 'number' && now < doc.until) {
-      blockedUntil.set(ip, doc.until)
+    const [blockDoc, countDoc] = await Promise.all([
+      getDoc(blockKey(ip)),
+      getDoc(blockKey(ip) + ':count'),
+    ])
+    if (blockDoc && typeof blockDoc.until === 'number' && now < blockDoc.until) {
+      blockedUntil.set(ip, blockDoc.until)
+      kvBlocked = true
       return false
     }
+    // Initialize local counter from KV if available (helps fresh isolates)
+    if (countDoc && typeof countDoc.count === 'number' && countDoc.first && now - countDoc.first < WINDOW_MS) {
+      const existing = attempts.get(ip)
+      if (!existing || countDoc.count > existing.count) {
+        attempts.set(ip, { count: countDoc.count, first: countDoc.first })
+      }
+    }
   } catch (error) {
-    // Fail open, deliberately. A KV outage must not lock the owner out of their own
-    // panel for fifteen minutes at a time, and the local counter below still holds —
-    // so the degraded behaviour is exactly the old behaviour, not no limit at all.
-    console.error('[admin-auth] rate-limit lookup failed, falling back to memory:', error)
+    // KV unavailable: we cannot verify global block state.
+    // If we have a local cached block, respect it. Otherwise, allow but log security event.
+    // This prevents an attacker from DoSing KV to bypass blocks, while not locking out
+    // the admin if KV is truly down (local counter still enforces per-isolate limit).
+    console.error('[admin-auth] rate-limit KV lookup failed:', error)
+    if (!cached) {
+      console.warn('[admin-auth] SECURITY: KV unavailable, global block check skipped for', ip)
+    }
   }
 
   const record = attempts.get(ip)
@@ -293,6 +309,10 @@ export async function checkRateLimit(ip) {
  * described above: only the attempt that blocks is worth a row, so the caller logs
  * on `true` and stays silent otherwise.
  *
+ * Also persists the attempt count to KV so other isolates can see progress toward
+ * the limit. Uses last-write-wins (no CAS), so concurrent writes may slightly
+ * undercount, but this is acceptable — the block itself is the hard enforcement.
+ *
  * @returns {Promise<boolean>} true when this attempt reached MAX_ATTEMPTS
  */
 export async function recordFailedAttempt(ip) {
@@ -307,6 +327,13 @@ export async function recordFailedAttempt(ip) {
   } else {
     record.count += 1
     count = record.count
+  }
+
+  // Persist attempt count to KV for cross-isolate visibility (best-effort, last-write-wins)
+  try {
+    await putDoc(blockKey(ip) + ':count', { count, first: record?.first || now }, { ttlSeconds: Math.ceil(WINDOW_MS / 1000) })
+  } catch (error) {
+    console.error('[admin-auth] could not persist attempt count:', error)
   }
 
   // Equality, not `>=`: past the limit `checkRateLimit` rejects before we are
@@ -330,7 +357,10 @@ export async function resetAttempts(ip) {
   attempts.delete(ip)
   blockedUntil.delete(ip)
   try {
-    await deleteDoc(blockKey(ip))
+    await Promise.all([
+      deleteDoc(blockKey(ip)),
+      deleteDoc(blockKey(ip) + ':count'),
+    ])
   } catch (error) {
     // Worst case the owner waits out a TTL they already earned by mistyping.
     console.error('[admin-auth] could not clear the rate-limit block:', error)

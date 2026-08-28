@@ -1,41 +1,26 @@
 import { NextResponse } from 'next/server'
 import { getOrderById } from '@/lib/orders'
+import { createRateLimiter } from '@/lib/rate-limit'
+import { extractClientKey } from '@/lib/request-ip'
 
-// Rate limiting for order tracking
-const trackAttempts = new Map()
-const MAX_TRACK_ATTEMPTS = 20
-const TRACK_LOCKOUT_TIME = 5 * 60 * 1000 // 5 minutes
-
-function checkTrackRateLimit(ip) {
-  const now = Date.now()
-  const attempts = trackAttempts.get(ip) || { count: 0, lastAttempt: 0 }
-
-  if (now - attempts.lastAttempt > TRACK_LOCKOUT_TIME) {
-    trackAttempts.set(ip, { count: 0, lastAttempt: now })
-    return true
-  }
-
-  if (attempts.count >= MAX_TRACK_ATTEMPTS) {
-    return false
-  }
-
-  trackAttempts.set(ip, { count: attempts.count + 1, lastAttempt: now })
-  return true
-}
+const trackRateLimiter = createRateLimiter({
+  namespace: 'track',
+  maxAttempts: 20,
+  windowMs: 5 * 60 * 1000,
+})
 
 function getClientIp(request) {
-  const forwarded = request.headers.get('x-forwarded-for')
-  if (forwarded) return forwarded.split(',')[0].trim()
-  return '127.0.0.1'
+  return extractClientKey(request)
 }
 
 export async function POST(request) {
   // Rate limiting
   const ip = getClientIp(request)
-  if (!checkTrackRateLimit(ip)) {
+  const rateLimitResult = await trackRateLimiter.check(ip)
+  if (!rateLimitResult.allowed) {
     return NextResponse.json(
       { error: 'تعداد درخواست‌ها بیش از حد مجاز است' },
-      { status: 429 }
+      { status: 429, headers: { 'Retry-After': String(rateLimitResult.retryAfter) } }
     )
   }
 
@@ -82,6 +67,7 @@ export async function POST(request) {
         product: order.productId,
         plan: order.plan,
         createdAt: order.createdAt,
+        uniqueAmount: order.uniqueAmount,
         statusHistory: order.statusHistory,
         deployment: order.deployment,
       },
