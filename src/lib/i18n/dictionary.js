@@ -5,7 +5,7 @@ const dictionary = {
       description: 'اردلان پیری — توسعه‌دهنده نرم‌افزار و هوش مصنوعی، با پشتوانه‌ی ۸ سال تجربه‌ی عملی در صنایع مختلف',
       brand: 'اردلان',
       tagline: 'توسعه‌دهنده نرم‌افزار و هوش مصنوعی — با پشتوانه‌ی ۸ سال تجربه‌ی عملی',
-      madeWith: 'ساخته شده با هوش مصنوعی',
+      madeWith: 'ساخته شده با ❤️ برای حل مسئله‌های واقعی',
       copyright: 'همه حقوق محفوظ است.',
       lang: 'fa',
       dir: 'rtl',
@@ -46,7 +46,7 @@ const dictionary = {
     },
     about: {
       badge: 'درباره من',
-      title: 'از تحلیل بازار تا خلق ماشین‌های هوشمند',
+      title: 'از تحلیل مسئله تا خلق نرم‌افزار',
       stats: [
         { num: 5, label: 'حوزه تخصصی', suffix: '' },
         { num: 13, label: 'سال تجربه در بازارهای مالی', suffix: '+' },
@@ -305,7 +305,7 @@ const dictionary = {
       description: 'Ardalan Piri — Software Developer | AI Specialist | Financial Markets Analyst | Insurance Consultant',
       brand: 'Ardalan',
       tagline: 'Software Developer · AI Specialist · Financial Markets Analyst · Insurance Consultant',
-      madeWith: 'Made with AI',
+      madeWith: 'Built with ❤️ to solve real problems',
       copyright: 'All rights reserved.',
       lang: 'en',
       dir: 'ltr',

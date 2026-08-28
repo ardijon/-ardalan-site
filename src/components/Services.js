@@ -88,11 +88,11 @@ export default function Services() {
             transition: 'opacity 0.7s ease, transform 0.7s ease',
           }}
         >
-          <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="text-center mb-14">
             <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
               {t('services.badge')}
             </span>
-            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)]">
+            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] whitespace-nowrap">
               {t('services.title')}
             </h2>
           </div>

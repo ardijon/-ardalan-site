@@ -24,7 +24,7 @@ function StatCard({ stat, visible, index }) {
         transform: visible ? 'translateY(0)' : 'translateY(24px)',
         transition: `opacity 0.7s ease ${transitionDelay}ms, transform 0.7s ease ${transitionDelay}ms`,
       }}
-      className="group relative p-8 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-sm hover:shadow-xl hover:shadow-[var(--color-accent)]/5 hover:-translate-y-2 hover:border-[var(--color-accent)]/25 transition-all duration-500 ease-out overflow-hidden"
+      className="group relative p-4 sm:p-5 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-sm hover:shadow-xl hover:shadow-[var(--color-accent)]/5 hover:-translate-y-2 hover:border-[var(--color-accent)]/25 transition-all duration-500 ease-out overflow-hidden text-center"
     >
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.2)] to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
       <div
@@ -34,14 +34,14 @@ function StatCard({ stat, visible, index }) {
             'radial-gradient(circle at 30% 30%, var(--color-accent) 0%, transparent 70%), radial-gradient(circle at 70% 70%, var(--color-tech) 0%, transparent 70%)',
         }}
       />
-      <p className="text-3xl sm:text-4xl font-black text-[var(--color-accent)] group-hover:scale-110 transition-transform duration-500 origin-center">
+      <p className="text-2xl sm:text-3xl font-black text-[var(--color-accent)] group-hover:scale-110 transition-transform duration-500 origin-center">
         {visible ? (
           <AnimatedCounter value={stat.num} suffix={stat.suffix} duration={hover ? 800 : 2000} />
         ) : (
           '۰' + stat.suffix
         )}
       </p>
-      <p className="mt-2 text-sm text-[var(--color-text)]/50 font-medium group-hover:text-[var(--color-text)]/70 transition-colors duration-500">
+      <p className="mt-1.5 text-xs text-[var(--color-text)]/50 font-medium group-hover:text-[var(--color-text)]/70 transition-colors duration-500">
         {stat.label}
       </p>
     </div>
@@ -79,34 +79,25 @@ export default function About() {
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
         <div
           ref={ref}
-          className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-center"
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'translateY(0)' : 'translateY(24px)',
+            transition: 'opacity 0.7s ease, transform 0.7s ease',
+          }}
         >
-          <div
-            style={{
-              opacity: visible ? 1 : 0,
-              transform: visible ? 'translateY(0)' : 'translateY(24px)',
-              transition: 'opacity 0.7s ease, transform 0.7s ease',
-            }}
-          >
-            <h2 className="text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)] leading-tight min-h-[1.2em]">
-              {/* The typed layer is decoration, so it is hidden from assistive
-                  tech and the real heading sits beside it. Two things were wrong
-                  with typing alone: on the server `visible` is false and
-                  `charIndex` is 0, so this <h2> went out empty and the section's
-                  own title was missing from the HTML crawlers read; and a screen
-                  reader was announcing a heading that mutated one letter at a
-                  time. One span fixes both, with no visual change. */}
+            <h2 className="text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)] leading-tight min-h-[1.2em] whitespace-nowrap">
               <span aria-hidden="true">
                 {visible ? titleText.slice(0, charIndex) : ''}
                 {!typingDone && visible && <span className="animate-pulse text-[var(--color-accent)]">|</span>}
               </span>
               <span className="sr-only">{titleText}</span>
             </h2>
-            <div className="flex items-center gap-3 mt-6 mb-6">
+            <div className="flex items-center gap-3 mt-6 mb-10">
               <div className="w-16 h-1 bg-[var(--color-accent)] rounded-full" />
               <TrustSeal size={28} />
             </div>
 
+          <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-start">
             <div className="space-y-5 text-[var(--color-text)]/60 leading-relaxed md:text-justify">
               <p dangerouslySetInnerHTML={{ __html: renderBold(t('about.p1')) }} />
               <p>{t('about.p2')}</p>
@@ -117,8 +108,6 @@ export default function About() {
                 <p className="text-lg sm:text-xl leading-relaxed text-[var(--color-text)]/70" dangerouslySetInnerHTML={{ __html: renderBold(t('about.quote')) }} />
               </div>
 
-              {/* The résumé left the header nav — it is proof, not a destination —
-                  so this is now the only way in. */}
               <a
                 href="#resume"
                 className="group inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-accent)] hover:underline"
@@ -129,12 +118,12 @@ export default function About() {
                 </svg>
               </a>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {stats.map((stat, i) => (
-              <StatCard key={stat.label} stat={stat} visible={visible} index={i} />
-            ))}
+            <div className="grid grid-cols-3 gap-4">
+              {stats.map((stat, i) => (
+                <StatCard key={stat.label} stat={stat} visible={visible} index={i} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
