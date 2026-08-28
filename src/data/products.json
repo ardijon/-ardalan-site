@@ -302,53 +302,47 @@
     "releaseAt": null,
     "pricingMode": "fixed",
     "title": {
-      "fa": "سایت اختصاصی نماینده فروش بیمه عمر",
-      "en": "Dedicated Website for a Life Insurance Agent"
+      "fa": "مشتری‌های جدید، بدون تماس تلفنی — با سیستم ارجاع خودکار",
+      "en": "New clients, without cold calls — with an auto-referral system"
     },
     "shortTitle": {
       "fa": "سایت نماینده",
       "en": "Agent Website"
     },
     "description": {
-      "fa": "یک ابزار واقعی فروش و خدمات‌رسانی، نه فقط یک صفحه‌ی معرفی.\n\nبیمه عمر بر پایه‌ی اعتماد فروخته می‌شود؛ مشتری پیش از آنکه به محصول اعتماد کند، به شخص نماینده اعتماد می‌کند. این سایت همان اعتماد را قبل از اولین تماس می‌سازد: پروفایل حرفه‌ای شما با سابقه و تعداد بیمه‌گذاران، ماشین‌حسابی که به بازدیدکننده نشان می‌دهد چقدر پوشش لازم دارد، و پاسخ‌های آماده‌ی خودتان به پرسش‌های پرتکرار.\n\nراه‌اندازی کامل ۵ تا ۷ روز کاری پس از دریافت اطلاعات و تصاویر شما زمان می‌برد. ثبت دامنه و بالا آوردن سایت انجام می‌شود و محتوا در فایل‌های ساده و قابل ویرایش تحویل داده می‌شود تا بعداً خودتان بتوانید تغییرش دهید.",
-      "en": "A real sales and service tool, not just an introduction page.\n\nLife insurance is sold on trust: before a client trusts the product, they trust the agent. This site builds that trust before the first phone call — a professional profile with your track record and policyholder count, a calculator that shows visitors how much coverage they actually need, and your own pre-approved answers to the questions you get asked every week.\n\nFull setup takes 5 to 7 working days after your information and photos arrive. Domain registration and deployment are included, and the content ships in plain editable files so you can change it yourself later."
+      "fa": "مشتری بیمه عمر، پیش از آنکه به محصول اعتماد کند، به شخص شما اعتماد می‌کند. اما امروز کسی که اسم شما را جستجو می‌کند، به یک پروفایل شبکه‌ی اجتماعی می‌رسد — میان هزاران پروفایل شبیه هم.\n\nاین سایت همان فاصله را پر می‌کند. بازدیدکننده سابقه و تعداد بیمه‌گذاران شما را می‌بیند، با ماشین‌حساب می‌فهمد چه پوششی نیاز دارد، و پاسخ پرسش‌هایش را با کلمات خودتان می‌خواند. وقتی روی واتساپ می‌زند، دیگر یک غریبه نیست.",
+      "en": "A life-insurance client trusts the person before they trust the product. But today, someone who searches your name finds a social-media profile among thousands of identical ones — or nothing at all.\n\nThis site closes that gap. A visitor sees your track record and policyholder count, works out how much coverage they need with the calculator, and reads your answers to common questions in your own words. By the time they tap WhatsApp, they are no longer a stranger."
     },
     "shortDescription": {
-      "fa": "سایت شخصی نماینده با ماشین‌حساب نیاز بیمه، سیستم ارجاع‌گیری و کارت دیجیتال — راه‌اندازی کامل در ۵ تا ۷ روز کاری",
-      "en": "A personal agent website with a coverage calculator, referral system and digital card — fully set up in 5 to 7 working days"
+      "fa": "سایت شخصی با ماشین‌حساب نیاز، سیستم ارجاع خودکار، و کارت دیجیتال",
+      "en": "Personal site with a coverage calculator, auto-referral system, and digital card"
     },
     "valueProposition": {
-      "fa": "مشتری بیمه عمر، پیش از آنکه به محصول اعتماد کند، به شخص شما اعتماد می‌کند.\n\nاما امروز کسی که نام شما را می‌شنود و جستجو می‌کند، به یک پروفایل شبکه‌ی اجتماعی می‌رسد میان هزاران پروفایل شبیه هم — یا به هیچ. اعتمادی که باید قبل از اولین تماس ساخته می‌شد ساخته نمی‌شود، و گفتگو از صفر شروع می‌شود.\n\nاین سایت همان فاصله را پر می‌کند. بازدیدکننده سابقه و تعداد بیمه‌گذاران شما را می‌بیند، با ماشین‌حساب می‌فهمد چه اندازه پوشش لازم دارد، و پاسخ پرسش‌های همیشگی‌اش را با کلمات خودتان می‌خواند — نه با متن یک ربات. وقتی روی واتساپ می‌زند، دیگر یک غریبه نیست.\n\nو یک کار دیگر هم می‌کند که یک صفحه‌ی معرفی نمی‌کند: هر بیمه‌گذار شما یک لینک کوتاه اختصاصی می‌گیرد و هر سرنخی که از آن لینک بیاید، خودکار به نام همان معرف ثبت می‌شود. زنجیره‌ی ارجاع از حافظه‌ی شما به یک جدول منتقل می‌شود.",
-      "en": "A life-insurance client trusts you before they trust the product.\n\nBut today, someone who hears your name and looks you up finds a social-media profile among thousands of identical ones — or nothing at all. The trust that should have been built before the first call never gets built, and the conversation starts from zero.\n\nThis site closes that gap. A visitor sees your track record and how many policyholders you serve, works out how much cover they actually need with the calculator, and reads your answers to the usual questions in your own words — not a chatbot’s. By the time they tap WhatsApp, they are no longer a stranger.\n\nAnd it does one thing a brochure page cannot: every policyholder gets their own short link, and any lead arriving through it is credited to that referrer automatically. Your referral chain moves out of your memory and into a table."
+      "fa": "مشتری بیمه عمر، پیش از آنکه به محصول اعتماد کند، به شخص شما اعتماد می‌کند.\n\nاما امروز کسی که نام شما را می‌شنود و جستجو می‌کند، به یک پروفایل شبکه‌ی اجتماعی می‌رسد میان هزاران پروفایل شبیه هم — یا به هیچ. اعتمادی که باید قبل از اولین تماس ساخته می‌شد ساخته نمی‌شود، و گفتگو از صفر شروع می‌شود.\n\nاین سایت همان فاصله را پر می‌کند. بازدیدکننده سابقه و تعداد بیمه‌گذاران شما را می‌بیند، با ماشین‌حساب می‌فهمد چه اندازه پوشش لازم دارد، و پاسخ پرسش‌های همیشگی‌اش را با کلمات خودتان می‌خواند — نه با متن یک ربات. وقتی روی واتساپ می‌زند، دیگر یک غریبه نیست.",
+      "en": "A life-insurance client trusts you before they trust the product.\n\nBut today, someone who hears your name and looks you up finds a social-media profile among thousands of identical ones — or nothing at all. The trust that should have been built before the first call never gets built, and the conversation starts from zero.\n\nThis site closes that gap. A visitor sees your track record and how many policyholders you serve, works out how much cover they actually need with the calculator, and reads your answers to the usual questions in your own words — not a chatbot's. By the time they tap WhatsApp, they are no longer a stranger."
     },
     "features": {
       "fa": [
-        "پروفایل حرفه‌ای: عکس، نام، عنوان، سابقه، تعداد بیمه‌گذاران و امتیاز رضایت",
-        "ماشین‌حساب «چقدر بیمه عمر نیاز دارید؟» بر پایه‌ی درآمد، افراد تحت تکفل و بدهی",
-        "دستیار پرسش‌وپاسخ سریع با ۱۰ تا ۱۵ پرسش پرتکرار — هوش مصنوعی نیست؛ هر پاسخ را خودتان می‌نویسید و تأیید می‌کنید",
-        "کارت ویزیت دیجیتال با «افزودن به مخاطبین» و QR اختصاصی برای کارت چاپی",
-        "سیستم ارجاع‌گیری: لینک کوتاه اختصاصی هر بیمه‌گذار و انتساب خودکار سرنخ‌های جدید",
-        "جدول خصوصی برترین معرف‌ها برای پیگیری زنجیره‌های ارجاع",
-        "دکمه‌ی شناور واتساپ با پیام آماده‌ی شروع گفتگو",
-        "راست‌چین کامل با فونت وزیرمتن و دو تم روشن و تیره",
-        "بارگذاری سریع و نمایش درست روی موبایل",
-        "هاست روی زیرساخت پایدار و در دسترس از داخل ایران",
-        "ثبت دامنه و راه‌اندازی کامل — تحویل ۵ تا ۷ روز کاری",
-        "محتوا در فایل‌های ساده و قابل ویرایش"
+        "ماشین‌حساب «چقدر بیمه نیاز دارید؟» بر پایه‌ی درآمد، افراد تحت تکفل و بدهی",
+        "کارت ویزیت دیجیتال با QR و دکمه‌ی افزودن به مخاطبین",
+        "دکمه‌ی شناور واتساپ و تلگرام با پیام آماده",
+        "پروفایل حرفه‌ای با سابقه و تعداد بیمه‌گذاران",
+        "دستیار پرسش و پاسخ با پاسخ‌های تأییدشده توسط شما",
+        "دو تم روشن و تیره، راست‌چین، مناسب موبایل",
+        "سیستم ارجاع خودکار با لینک اختصاصی هر بیمه‌گذار",
+        "جدول برترین معرف‌ها برای پیگیری ارجاع‌ها",
+        "گزارش خودکار سرنخ‌های جدید از هر معرف"
       ],
       "en": [
-        "Professional profile: photo, name, title, track record, policyholder count and satisfaction score",
-        "A \"How much life insurance do you need?\" calculator based on income, dependents and debt",
-        "Quick Q&A assistant covering 10 to 15 recurring questions — this is not AI; you write and approve every answer",
-        "Digital business card with \"Add to contacts\" and a dedicated QR code for printed cards",
-        "Referral system: a short link per policyholder with automatic attribution of new leads",
-        "A private top-referrers table for following referral chains",
-        "Floating WhatsApp button with a pre-filled opening message",
-        "Full RTL layout with the Vazirmatn font and both light and dark themes",
-        "Fast loading and correct rendering on mobile",
-        "Hosted on stable infrastructure that stays reachable from inside Iran",
-        "Domain registration and complete setup — delivered in 5 to 7 working days",
-        "Content in plain, editable files"
+        "Coverage calculator based on income, dependents, and debt",
+        "Digital business card with QR code and add-to-contacts button",
+        "Floating WhatsApp and Telegram button with a pre-filled message",
+        "Professional profile with track record and policyholder count",
+        "Q&A assistant with answers approved by you",
+        "Light and dark themes, RTL, mobile-optimized",
+        "Auto-referral system with a unique link per policyholder",
+        "Top-referrers table for tracking referral chains",
+        "Automatic lead reports from each referrer"
       ]
     },
     "tech": [],
