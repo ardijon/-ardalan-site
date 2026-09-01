@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { guardAdminRoute } from '@/lib/admin-auth'
+import { recordAudit } from '@/lib/audit'
 
 /**
  * POST /api/admin/revalidate
@@ -19,6 +20,12 @@ export async function POST(request) {
     revalidatePath('/store')
     revalidatePath('/store/[slug]', 'page')
     revalidatePath('/sitemap.xml')
+
+    await recordAudit({
+      action: 'cache.revalidate',
+      entityId: 'store',
+      summary: 'کش فروشگاه و sitemap بازاعتبارسنجی شد',
+    }).catch(() => {})
 
     return NextResponse.json({
       revalidated: true,

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 import { planPriceLine, summaryPriceLine } from '@/lib/number-fa'
+import { toPersianDigits } from '@/lib/jalali'
 
 /**
  * The landing page's bridge into the store.
@@ -81,13 +82,13 @@ export default function Products({ initialProducts }) {
           }}
         >
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
+            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
               {t('products.badge')}
             </span>
-            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] whitespace-nowrap">
+            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] text-balance">
               {t('products.title')}
             </h2>
-            <p className="mt-4 text-sm sm:text-base text-[var(--color-text)]/50 leading-relaxed">
+            <p className="mt-4 text-sm sm:text-base text-text-soft-50 leading-relaxed">
               {t('products.subtitle')}
             </p>
             {t('products.highlights')?.map((line, i) => (
@@ -121,7 +122,7 @@ export default function Products({ initialProducts }) {
           <div className="mt-10 text-center">
             <Link
               href="/store"
-              className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-[var(--color-accent)] border-2 border-[var(--color-accent)]/30 rounded-xl hover:bg-[var(--color-accent)] hover:text-white transition-all duration-300"
+              className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-[var(--color-accent)] border-2 border-accent-soft-30 rounded-xl hover:bg-[var(--color-accent)] hover:text-white transition-all duration-300"
             >
               {t('products.viewAll')}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" className={isRtl ? 'rotate-180' : ''}>
@@ -157,17 +158,17 @@ function ProductRow({ product, step, isRtl, locale, t }) {
     <li
       className={`group relative flex flex-col gap-4 p-5 sm:p-6 rounded-2xl border bg-[var(--color-bg)] transition-all duration-300 sm:flex-row sm:items-center ${
         product.featured
-          ? 'border-[var(--color-accent)]/30 shadow-lg shadow-[var(--color-accent)]/5'
-          : 'border-[var(--color-border)] hover:border-[var(--color-accent)]/20'
+          ? 'border-accent-soft-30 shadow-lg shadow-accent-soft-5'
+          : 'border-[var(--color-border)] hover:border-accent-soft-20'
       } ${isRtl ? 'text-right' : 'text-left'}`}
     >
       {/* The step number is the whole point of the ladder metaphor — it says
           "these are sizes of the same thing", not three unrelated products. */}
       <div className="flex shrink-0 items-center gap-3 sm:flex-col sm:gap-1">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-accent)]/10 text-base font-black text-[var(--color-accent)]">
-          {step.toLocaleString(locale === 'fa' ? 'fa-IR' : 'en-US')}
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft-10 text-base font-black text-[var(--color-accent)]">
+          {locale === 'fa' ? toPersianDigits(step) : String(step)}
         </span>
-        <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--color-text)]/30">
+        <span className="text-[10px] font-medium uppercase tracking-wide text-text-soft-30">
           {t('products.levelLabel')}
         </span>
       </div>
@@ -180,7 +181,7 @@ function ProductRow({ product, step, isRtl, locale, t }) {
             </span>
           )}
           {isComingSoon && (
-            <span className="rounded-full bg-[var(--color-tech)]/10 px-2 py-0.5 text-[10px] font-bold text-[var(--color-tech)]">
+            <span className="rounded-full bg-tech-soft-10 px-2 py-0.5 text-[10px] font-bold text-[var(--color-tech)]">
               {t('store.comingSoon')}
             </span>
           )}
@@ -188,7 +189,7 @@ function ProductRow({ product, step, isRtl, locale, t }) {
         <h3 className="mt-1 text-base font-bold leading-snug text-[var(--color-primary)] group-hover:text-[var(--color-accent)] transition-colors sm:text-lg">
           {title}
         </h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-text)]/50">
+        <p className="mt-1.5 text-sm leading-relaxed text-text-soft-50">
           {summary}
         </p>
       </div>
@@ -198,7 +199,7 @@ function ProductRow({ product, step, isRtl, locale, t }) {
           {planPrice ? (
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg font-black text-[var(--color-accent)] whitespace-nowrap">{planPrice}</span>
-              {planPeriod && <span className="text-xs text-[var(--color-text)]/40">{planPeriod}</span>}
+              {planPeriod && <span className="text-xs text-text-soft-40">{planPeriod}</span>}
             </div>
           ) : summaryPrice ? (
             <span className="text-sm font-black leading-snug text-[var(--color-accent)]">{summaryPrice}</span>
@@ -209,8 +210,8 @@ function ProductRow({ product, step, isRtl, locale, t }) {
           href={`/store/${product.slug}`}
           className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold transition-all active:scale-95 ${
             isComingSoon
-              ? 'text-[var(--color-accent)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/10'
-              : 'text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent)]/90 shadow-md shadow-[var(--color-accent)]/20'
+              ? 'text-[var(--color-accent)] border border-accent-soft-30 hover:bg-accent-soft-10'
+              : 'text-white bg-[var(--color-accent)] hover:bg-accent-soft-90 shadow-md shadow-accent-soft-20'
           }`}
         >
           {isComingSoon ? t('store.moreInfo') : t('store.buyNow')}

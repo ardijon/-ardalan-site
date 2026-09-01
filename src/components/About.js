@@ -24,7 +24,7 @@ function StatCard({ stat, visible, index }) {
         transform: visible ? 'translateY(0)' : 'translateY(24px)',
         transition: `opacity 0.7s ease ${transitionDelay}ms, transform 0.7s ease ${transitionDelay}ms`,
       }}
-      className="group relative p-4 sm:p-5 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-sm hover:shadow-xl hover:shadow-[var(--color-accent)]/5 hover:-translate-y-2 hover:border-[var(--color-accent)]/25 transition-all duration-500 ease-out overflow-hidden text-center"
+      className="group relative p-4 sm:p-5 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-sm hover:shadow-xl hover:shadow-accent-soft-5 hover:-translate-y-2 hover:border-accent-soft-25 transition-all duration-500 ease-out overflow-hidden text-center"
     >
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.2)] to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out" />
       <div
@@ -41,7 +41,7 @@ function StatCard({ stat, visible, index }) {
           '۰' + stat.suffix
         )}
       </p>
-      <p className="mt-1.5 text-xs text-[var(--color-text)]/50 font-medium group-hover:text-[var(--color-text)]/70 transition-colors duration-500">
+      <p className="mt-1.5 text-xs text-text-soft-50 font-medium group-hover:text-text-soft-70 transition-colors duration-500">
         {stat.label}
       </p>
     </div>
@@ -75,7 +75,7 @@ export default function About() {
   }, [visible, typingDone])
 
   return (
-    <section id="about" className="py-16 sm:py-20 lg:py-28 bg-[var(--color-surface)]/50 scroll-mt-20">
+    <section id="about" className="py-16 sm:py-20 lg:py-28 bg-surface-soft scroll-mt-20">
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
         <div
           ref={ref}
@@ -85,7 +85,7 @@ export default function About() {
             transition: 'opacity 0.7s ease, transform 0.7s ease',
           }}
         >
-            <h2 className="text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)] leading-tight min-h-[1.2em] whitespace-nowrap">
+            <h2 className="text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)] leading-tight min-h-[1.2em] text-balance">
               <span aria-hidden="true">
                 {visible ? titleText.slice(0, charIndex) : ''}
                 {!typingDone && visible && <span className="animate-pulse text-[var(--color-accent)]">|</span>}
@@ -98,14 +98,14 @@ export default function About() {
             </div>
 
           <div className="grid lg:grid-cols-2 gap-10 sm:gap-16 items-start">
-            <div className="space-y-5 text-[var(--color-text)]/60 leading-relaxed md:text-justify">
+            <div className="space-y-5 text-text-soft-60 leading-relaxed md:text-justify">
               <p dangerouslySetInnerHTML={{ __html: renderBold(t('about.p1')) }} />
               <p>{t('about.p2')}</p>
               <p dangerouslySetInnerHTML={{ __html: renderBold(t('about.p3')) }} />
               <div className={`relative pt-2 ${
                 isRtl ? 'pr-6 sm:pr-8 border-r-2' : 'pl-6 sm:pl-8 border-l-2'
-              } border-[var(--color-accent)]/30`}>
-                <p className="text-lg sm:text-xl leading-relaxed text-[var(--color-text)]/70" dangerouslySetInnerHTML={{ __html: renderBold(t('about.quote')) }} />
+              } border-accent-soft-30`}>
+                <p className="text-lg sm:text-xl leading-relaxed text-text-soft-70" dangerouslySetInnerHTML={{ __html: renderBold(t('about.quote')) }} />
               </div>
 
               <a

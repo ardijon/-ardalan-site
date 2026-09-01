@@ -4,6 +4,7 @@ import bundledProducts from '@/data/products.json'
 import { readCollection, writeCollection } from '@/lib/storage'
 import { guardAdminRoute } from '@/lib/admin-auth'
 import { recordAudit, auditSummary } from '@/lib/audit'
+import { serializeProduct } from '@/lib/product-shape'
 
 /**
  * Product CRUD for the admin panel.
@@ -21,9 +22,13 @@ import { recordAudit, auditSummary } from '@/lib/audit'
 const COLLECTION = 'products'
 
 async function readProducts() {
-  const stored = await readCollection(COLLECTION, null)
-  if (Array.isArray(stored) && stored.length > 0) return stored
-  return bundledProducts
+  const raw = await readCollection(COLLECTION, null)
+  // `null` means the collection has never been written — fall back to the
+  // bundled catalogue. A stored EMPTY array is a real state (the admin deleted
+  // every product) and must come back as empty, not resurrect the bundled
+  // catalogue behind the admin's back.
+  if (raw === null || !Array.isArray(raw)) return bundledProducts
+  return raw
 }
 
 async function writeProducts(products) {
@@ -44,12 +49,38 @@ async function writeProducts(products) {
 function validateProduct(product) {
   if (!product || typeof product !== 'object') return false
   if (!product.slug || typeof product.slug !== 'string') return false
-  // Slug ends up in URLs and on disk paths — keep it strict.
-  if (!/^[a-z0-9-]+$/i.test(product.slug)) return false
+  // Slug ends up in URLs and on disk paths — keep it strict. Lowercase only:
+  // the form's hint promises حروف کوچک, and two slugs differing only in case
+  // would be two different products and two different URLs.
+  if (!/^[a-z0-9-]+$/.test(product.slug)) return false
   if (!product.title || typeof product.title !== 'object') return false
   if (!product.pricing || typeof product.pricing !== 'object') return false
   if (!product.shortDescription || typeof product.shortDescription !== 'object') return false
+
+  // Prices must be real positive numbers. The panel's serializeProduct guards
+  // this client-side, but the API accepts raw calls where a negative, NaN-ish
+  // or string price flows straight into generateUniqueAmount and the storefront.
+  for (const plan of Object.values(product.pricing)) {
+    if (!plan || typeof plan !== 'object') continue
+    if (plan.price === null || plan.price === undefined || plan.price === '') continue
+    const price = Number(plan.price)
+    if (!Number.isFinite(price) || price <= 0) return false
+  }
+  if (
+    product.priceSummary?.price !== null &&
+    product.priceSummary?.price !== undefined &&
+    product.priceSummary?.price !== ''
+  ) {
+    const summaryPrice = Number(product.priceSummary.price)
+    if (!Number.isFinite(summaryPrice) || summaryPrice < 0) return false
+  }
+
   return true
+}
+
+/** Shape the payload exactly as the panel does, so every save is canonical. */
+function canonicalize(product) {
+  return serializeProduct(typeof structuredClone === 'function' ? structuredClone(product) : JSON.parse(JSON.stringify(product)))
 }
 
 export async function GET(request) {
@@ -70,12 +101,13 @@ export async function POST(request) {
   if (denied) return denied
 
   try {
-    const newProduct = await request.json()
+    const posted = await request.json()
 
-    if (!validateProduct(newProduct)) {
+    if (!validateProduct(posted)) {
       return NextResponse.json({ error: 'Invalid product data' }, { status: 400 })
     }
 
+    const newProduct = canonicalize(posted)
     const products = await readProducts()
 
     if (products.find(p => p.slug === newProduct.slug)) {
@@ -105,17 +137,21 @@ export async function PUT(request) {
   if (denied) return denied
 
   try {
-    const updated = await request.json()
+    const posted = await request.json()
 
-    if (!validateProduct(updated)) {
+    if (!validateProduct(posted)) {
       return NextResponse.json({ error: 'Invalid product data' }, { status: 400 })
     }
 
+    const updated = canonicalize(posted)
     const products = await readProducts()
     const index = products.findIndex(p => p.slug === updated.slug)
 
     if (index === -1) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      // The UI disables slug editing, so a PUT that matches nothing is a client
+      // bug or a stale tab — name it precisely instead of silently creating a
+      // product at a URL nobody linked to.
+      return NextResponse.json({ error: 'Product not found — slugs are immutable; create via POST' }, { status: 404 })
     }
 
     const next = [...products]

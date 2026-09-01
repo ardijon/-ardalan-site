@@ -173,12 +173,15 @@ describe('the dashboard panel', () => {
     expect(source).toMatch(/<VisitStats /)
   })
 
-  it('swallows its own failures so the revenue figures still render', () => {
-    // Same rule the activity feed follows: one empty panel, not an error state
-    // that replaces numbers which read fine.
+  it('reports its own failures without replacing the revenue figures', () => {
+    // The old rule was "swallow everything": an empty visits panel was
+    // indistinguishable from "nobody visited" — and the visits route can fail
+    // for real (KV hiccup, subrequest cap). Failures now surface inside the
+    // visits panel only, via a dedicated flag, never through the shared
+    // setError that would blank the revenue figures.
     const effect = source.slice(source.indexOf("fetch('/api/admin/visits"))
-    expect(effect.slice(0, 400)).toMatch(/\.catch\(\(\) => \{\}\)/)
-    expect(effect.slice(0, 400)).not.toMatch(/setError/)
+    expect(effect.slice(0, 600)).toMatch(/setVisitsError\(true\)/)
+    expect(effect.slice(0, 600)).not.toMatch(/setError/)
   })
 
   it('states what «خوانده شد» means next to the number', () => {

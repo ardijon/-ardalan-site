@@ -81,3 +81,54 @@ export function toLadderSummary(products) {
     return row
   })
 }
+
+/**
+ * The trim the related-products strip on a product page crosses the client
+ * boundary with.
+ *
+ * `RelatedProducts` renders each card with ProductCard, which reads: title,
+ * shortTitle, shortDescription, audience, status, demoUrl, one screenshot with
+ * its alt pair, two feature bullets, and the two pricing shapes. Everything
+ * else — the body copy, every other screenshot, testimonials, featureGroups —
+ * used to ride along in the RSC payload on EVERY product page, multiplied by
+ * the whole catalogue.
+ */
+export function toRelatedSummary(products) {
+  if (!Array.isArray(products)) return []
+
+  return products.map(product => {
+    const row = {
+      slug: product.slug,
+      status: product.status === 'coming_soon' ? 'coming_soon' : 'available',
+      demoUrl: product.demoUrl || null,
+    }
+
+    for (const key of ['title', 'shortTitle', 'shortDescription', 'audience']) {
+      const value = bi(product[key])
+      if (value) row[key] = value
+    }
+
+    const features = bi({ fa: product.features?.fa?.slice(0, 2), en: product.features?.en?.slice(0, 2) })
+    if (features) row.features = features
+
+    const pricing = {}
+    for (const key of ['starter', 'pro']) {
+      const trimmed = plan(product.pricing?.[key])
+      if (trimmed) pricing[key] = trimmed
+    }
+    if (Object.keys(pricing).length > 0) row.pricing = pricing
+
+    const display = bi(product.priceSummary?.display)
+    if (display) row.priceSummary = { display }
+
+    const shot = product.screenshots?.[0]
+    if (shot?.src) {
+      row.screenshots = [{ src: shot.src, alt: { fa: shot.alt?.fa || '', en: shot.alt?.en || '' } }]
+    }
+
+    // ProductCard scores relatedness on shared tech tags.
+    if (Array.isArray(product.tech) && product.tech.length > 0) row.tech = product.tech
+
+    return row
+  })
+}

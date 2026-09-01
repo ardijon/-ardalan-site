@@ -56,7 +56,7 @@ export default function OrderTimeline({ status, statusHistory }) {
   if (isUnknown) {
     return (
       <div className="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
-        <p className="text-sm text-[var(--color-text)]/60">
+        <p className="text-sm text-text-soft-60">
           {locale === 'fa' ? 'وضعیت سفارش: ' : 'Order status: '}
           <span className="font-medium text-[var(--color-accent)]">{status}</span>
         </p>
@@ -76,22 +76,22 @@ export default function OrderTimeline({ status, statusHistory }) {
             <div className="flex flex-col items-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all ${
                 isCompleted
-                  ? 'bg-[var(--color-success)]/10 text-[var(--color-success)]'
+                  ? 'bg-success-soft-10 text-[var(--color-success)]'
                   : isCurrent
-                    ? 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] ring-2 ring-[var(--color-accent)]/30'
-                    : 'bg-[var(--color-surface)] text-[var(--color-text)]/30'
+                    ? 'bg-accent-soft-10 text-[var(--color-accent)] ring-2 ring-accent-soft-30'
+                    : 'bg-[var(--color-surface)] text-text-soft-30'
               }`}>
                 {STATUS_ICONS[step]}
               </div>
               {index < STATUS_STEPS.length - 1 && (
                 <div className={`w-0.5 h-8 ${
-                  isCompleted ? 'bg-[var(--color-success)]/30' : 'bg-[var(--color-border)]'
+                  isCompleted ? 'bg-success-soft-30' : 'bg-[var(--color-border)]'
                 }`} />
               )}
             </div>
             <div className="pt-2">
               <p className={`text-sm font-medium ${
-                isCurrent ? 'text-[var(--color-accent)]' : isCompleted ? 'text-[var(--color-success)]' : 'text-[var(--color-text)]/30'
+                isCurrent ? 'text-[var(--color-accent)]' : isCompleted ? 'text-[var(--color-success)]' : 'text-text-soft-30'
               }`}>
                 {locale === 'fa'
                   ? {
@@ -111,9 +111,14 @@ export default function OrderTimeline({ status, statusHistory }) {
                 }
               </p>
               {isCurrent && (() => {
-                const historyEntry = statusHistory?.findLast(h => h.status === step)
+                // findLast needs ES2023 (Safari < 15.4 throws), which broke the
+                // result view on older phones — a plain reverse scan is the
+                // same answer with no runtime requirement.
+                const historyEntry = [...(statusHistory || [])]
+                  .reverse()
+                  .find(h => h.status === step)
                 return historyEntry && (
-                  <p className="text-xs text-[var(--color-text)]/40 mt-0.5">
+                  <p className="text-xs text-text-soft-40 mt-0.5">
                     {locale === 'fa'
                       ? formatJalali(historyEntry.at)
                       : new Date(historyEntry.at).toLocaleDateString('en-US')}

@@ -19,6 +19,42 @@ import { getDoc, putDoc, deleteDoc } from '@/lib/storage'
 const SESSION_COOKIE = 'admin_session'
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000 // 8 hours
 
+/**
+ * Session revocation epoch, persisted in KV.
+ *
+ * The session token itself is stateless — that is what makes it survive isolate
+ * churn — but statelessness also means logout or a password change could never
+ * invalidate an already-issued cookie: nothing server-side distinguished it
+ * from a stolen copy. The epoch closes that. It is stamped into every token at
+ * issue time and compared at verify time; bumping the epoch (logout, or a
+ * future password-change route) instantly invalidates every outstanding
+ * session, including the thief's copy.
+ *
+ * KV unavailable → the epoch check degrades to skip (fail-open). Locking the
+ * admin out because storage hiccuped costs more than the narrow window it
+ * protects; the token's HMAC and expiry still stand.
+ */
+const SESSION_EPOCH_KEY = 'admin:session-epoch'
+
+async function readSessionEpoch() {
+  try {
+    const doc = await getDoc(SESSION_EPOCH_KEY)
+    return typeof doc?.epoch === 'number' ? doc.epoch : 0
+  } catch {
+    return null // signal: cannot verify — caller skips the check
+  }
+}
+
+/** Invalidate every outstanding session. Called on logout. */
+export async function bumpSessionEpoch() {
+  try {
+    const current = await readSessionEpoch()
+    await putDoc(SESSION_EPOCH_KEY, { epoch: (current || 0) + 1 })
+  } catch (error) {
+    console.error('[admin-auth] could not bump session epoch:', error)
+  }
+}
+
 // ---------------------------------------------------------------- primitives
 
 function b64urlEncode(bytes) {
@@ -43,7 +79,7 @@ async function hmac(key, message) {
 }
 
 /** Constant-time equality: compare HMACs of both values under a random key. */
-async function safeEqual(a, b) {
+export async function safeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string') return false
   const nonce = b64urlEncode(crypto.getRandomValues(new Uint8Array(16)))
   const [ha, hb] = await Promise.all([hmac(nonce, a), hmac(nonce, b)])
@@ -62,9 +98,16 @@ function credentials() {
 function sessionSecret() {
   const creds = credentials()
   if (!creds) return null
-  // Prefer a dedicated secret; fall back to the admin password so existing
-  // deployments keep working without adding new env vars.
-  return process.env.ADMIN_SESSION_SECRET || `${creds.user}:${creds.pass}`
+  const dedicated = process.env.ADMIN_SESSION_SECRET
+  if (dedicated) return dedicated
+  // The fallback key IS the credentials string, so anyone who learns the
+  // password can mint valid cookies offline without ever touching the login
+  // endpoint. That trade-off is documented in wrangler.toml — but it must be
+  // loud, not silent, so a production deploy missing the secret is visible.
+  if (process.env.NODE_ENV === 'production') {
+    console.warn('[admin-auth] SECURITY: ADMIN_SESSION_SECRET is not set — session cookies are keyed on the admin password. Set a dedicated 64+ char secret.')
+  }
+  return `${creds.user}:${creds.pass}`
 }
 
 // ------------------------------------------------------------------ basic auth
@@ -104,7 +147,8 @@ export async function checkBasicAuth(request) {
 export async function createSessionToken() {
   const secret = sessionSecret()
   if (!secret) return null
-  const payload = b64urlEncode(utf8(JSON.stringify({ exp: Date.now() + SESSION_TTL_MS })))
+  const epoch = await readSessionEpoch()
+  const payload = b64urlEncode(utf8(JSON.stringify({ exp: Date.now() + SESSION_TTL_MS, epoch: epoch ?? 0 })))
   const sig = await hmac(secret, payload)
   return `${payload}.${sig}`
 }
@@ -121,12 +165,23 @@ export async function verifySessionToken(token) {
   const expected = await hmac(secret, payload)
   if (!(await safeEqual(sig, expected))) return false
 
+  let claims
   try {
-    const { exp } = JSON.parse(Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'))
-    return typeof exp === 'number' && Date.now() < exp
+    claims = JSON.parse(Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'))
   } catch {
     return false
   }
+  if (typeof claims.exp !== 'number' || Date.now() >= claims.exp) return false
+
+  // Revocation: a token issued before the current epoch is dead even though its
+  // signature and expiry are both valid. Epoch 0 (never bumped) passes for
+  // tokens minted before this field existed.
+  const current = await readSessionEpoch()
+  if (current !== null && typeof claims.epoch === 'number' && claims.epoch !== current) {
+    return false
+  }
+
+  return true
 }
 
 export async function checkSession(request) {
@@ -321,17 +376,20 @@ export async function recordFailedAttempt(ip) {
 
   const record = attempts.get(ip)
   let count
+  let first
   if (!record || now - record.first > WINDOW_MS) {
     attempts.set(ip, { count: 1, first: now })
     count = 1
+    first = now
   } else {
     record.count += 1
     count = record.count
+    first = record.first
   }
 
   // Persist attempt count to KV for cross-isolate visibility (best-effort, last-write-wins)
   try {
-    await putDoc(blockKey(ip) + ':count', { count, first: record?.first || now }, { ttlSeconds: Math.ceil(WINDOW_MS / 1000) })
+    await putDoc(blockKey(ip) + ':count', { count, first }, { ttlSeconds: Math.ceil(WINDOW_MS / 1000) })
   } catch (error) {
     console.error('[admin-auth] could not persist attempt count:', error)
   }

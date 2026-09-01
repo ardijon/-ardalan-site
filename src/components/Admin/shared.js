@@ -70,13 +70,13 @@ export function FilterChip({ label, count, active, onClick }) {
       onClick={onClick}
       className={`flex items-center gap-1.5 shrink-0 h-9 px-3 rounded-lg border text-xs font-medium transition-colors ${
         active
-          ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--color-accent)]'
-          : 'border-[var(--color-border)] text-[var(--color-text)]/60 hover:border-[var(--color-accent)]/30 hover:text-[var(--color-text)]'
+          ? 'border-[var(--color-accent)] bg-accent-soft-10 text-[var(--color-accent)]'
+          : 'border-[var(--color-border)] text-text-soft-60 hover:border-accent-soft-30 hover:text-[var(--color-text)]'
       }`}
     >
       <span className="truncate max-w-[9rem]">{label}</span>
       {count != null && (
-        <span className={`tabular-nums ${active ? '' : 'text-[var(--color-text)]/40'}`}>{count}</span>
+        <span className={`tabular-nums ${active ? '' : 'text-text-soft-40'}`}>{count}</span>
       )}
     </button>
   )
@@ -87,7 +87,7 @@ export function SearchBox({ value, onChange, placeholder }) {
   return (
     <div className="relative w-52 shrink-0">
       <svg
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text)]/30"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-text-soft-30"
         width="15"
         height="15"
         viewBox="0 0 24 24"
@@ -104,7 +104,8 @@ export function SearchBox({ value, onChange, placeholder }) {
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full h-9 pr-9 pl-3 text-xs rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-[var(--color-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-[var(--color-accent)] transition-all"
+        aria-label={placeholder}
+        className="w-full h-9 pr-9 pl-3 text-xs rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] placeholder:text-text-soft-40 focus:outline-none focus:ring-2 focus:ring-accent-soft-40 focus:border-[var(--color-accent)] transition-all"
       />
     </div>
   )

@@ -63,6 +63,9 @@ async function loadRoutes({ authenticated = true } = {}) {
     return {
       guardAdminRoute: async () =>
         authenticated ? null : NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
+      // The upload route reuses the shared CSRF check; tests post via the
+      // route handler directly, so the origin check is stubbed pass-through.
+      checkCsrf: () => true,
     }
   })
 
@@ -89,11 +92,15 @@ function uploadRequest(fields = {}) {
     receipt = new File([PNG_BYTES], 'slip.png', { type: 'image/png' }),
     amount,
     trackingCode,
+    phone = '09123456789',
   } = fields
 
   if (receipt !== null) body.append('receipt', receipt)
   if (amount !== undefined) body.append('amount', String(amount))
   if (trackingCode !== undefined) body.append('trackingCode', trackingCode)
+  // The upload requires the buyer's phone as a second factor — every happy-path
+  // request carries it unless a test overrides it explicitly.
+  if (phone !== null) body.append('phone', String(phone))
 
   return new Request('https://ai2apps.sbs/api/orders/x/receipt', { method: 'POST', body })
 }
@@ -101,7 +108,7 @@ function uploadRequest(fields = {}) {
 /** Helper to upload a receipt for an order using its uniqueAmount. */
 async function uploadReceiptForOrder(upload, order, receiptFile = new File([PNG_BYTES], 'slip.png', { type: 'image/png' })) {
   return upload.POST(
-    uploadRequest({ receipt: receiptFile, amount: String(order.uniqueAmount) }),
+    uploadRequest({ receipt: receiptFile, amount: String(order.uniqueAmount), phone: order.customer.phone }),
     params({ id: order.id })
   )
 }
@@ -127,7 +134,7 @@ describe('POST /api/orders/[id]/receipt', () => {
     const order = await pendingOrder(orders)
 
     const res = await upload.POST(
-      uploadRequest({ amount: order.uniqueAmount, trackingCode: 'TRK-1' }),
+      uploadRequest({ amount: order.uniqueAmount, trackingCode: 'TRK-1', phone: order.customer.phone }),
       params({ id: order.id })
     )
     const json = await res.json()
@@ -195,6 +202,39 @@ describe('POST /api/orders/[id]/receipt', () => {
     const res = await upload.POST(uploadRequest({ receipt: null }), params({ id: order.id }))
 
     expect(res.status).toBe(400)
+  })
+
+  it('rejects an upload whose phone does not match the buyer', async () => {
+    // The order ID alone is enumerable; the phone is the second factor that
+    // stops someone attaching a fake slip to a guessed awaiting_payment order.
+    const { upload, orders } = await loadRoutes()
+    const order = await pendingOrder(orders)
+
+    const res = await upload.POST(
+      uploadRequest({ amount: order.uniqueAmount, phone: '09999999999' }),
+      params({ id: order.id })
+    )
+
+    expect(res.status).toBe(403)
+    const updated = await orders.getOrderById(order.id)
+    expect(updated.status).toBe('awaiting_payment')
+  })
+
+  it('rejects a receipt whose amount is outside the fixed tolerance', async () => {
+    // ±10% was wider than the whole suffix space on a Pro order: any amount
+    // validated against any other order. The window is now ±5,000 toman.
+    const { upload, orders } = await loadRoutes()
+    const order = await pendingOrder(orders)
+
+    const wrongAmount = order.uniqueAmount + 20000
+    const res = await upload.POST(
+      uploadRequest({ amount: wrongAmount, phone: order.customer.phone }),
+      params({ id: order.id })
+    )
+
+    expect(res.status).toBe(400)
+    const updated = await orders.getOrderById(order.id)
+    expect(updated.status).toBe('awaiting_payment')
   })
 
   it('rejects a non-image upload and stores nothing', async () => {

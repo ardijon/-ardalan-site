@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getAllOrders, getOrdersByStatus, updateOrderStatus, getOrderStats } from '@/lib/orders'
+import { getAllOrders, getOrdersByStatus, updateOrderStatus, getOrderStats, canTransitionOrder } from '@/lib/orders'
 import { ORDER_STATUS_KEYS } from '@/lib/order-status'
 import { guardAdminRoute } from '@/lib/admin-auth'
 
@@ -58,12 +58,29 @@ export async function PATCH(request) {
       )
     }
 
+    // Forward-only pipeline: an accidental completed → rejected must be a 400 at
+    // the API, not just a suspicious row in the audit feed.
+    const current = (await getAllOrders()).find(o => o.id === orderId)
+    if (current && !canTransitionOrder(current.status, status)) {
+      return NextResponse.json(
+        { error: `گذار از «${current.status}» به «${status}» مجاز نیست` },
+        { status: 400 }
+      )
+    }
+
     // The audit entry is written inside updateOrderStatus — see the note there.
     const order = await updateOrderStatus(orderId, status, note || '')
     if (!order) {
       return NextResponse.json(
         { error: 'سفارش یافت نشد' },
         { status: 404 }
+      )
+    }
+
+    if (order.error === 'illegal_transition') {
+      return NextResponse.json(
+        { error: `گذار از «${order.from}» به «${order.to}» مجاز نیست` },
+        { status: 400 }
       )
     }
 

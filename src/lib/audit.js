@@ -60,6 +60,10 @@ export const AUDIT_ACTIONS = {
   'product.create': { label: 'محصول جدید', tone: 'good' },
   'product.update': { label: 'ویرایش محصول', tone: 'default' },
   'product.delete': { label: 'حذف محصول', tone: 'bad' },
+  'lead.notify': { label: 'اعلان سرنخ‌ها', tone: 'info' },
+  'lead.unnotify': { label: 'لغو اعلان سرنخ‌ها', tone: 'default' },
+  'cache.revalidate': { label: 'بازاعتبارسنجی کش', tone: 'default' },
+  'admin.logout': { label: 'خروج از پنل', tone: 'info' },
   'auth.login': { label: 'ورود به پنل', tone: 'info' },
   'auth.blocked': { label: 'ورود مسدود شد', tone: 'bad' },
 }

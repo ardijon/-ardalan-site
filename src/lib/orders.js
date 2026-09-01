@@ -17,6 +17,9 @@ import { recordAudit, auditSummary, AUDIT_ACTORS } from '@/lib/audit'
 
 const COLLECTION = 'orders'
 
+/** How many random bytes back the order ID carries beyond its timestamp. */
+const ORDER_ID_RANDOM_BYTES = 4
+
 async function readOrders() {
   return readCollection(COLLECTION, [])
 }
@@ -32,42 +35,40 @@ async function readAndWrite(fn) {
 
 function generateOrderId() {
   const timestamp = Date.now()
-  const random = crypto.randomBytes(3).toString('hex').toUpperCase()
+  const random = crypto.randomBytes(ORDER_ID_RANDOM_BYTES).toString('hex').toUpperCase()
   return `ORD-${timestamp}-${random}`
 }
 
 /**
- * Generates a unique amount by adding a random suffix to the base price.
- * Uses a larger range (1000-999999) to minimize collisions, and retries on collision.
- * The suffix is chosen so the total amount uniquely identifies the order for bank transfer matching.
+ * Pick a transfer amount that identifies exactly one order.
+ *
+ * MUST be called from inside the `mutateCollection` callback: uniqueness is only
+ * meaningful against the array being written in the same transaction. The old
+ * version snapshotted `existingAmounts` from a separate read *before* the write
+ * transaction, so two concurrent order creations both saw the same snapshot,
+ * both picked the same suffix, and both customers were told to transfer the
+ * same amount — the exact bank-statement ambiguity this function exists to
+ * prevent.
+ *
+ * Range is 1000–999999 (6 digits) over the base price; the fallback when the
+ * space is somehow saturated is a random retry, not a timestamp (which is
+ * predictable and would collide across simultaneous creations again).
  */
-async function generateUniqueAmount(basePrice) {
-  const maxRetries = 10
-  const existingAmounts = new Set()
-
-  // Pre-fetch existing unique amounts to avoid collisions
-  try {
-    const orders = await readOrders()
-    for (const order of orders) {
-      if (order.uniqueAmount) existingAmounts.add(order.uniqueAmount)
-    }
-  } catch {
-    // If we can't read orders, proceed without collision check
+function pickUniqueAmount(basePrice, existingOrders) {
+  const existing = new Set()
+  for (const order of existingOrders) {
+    if (order.uniqueAmount) existing.add(order.uniqueAmount)
   }
 
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    // Use crypto.randomInt for better randomness, range 1000-999999 (6 digits)
+  for (let attempt = 0; attempt < 10; attempt++) {
     const randomSuffix = crypto.randomInt(1000, 1000000)
-    const uniqueAmount = basePrice + randomSuffix
-
-    if (!existingAmounts.has(uniqueAmount)) {
-      return uniqueAmount
-    }
+    const amount = basePrice + randomSuffix
+    if (!existing.has(amount)) return amount
   }
 
-  // Fallback: use timestamp-based suffix if all retries collide (extremely unlikely)
-  const fallbackSuffix = Date.now() % 1000000
-  return basePrice + fallbackSuffix
+  // Space saturated (would take ~999k live orders). A wider random draw is the
+  // only remaining move that keeps two concurrent creations apart.
+  return basePrice + crypto.randomInt(1000000, 100000000)
 }
 
 function sanitize(str) {
@@ -96,11 +97,11 @@ export async function getOrdersByStatus(status) {
 }
 
 export async function createOrder({ productId, plan, customer, receipt, basePrice }) {
-  // Generate unique amount before the write transaction to avoid async in callback
-  const uniqueAmount = await generateUniqueAmount(basePrice || 0)
-
+  // Amount is picked INSIDE the write transaction (see pickUniqueAmount) so two
+  // concurrent creations can never both claim the same suffix.
   return readAndWrite(orders => {
     const now = new Date().toISOString()
+    const uniqueAmount = pickUniqueAmount(basePrice || 0, orders)
 
     // Calculate expiry date for Starter plan (30 days from deployment)
     const expiresAt = plan === 'starter'
@@ -146,6 +147,43 @@ export async function createOrder({ productId, plan, customer, receipt, basePric
 }
 
 /**
+ * Legal state transitions for an order.
+ *
+ * The pipeline is forward-only: money goes awaiting → receipt claimed →
+ * verified → deploying → completed. Moving backward would let an accidental
+ * click turn a completed order back into an unpaid one — the kind of mistake
+ * the panel exists to prevent. Forward jumps stay legal because they are real
+ * workflows: an admin can approve straight from the bank statement without a
+ * receipt upload, or mark a manually-delivered order completed.
+ *
+ * `rejected` is reachable from any non-terminal state and is terminal — there
+ * is no un-rejecting, because the review verdict is a business decision the
+ * audit log is supposed to record, not silently reverse. `deploying →
+ * approved` is the one backward edge allowed: a failed deploy deliberately
+ * returns the order to its owner's queue for a retry (see lib/deployer.js).
+ */
+const ORDER_RANK = {
+  awaiting_payment: 0,
+  receipt_uploaded: 1,
+  approved: 2,
+  deploying: 3,
+  completed: 4,
+  rejected: 5,
+}
+
+/** Can `status` legally move to `next`? Same-status no-ops are allowed. */
+export function canTransitionOrder(status, next) {
+  if (status === next) return true
+  if (next === 'rejected') return status in ORDER_RANK && status !== 'completed' && status !== 'rejected'
+  if (status === 'rejected' || status === 'completed') return false
+  // The one sanctioned backward edge: a failed deploy re-opens the order.
+  if (status === 'deploying' && next === 'approved') return true
+  const from = ORDER_RANK[status]
+  const to = ORDER_RANK[next]
+  return from !== undefined && to !== undefined && to > from
+}
+
+/**
  * Audit lives here rather than in the routes that call these functions.
  *
  * Not for tidiness — for the actor. `updateOrderStatus` is reachable only from the
@@ -158,10 +196,14 @@ export async function createOrder({ productId, plan, customer, receipt, basePric
  * is invoked synchronously and its return value is not awaited, so an async append
  * in there would race the write it was supposed to describe.
  */
-export async function updateOrderStatus(orderId, status, note = '') {
+export async function updateOrderStatus(orderId, status, note = '', actor = AUDIT_ACTORS.ADMIN) {
   const order = await readAndWrite(orders => {
     const index = orders.findIndex(o => o.id === orderId)
     if (index === -1) return null
+
+    if (!canTransitionOrder(orders[index].status, status)) {
+      return { error: 'illegal_transition', from: orders[index].status, to: status }
+    }
 
     const now = new Date().toISOString()
     orders[index].status = status
@@ -171,9 +213,10 @@ export async function updateOrderStatus(orderId, status, note = '') {
     return orders[index]
   })
 
-  if (order) {
+  if (order && !order.error) {
     await recordAudit({
       action: 'order.status',
+      actor,
       entityId: order.id,
       summary: auditSummary.orderStatus(order, status, note),
     })
@@ -257,10 +300,11 @@ export const PENDING_REVENUE_STATUSES = ['receipt_uploaded']
 /**
  * `uniqueAmount` is the amount, full stop.
  *
- * It is the base price plus a random 100–999 so a bank transfer can be matched to
- * an order, which means it is what the customer actually transferred. `basePrice`
- * is never persisted, so there is nothing else to sum — and summing the receipt's
- * self-reported amount would let a typo in the buyer's form change the totals.
+ * It is the base price plus a random 1000–999999 suffix (6 digits) so a bank
+ * transfer can be matched to an order, which means it is what the customer
+ * actually transferred. `basePrice` is never persisted, so there is nothing
+ * else to sum — and summing the receipt's self-reported amount would let a
+ * typo in the buyer's form change the totals.
  */
 function amountOf(order) {
   const amount = Number(order?.uniqueAmount)

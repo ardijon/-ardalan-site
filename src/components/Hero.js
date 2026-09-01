@@ -58,7 +58,7 @@ export default function Hero() {
         <div className="flex flex-col-reverse lg:flex-row items-center gap-8 sm:gap-12 lg:gap-20">
           <div className={`flex-1 text-center ${isRtl ? 'lg:text-right' : 'lg:text-left'}`}>
             <div
-              className={`inline-block px-3 py-1 mb-4 sm:mb-6 text-[10px] sm:text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full border border-[var(--color-accent)]/20 transition-all duration-700 ${
+              className={`inline-block px-3 py-1 mb-4 sm:mb-6 text-[10px] sm:text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full border border-accent-soft-20 transition-all duration-700 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
@@ -82,13 +82,13 @@ export default function Hero() {
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              <p className="text-xs sm:text-sm text-[var(--color-text)]/60 font-medium tracking-wide">
+              <p className="text-xs sm:text-sm text-text-soft-60 font-medium tracking-wide">
                 {t('hero.subtitle')}
               </p>
             </div>
 
             <p
-              className={`mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-[var(--color-text)]/60 max-w-xl leading-relaxed ${isRtl ? 'lg:mx-0' : 'lg:mr-0 lg:ml-auto'} mx-auto transition-all duration-700 delay-200 ${
+              className={`mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-text-soft-60 max-w-xl leading-relaxed ${isRtl ? 'lg:mx-0' : 'lg:mr-0 lg:ml-auto'} mx-auto transition-all duration-700 delay-200 ${
                 loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
@@ -102,7 +102,7 @@ export default function Hero() {
             >
               <a
                 href="#products"
-                className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-accent)] text-white text-sm sm:text-base font-medium rounded-xl shadow-lg shadow-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/40 hover:-translate-y-1 hover:scale-105 transition-all duration-300"
+                className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-accent)] text-white text-sm sm:text-base font-medium rounded-xl shadow-lg shadow-accent-soft-20 hover:shadow-xl hover:shadow-accent-soft-40 hover:-translate-y-1 hover:scale-105 transition-all duration-300"
               >
                 {t('hero.cta1')}
                 <svg className="w-4 h-4 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
@@ -152,11 +152,11 @@ export default function Hero() {
               </div>
 
               {/* پس‌زمینه درخشان ملایم */}
-              <div className="absolute inset-4 rounded-full bg-[var(--color-accent)]/10 dark:bg-[var(--color-accent)]/15 blur-2xl group-hover:bg-[var(--color-accent)]/20 transition-all duration-700" />
+              <div className="absolute inset-4 rounded-full bg-accent-soft-10 dark:bg-accent-soft-15 blur-2xl group-hover:bg-accent-soft-20 transition-all duration-700" />
 
               {/* تصویر پروفایل */}
               <div className="relative w-full h-full rounded-full overflow-hidden ring-[6px] ring-white dark:ring-[var(--color-surface)] shadow-2xl group-hover:shadow-[0_0_40px_rgba(217,119,6,0.2)] transition-all duration-500 z-10">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-accent)]/10 via-transparent to-[var(--color-tech)]/10 z-10 group-hover:from-[var(--color-accent)]/20 group-hover:to-[var(--color-tech)]/20 transition-all duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-accent-soft-10 via-transparent to-tech-soft-10 z-10 group-hover:from-accent-soft-20 group-hover:to-tech-soft-20 transition-all duration-500" />
                 <Image
                   src="/profile.png"
                   alt={t('hero.name')}
@@ -172,7 +172,7 @@ export default function Hero() {
       </div>
 
       <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 animate-bounce" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--color-text)]/30">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-soft-30">
           <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
         </svg>
       </div>

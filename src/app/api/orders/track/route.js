@@ -9,13 +9,9 @@ const trackRateLimiter = createRateLimiter({
   windowMs: 5 * 60 * 1000,
 })
 
-function getClientIp(request) {
-  return extractClientKey(request)
-}
-
 export async function POST(request) {
   // Rate limiting
-  const ip = getClientIp(request)
+  const ip = extractClientKey(request)
   const rateLimitResult = await trackRateLimiter.check(ip)
   if (!rateLimitResult.allowed) {
     return NextResponse.json(
@@ -24,16 +20,14 @@ export async function POST(request) {
     )
   }
 
+  let body
   try {
-    const contentType = request.headers.get('content-type')
-    if (!contentType?.includes('application/json')) {
-      return NextResponse.json(
-        { error: 'نوع محتوای نامعتبر' },
-        { status: 415 }
-      )
-    }
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'درخواست نامعتبر است' }, { status: 400 })
+  }
 
-    const body = await request.json()
+  try {
     const { phone, orderId } = body
 
     if (!phone || !orderId) {
@@ -51,7 +45,7 @@ export async function POST(request) {
       )
     }
 
-    const order = await getOrderById(orderId)
+    const order = await getOrderById(String(orderId).slice(0, 50))
     if (!order || order.customer.phone !== phone) {
       return NextResponse.json(
         { error: 'سفارشی با این اطلاعات یافت نشد' },
@@ -68,8 +62,17 @@ export async function POST(request) {
         plan: order.plan,
         createdAt: order.createdAt,
         uniqueAmount: order.uniqueAmount,
-        statusHistory: order.statusHistory,
-        deployment: order.deployment,
+        // Only status + timestamp. `note` is whatever the admin typed in the
+        // panel ("رسید مشکوک به جعل است" is not customer-facing content), and
+        // `deployment.error` holds internal build output.
+        statusHistory: (order.statusHistory || []).map(({ status, at }) => ({ status, at })),
+        deployment: order.deployment
+          ? {
+              status: order.deployment.status,
+              startedAt: order.deployment.startedAt,
+              completedAt: order.deployment.completedAt,
+            }
+          : null,
       },
     })
   } catch (error) {

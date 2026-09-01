@@ -147,7 +147,7 @@ export default function Leads({ auth, products = [], onStats }) {
   return (
     <div className="space-y-3">
       {message && (
-        <div className="px-4 py-2.5 text-sm rounded-xl bg-orange-50 text-orange-700 border border-orange-200">
+        <div role="status" aria-live="polite" className="px-4 py-2.5 text-sm rounded-xl bg-orange-50 text-orange-700 border border-orange-200">
           {message}
         </div>
       )}
@@ -201,7 +201,7 @@ export default function Leads({ auth, products = [], onStats }) {
           does not sit there offering to copy nothing. */}
       {leads.length > 0 && (
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-          <span className="text-xs text-[var(--color-text)]/50">
+          <span className="text-xs text-text-soft-50">
             {leads.length} نتیجه
             {pendingShown > 0 && ` · ${pendingShown} در انتظار`}
             {notifiedShown > 0 && ` · ${notifiedShown} اطلاع‌داده‌شده`}
@@ -209,14 +209,14 @@ export default function Leads({ auth, products = [], onStats }) {
           <div className="flex-1" />
           <button
             onClick={copyPhones}
-            className="h-8 px-3 text-xs font-medium rounded-lg border border-[var(--color-border)] text-[var(--color-text)]/70 hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)] transition-colors"
+            className="h-8 px-3 text-xs font-medium rounded-lg border border-[var(--color-border)] text-text-soft-70 hover:border-accent-soft-40 hover:text-[var(--color-accent)] transition-colors"
           >
             {copied ? 'کپی شد!' : `کپی شماره‌ها (${leads.length})`}
           </button>
           <button
             onClick={markAllShown}
             disabled={busy || pendingShown === 0}
-            className="h-8 px-3 text-xs font-medium text-white bg-[var(--color-accent)] rounded-lg hover:bg-[var(--color-accent)]/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-8 px-3 text-xs font-medium text-white bg-[var(--color-accent)] rounded-lg hover:bg-accent-soft-90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             علامت‌زدن {pendingShown} مورد
           </button>
@@ -231,13 +231,13 @@ export default function Leads({ auth, products = [], onStats }) {
       )}
 
       {loading ? (
-        <div className="py-10 text-center text-sm text-[var(--color-text)]/50">در حال بارگذاری...</div>
+        <div className="py-10 text-center text-sm text-text-soft-50">در حال بارگذاری...</div>
       ) : leads.length === 0 ? (
-        <div className="py-10 text-center text-sm text-[var(--color-text)]/50">سرنخی یافت نشد</div>
+        <div className="py-10 text-center text-sm text-text-soft-50">سرنخی یافت نشد</div>
       ) : (
         <div className="rounded-xl border border-[var(--color-border)] overflow-hidden">
           <table className="w-full text-xs">
-            <thead className="bg-[var(--color-surface)] text-[var(--color-text)]/40">
+            <thead className="bg-[var(--color-surface)] text-text-soft-40">
               <tr>
                 <th className="text-start font-normal px-3 py-2">تلفن</th>
                 <th className="text-start font-normal px-3 py-2">ایمیل</th>
@@ -251,11 +251,11 @@ export default function Leads({ auth, products = [], onStats }) {
               {leads.map(lead => (
                 <tr key={lead.id} className="border-t border-[var(--color-border)]">
                   <td className="px-3 py-2 font-medium text-[var(--color-primary)] tabular-nums" dir="ltr">{lead.phone}</td>
-                  <td className="px-3 py-2 text-[var(--color-text)]/60 truncate max-w-[14rem]" dir="ltr">{lead.email || '—'}</td>
-                  <td className="px-3 py-2 text-[var(--color-text)]/60 truncate max-w-[10rem]">
+                  <td className="px-3 py-2 text-text-soft-60 truncate max-w-[14rem]" dir="ltr">{lead.email || '—'}</td>
+                  <td className="px-3 py-2 text-text-soft-60 truncate max-w-[10rem]">
                     {productLabels[lead.productSlug] || lead.productSlug}
                   </td>
-                  <td className="px-3 py-2 text-[var(--color-text)]/40">{faDate(lead.createdAt)}</td>
+                  <td className="px-3 py-2 text-text-soft-40">{faDate(lead.createdAt)}</td>
                   <td className="px-3 py-2">
                     {lead.notifiedAt ? (
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-700">

@@ -30,9 +30,15 @@ export async function GET(request) {
     }
   }
 
-  return NextResponse.json({
-    bankName: process.env.BANK_NAME || '',
-    cardNumber: process.env.CARD_NUMBER || '',
-    accountHolder: process.env.ACCOUNT_HOLDER || '',
-  })
+  return NextResponse.json(
+    {
+      bankName: process.env.BANK_NAME || '',
+      cardNumber: process.env.CARD_NUMBER || '',
+      accountHolder: process.env.ACCOUNT_HOLDER || '',
+    },
+    // A bank card number must not land in any shared cache. The response is
+    // semi-public by design (buyers need it), but that is not a licence for
+    // heuristic caching by intermediaries.
+    { headers: { 'Cache-Control': 'no-store' } }
+  )
 }

@@ -33,7 +33,7 @@ export default function ProductLadder({ products }) {
           <h2 className="text-2xl sm:text-3xl font-black text-[var(--color-primary)]">
             {t('store.ladderTitle')}
           </h2>
-          <p className="mt-2 text-sm sm:text-base text-[var(--color-text)]/50 max-w-xl mx-auto">
+          <p className="mt-2 text-sm sm:text-base text-text-soft-50 max-w-xl mx-auto">
             {t('store.ladderSubtitle')}
           </p>
         </div>

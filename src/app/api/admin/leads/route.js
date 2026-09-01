@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getAllLeads, getLeadStats, markLeadsNotified, unmarkLeadsNotified } from '@/lib/leads'
 import { guardAdminRoute } from '@/lib/admin-auth'
+import { recordAudit, AUDIT_ACTIONS } from '@/lib/audit'
 
 /**
  * Waitlist rows for the panel's leads tab.
@@ -81,6 +82,15 @@ export async function PATCH(request) {
     } else {
       changed = await markLeadsNotified(clean)
     }
+
+    // Notifying the waitlist is a business action ("we SMS'd 300 people today")
+    // — exactly what the audit log exists to answer later.
+    await recordAudit({
+      action: action === 'unmark' ? 'lead.unnotify' : 'lead.notify',
+      entityId: clean.length === 1 ? clean[0] : `${clean.length} leads`,
+      summary: `${AUDIT_ACTIONS[action === 'unmark' ? 'lead.unnotify' : 'lead.notify'].label} — ${changed} مورد`,
+    }).catch(() => {})
+
     return NextResponse.json({ success: true, changed, action })
   } catch (error) {
     console.error('Failed to update leads notified status:', error)

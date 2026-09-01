@@ -6,9 +6,8 @@ export default function robots() {
       {
         userAgent: '*',
         allow: '/',
-      },
-      {
-        userAgent: '*',
+        // One rule group: two separate `User-agent: *` groups are merged by
+        // Google but the contract is parser-dependent.
         disallow: '/admin',
       },
     ],

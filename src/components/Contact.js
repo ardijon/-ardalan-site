@@ -115,7 +115,7 @@ export default function Contact() {
           }}
         >
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
+            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
               {t('contact.badge')}
             </span>
             <div className="flex items-center justify-center gap-3 mt-6">
@@ -124,37 +124,44 @@ export default function Contact() {
                 {t('contact.title')}
               </h2>
             </div>
-            <p className="mt-4 text-[var(--color-text)]/50">
+            <p className="mt-4 text-text-soft-50">
               {t('contact.subtitle')}
             </p>
           </div>
 
           <div className="max-w-3xl mx-auto">
             <div className="grid sm:grid-cols-2 gap-5">
-              {contactLinks.map((link, i) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  style={{
-                    opacity: visible ? 1 : 0,
-                    transform: visible ? 'translateY(0)' : 'translateY(16px)',
-                    transition: `opacity 0.5s ease ${200 + i * 100}ms, transform 0.5s ease ${200 + i * 100}ms`,
-                  }}
-                  className="flex items-center gap-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shrink-0">
-                    {contactIcons[i]}
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-text)]/40 font-medium">
-                      {link.label}
-                    </p>
-                    <p className="text-sm font-medium text-[var(--color-text)] mt-0.5">
-                      {link.value}
-                    </p>
-                  </div>
-                </a>
-              ))}
+              {contactLinks.map((link, i) => {
+                // The «آدرس» card carries href: '#' in the dictionary — a link
+                // that is announced and clickable but does nothing. A dead link
+                // renders as static text, not as a control.
+                const isDead = !link.href || link.href === '#'
+                const CardTag = isDead ? 'div' : 'a'
+                return (
+                  <CardTag
+                    key={link.label}
+                    {...(isDead ? {} : { href: link.href })}
+                    style={{
+                      opacity: visible ? 1 : 0,
+                      transform: visible ? 'translateY(0)' : 'translateY(16px)',
+                      transition: `opacity 0.5s ease ${200 + i * 100}ms, transform 0.5s ease ${200 + i * 100}ms`,
+                    }}
+                    className="flex items-center gap-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-accent-soft-10 text-[var(--color-accent)] flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shrink-0">
+                      {contactIcons[i]}
+                    </div>
+                    <div>
+                      <p className="text-xs text-text-soft-40 font-medium">
+                        {link.label}
+                      </p>
+                      <p className="text-sm font-medium text-[var(--color-text)] mt-0.5">
+                        {link.value}
+                      </p>
+                    </div>
+                  </CardTag>
+                )
+              })}
             </div>
 
             <form
@@ -176,7 +183,7 @@ export default function Contact() {
                   autoComplete="name"
                   placeholder={t('contact.form.name')}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text)]/30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all"
                 />
               </div>
               <div className="col-span-full sm:col-span-1">
@@ -189,7 +196,7 @@ export default function Contact() {
                   inputMode="tel"
                   placeholder={t('contact.form.phone')}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text)]/30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all"
                 />
               </div>
               <div className="col-span-full">
@@ -200,14 +207,14 @@ export default function Contact() {
                   placeholder={t('contact.form.message')}
                   rows="4"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text)]/30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all resize-none"
                 />
               </div>
               <button
                 ref={buttonRef}
                 type="submit"
                 disabled={sending}
-                className="col-span-full relative overflow-hidden px-6 py-3 bg-[var(--color-accent)] text-white font-medium rounded-xl hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-lg shadow-[var(--color-accent)]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="col-span-full relative overflow-hidden px-6 py-3 bg-[var(--color-accent)] text-white font-medium rounded-xl hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-lg shadow-accent-soft-20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {ripples.map((r) => (
                   <span

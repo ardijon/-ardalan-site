@@ -6,6 +6,7 @@ import WhyUs from '@/components/Store/WhyUs'
 import HowItWorks from '@/components/Store/HowItWorks'
 import { getLiveProducts } from '@/lib/products-server'
 import { SITE_URL, OG_IMAGE_STORE } from '@/lib/constants'
+import { jsonLd } from '@/lib/json-safe'
 
 export const metadata = {
   title: 'فروشگاه | ابزارهای نرم‌افزاری',
@@ -48,18 +49,25 @@ export default async function StorePage() {
       '@type': 'Person',
       name: 'اردلان پیری',
     },
-    offers: products.map(p => ({
-      '@type': 'Offer',
-      name: p.title.fa,
-      description: p.shortDescription.fa,
-      // A product still in development is a pre-order, not stock on a shelf —
-      // an InStock offer nobody can buy is the kind of thing Google penalises.
-      availability: p.status === 'coming_soon'
-        ? 'https://schema.org/PreOrder'
-        : 'https://schema.org/InStock',
-      price: p.pricing?.pro?.price || p.pricing?.starter?.price || p.priceSummary?.price || 0,
-      priceCurrency: 'IRR',
-    })),
+    offers: products.map(p => {
+      // Toman on the site, Rial in the currency code: schema.org needs ISO 4217,
+      // where Iran's unit is IRR. 1 Toman = 10 Rial, so the number must be
+      // converted — the old code shipped Toman numbers under an IRR label and
+      // every consumer of the data read prices 10× too low. Contact-mode
+      // products have no price and get none (price: 0 reads as "free").
+      const tomanPrice = p.pricing?.pro?.price || p.pricing?.starter?.price || p.priceSummary?.price || null
+      return {
+        '@type': 'Offer',
+        name: p.title.fa,
+        description: p.shortDescription.fa,
+        // A product still in development is a pre-order, not stock on a shelf —
+        // an InStock offer nobody can buy is the kind of thing Google penalises.
+        availability: p.status === 'coming_soon'
+          ? 'https://schema.org/PreOrder'
+          : 'https://schema.org/InStock',
+        ...(tomanPrice ? { price: tomanPrice * 10, priceCurrency: 'IRR' } : {}),
+      }
+    }),
   }
 
   return (
@@ -74,7 +82,7 @@ export default async function StorePage() {
       <Footer />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(storeSchema) }}
       />
     </>
   )

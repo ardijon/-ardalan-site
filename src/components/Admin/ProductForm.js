@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   InputField,
   SelectField,
@@ -90,7 +90,9 @@ export default function ProductForm({ initial, saving, onSave, onCancel }) {
 
   const isEditing = Boolean(initial)
   const isComingSoon = form.status === 'coming_soon'
-  const warnings = productWarnings(serializeProduct(form))
+  // Two full serializations per keystroke used to run in the render body — this
+  // is the largest form in the app. Memoized on the form snapshot.
+  const warnings = useMemo(() => productWarnings(serializeProduct(form)), [form])
 
   function setNested(obj, path, value) {
     const clone = JSON.parse(JSON.stringify(obj))
@@ -348,12 +350,12 @@ export default function ProductForm({ initial, saving, onSave, onCancel }) {
 
       {/* Machine output, so it is announced as a draft rather than a result. */}
       {translateError && (
-        <p className="mb-4 px-3 py-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg">
+        <p role="alert" className="mb-4 px-3 py-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg">
           {translateError}
         </p>
       )}
       {translateNote && (
-        <p className="mb-4 px-3 py-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg">
+        <p role="status" className="mb-4 px-3 py-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg">
           {translateNote}
         </p>
       )}
@@ -601,14 +603,14 @@ export default function ProductForm({ initial, saving, onSave, onCancel }) {
               onSave(serialized)
             }}
             disabled={saving || !form.slug.trim()}
-            className="px-6 py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 transition-colors disabled:opacity-50"
+            className="px-6 py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:bg-accent-soft-90 transition-colors disabled:opacity-50"
           >
             {saving ? 'در حال ذخیره...' : 'ذخیره'}
           </button>
           {isEditing && (
             <button
               onClick={onCancel}
-              className="px-6 py-2.5 text-sm font-medium text-[var(--color-text)]/60 border border-[var(--color-border)] rounded-xl hover:bg-[var(--color-text)]/5 transition-colors"
+              className="px-6 py-2.5 text-sm font-medium text-text-soft-60 border border-[var(--color-border)] rounded-xl hover:bg-text-soft-5 transition-colors"
             >
               انصراف
             </button>

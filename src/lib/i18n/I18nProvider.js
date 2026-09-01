@@ -20,6 +20,31 @@ function applyDir(locale) {
   document.documentElement.lang = locale
   document.documentElement.dir = dir
   document.body.style.direction = dir
+  // The layout bootstrap sets an inline `direction` on <html> to win the first
+  // paint before hydration. React never manages that style, so switching back
+  // to fa left a stale `ltr` on the root element — and the root's direction
+  // governs things like the scrollbar side. It must be cleared here, or html
+  // and body disagree forever after the first en→fa flip.
+  document.documentElement.style.direction = ''
+}
+
+/**
+ * Sync the document's <title> and description meta with the active locale.
+ *
+ * Used to run only inside toggleLocale, which meant a returning ENGLISH
+ * visitor — whose saved locale is applied by the mount effect — read English
+ * content under the Persian SSR title and og:description for the whole visit.
+ * Now the mount effect calls it too.
+ */
+function applyDocumentMeta(locale) {
+  const site = dictionary[locale]?.site || dictionary.fa.site
+  if (site) {
+    document.title = site.title || document.title
+    const descMeta = document.querySelector('meta[name="description"]')
+    if (descMeta && site.description) {
+      descMeta.setAttribute('content', site.description)
+    }
+  }
 }
 
 /**
@@ -69,8 +94,10 @@ export function I18nProvider({ children }) {
     if (saved && saved !== locale) {
       setLocale(saved)
       applyDir(saved)
+      applyDocumentMeta(saved)
     } else {
       applyDir(locale)
+      applyDocumentMeta(locale)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -92,16 +119,7 @@ export function I18nProvider({ children }) {
       setLocale(next)
       setLocalStorage('NEXT_LOCALE', next)
       applyDir(next)
-
-      // Update page metadata
-      const site = dictionary[next]?.site || dictionary.fa.site
-      if (site) {
-        document.title = site.title || document.title
-        const descMeta = document.querySelector('meta[name="description"]')
-        if (descMeta && site.description) {
-          descMeta.setAttribute('content', site.description)
-        }
-      }
+      applyDocumentMeta(next)
 
       setTimeout(() => setTransitioning(false), 50)
     }, 150)

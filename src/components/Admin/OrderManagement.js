@@ -20,6 +20,7 @@ const FILTERS = [
   { key: 'approved', label: 'تایید شده', statKey: 'approved' },
   { key: 'deploying', label: 'در حال دیپلوی', statKey: 'deploying' },
   { key: 'completed', label: 'تکمیل شده', statKey: 'completed' },
+  { key: 'rejected', label: 'رد شده', statKey: 'rejected' },
 ]
 
 // Module scope, so a re-render of the parent does not remount the search input and
@@ -174,7 +175,7 @@ export default function OrderManagement({ auth, onStats }) {
   return (
     <div className="space-y-3">
       {message && (
-        <div className="px-4 py-3 text-sm rounded-lg bg-orange-50 text-orange-700 border border-orange-200">
+        <div role="status" aria-live="polite" className="px-4 py-3 text-sm rounded-lg bg-orange-50 text-orange-700 border border-orange-200">
           {message}
         </div>
       )}
@@ -213,20 +214,20 @@ export default function OrderManagement({ auth, onStats }) {
 
       {/* Orders List */}
       {loading ? (
-        <div className="text-center py-8 text-[var(--color-text)]/50">در حال بارگذاری...</div>
+        <div className="text-center py-8 text-text-soft-50">در حال بارگذاری...</div>
       ) : orders.length === 0 ? (
-        <div className="text-center py-8 text-[var(--color-text)]/50">سفارشی یافت نشد</div>
+        <div className="text-center py-8 text-text-soft-50">سفارشی یافت نشد</div>
       ) : (
         <div className="space-y-3">
           {orders.map(order => (
             <div
               key={order.id}
-              className="p-4 rounded-xl border border-[var(--color-border)] hover:border-[var(--color-accent)]/30 transition-all"
+              className="p-4 rounded-xl border border-[var(--color-border)] hover:border-accent-soft-30 transition-all"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs text-[var(--color-text)]/40">{order.id}</span>
+                    <span className="font-mono text-xs text-text-soft-40">{order.id}</span>
                     <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${STATUS_COLORS[order.status] || 'bg-gray-100 text-gray-600'}`}>
                       {STATUS_LABELS[order.status] || order.status}
                     </span>
@@ -234,7 +235,7 @@ export default function OrderManagement({ auth, onStats }) {
                   <div className="text-sm font-medium text-[var(--color-primary)]">
                     {order.customer?.name} — {order.customer?.phone}
                   </div>
-                  <div className="text-xs text-[var(--color-text)]/40 mt-1">
+                  <div className="text-xs text-text-soft-40 mt-1">
                     {order.productId} | {order.plan} | {faDate(order.createdAt)}
                   </div>
                 </div>
@@ -297,7 +298,7 @@ export default function OrderManagement({ auth, onStats }) {
                   )}
                   <button
                     onClick={() => setSelectedOrder(selectedOrder?.id === order.id ? null : order)}
-                    className="px-3 py-1.5 text-xs font-medium text-[var(--color-text)]/60 border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-text)]/5 transition-colors"
+                    className="px-3 py-1.5 text-xs font-medium text-text-soft-60 border border-[var(--color-border)] rounded-lg hover:bg-text-soft-5 transition-colors"
                   >
                     جزئیات
                   </button>
@@ -309,22 +310,22 @@ export default function OrderManagement({ auth, onStats }) {
                 <div className="mt-4 pt-4 border-t border-[var(--color-border)] space-y-3">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-[var(--color-text)]/50">ایمیل: </span>
+                      <span className="text-text-soft-50">ایمیل: </span>
                       <span className="text-[var(--color-text)]">{order.customer?.email || '—'}</span>
                     </div>
                     <div>
-                      <span className="text-[var(--color-text)]/50">دامنه: </span>
+                      <span className="text-text-soft-50">دامنه: </span>
                       <span className="text-[var(--color-text)]" dir="ltr">{order.customer?.domain || '—'}</span>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-[var(--color-text)]/50">اطلاعات هاست: </span>
+                      <span className="text-text-soft-50">اطلاعات هاست: </span>
                       <span className="text-[var(--color-text)] text-xs">{order.customer?.hostingInfo || '—'}</span>
                     </div>
                   </div>
 
                   {order.receipt && (
                     <div className="p-3 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)]">
-                      <div className="text-xs font-medium text-[var(--color-text)]/50 mb-2">رسید پرداخت</div>
+                      <div className="text-xs font-medium text-text-soft-50 mb-2">رسید پرداخت</div>
                       <div className="flex items-center gap-4">
                         {order.receipt.filename && (
                           <button
@@ -349,7 +350,7 @@ export default function OrderManagement({ auth, onStats }) {
                       {/* Message Templates */}
                       {order.status === 'receipt_uploaded' && (
                         <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
-                          <div className="text-xs font-medium text-[var(--color-text)]/50 mb-2">قالب پیام</div>
+                          <div className="text-xs font-medium text-text-soft-50 mb-2">قالب پیام</div>
                           <div className="flex flex-wrap gap-2">
                             <button
                               onClick={() => copyTemplate('approve')}
@@ -397,9 +398,9 @@ export default function OrderManagement({ auth, onStats }) {
                   {/* Status History */}
                   {order.statusHistory?.length > 0 && (
                     <div className="space-y-1">
-                      <div className="text-xs font-medium text-[var(--color-text)]/50">تاریخچه وضعیت</div>
+                      <div className="text-xs font-medium text-text-soft-50">تاریخچه وضعیت</div>
                       {order.statusHistory.map((h, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs text-[var(--color-text)]/40">
+                        <div key={i} className="flex items-center gap-2 text-xs text-text-soft-40">
                           <span className={`px-1.5 py-0.5 rounded ${STATUS_COLORS[h.status] || 'bg-gray-100 text-gray-600'}`}>
                             {STATUS_LABELS[h.status] || h.status}
                           </span>

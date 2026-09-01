@@ -5,6 +5,8 @@ import { getAllProducts } from '@/lib/products'
 import { getLiveProduct, getLiveProducts } from '@/lib/products-server'
 import { notFound } from 'next/navigation'
 import { SITE_URL, OG_IMAGE_STORE } from '@/lib/constants'
+import { jsonLd } from '@/lib/json-safe'
+import { toRelatedSummary } from '@/lib/product-summary'
 
 export async function generateStaticParams() {
   // Must stay on the build-time catalogue: this runs during the build, where
@@ -62,8 +64,12 @@ export default async function ProductPage({ params }) {
   if (!product) notFound()
 
   // RelatedProducts used to receive the build-time catalogue, so a product added
-  // from the admin panel stayed invisible until the next deploy.
+  // from the admin panel stayed invisible until the next deploy. It now gets the
+  // live catalogue — trimmed to the fields the related strip renders, because
+  // shipping every product's full body (23 screenshots of copy each) across the
+  // client boundary serialized ~37KB into every product page twice.
   const allProducts = await getLiveProducts()
+  const relatedProducts = toRelatedSummary(allProducts)
 
   const productSchema = {
     '@context': 'https://schema.org',
@@ -77,8 +83,15 @@ export default async function ProductPage({ params }) {
     },
     offers: {
       '@type': 'Offer',
-      price: product.pricing?.pro?.price || product.pricing?.starter?.price || product.priceSummary?.price || 0,
-      priceCurrency: 'IRR',
+      // Toman on the site, Rial in the ISO currency code: ×10, or the structured
+      // data reads every price ten times too low. A contact-mode product states
+      // no price rather than price: 0 ("free").
+      ...(product.pricing?.pro?.price || product.pricing?.starter?.price || product.priceSummary?.price
+        ? {
+            price: (product.pricing?.pro?.price || product.pricing?.starter?.price || product.priceSummary?.price) * 10,
+            priceCurrency: 'IRR',
+          }
+        : {}),
       // An unreleased product is a pre-order; claiming InStock for something that
       // cannot be bought yet is exactly what Merchant listings get flagged for.
       availability: product.status === 'coming_soon'
@@ -119,15 +132,15 @@ export default async function ProductPage({ params }) {
   return (
     <>
       <Header />
-      <ProductClient product={product} allProducts={allProducts} />
+      <ProductClient product={product} allProducts={relatedProducts} />
       <Footer />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(productSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbSchema) }}
       />
     </>
   )

@@ -28,7 +28,7 @@ export default function ProductDetail({ product }) {
                 // reads as a lead rather than as body copy.
                 i === 0
                   ? 'text-lg sm:text-xl font-bold leading-relaxed text-[var(--color-primary)]'
-                  : 'mt-3 text-sm leading-relaxed text-[var(--color-text)]/70'
+                  : 'mt-3 text-sm leading-relaxed text-text-soft-70'
               }
             >
               {paragraph}
@@ -51,15 +51,15 @@ export default function ProductDetail({ product }) {
         {product.featureGroups?.[locale] || product.featureGroups?.en ? (
           <div className="grid sm:grid-cols-3 gap-6" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
             {(product.featureGroups[locale] || product.featureGroups.en).map((group, gi) => (
-              <div key={gi} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/50 p-5">
+              <div key={gi} className="rounded-2xl border border-[var(--color-border)] bg-surface-soft p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xl">{group.icon}</span>
                   <h3 className="text-sm font-bold text-[var(--color-primary)]">{group.title}</h3>
                 </div>
                 <ul className="space-y-2.5">
                   {group.items.map((item, ii) => (
-                    <li key={ii} className="flex items-start gap-2 text-[var(--color-text)]/80">
-                      <span className="mt-1 w-4 h-4 shrink-0 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center text-[10px]">
+                    <li key={ii} className="flex items-start gap-2 text-text-soft-80">
+                      <span className="mt-1 w-4 h-4 shrink-0 rounded-full bg-accent-soft-10 text-[var(--color-accent)] flex items-center justify-center text-[10px]">
                         ✓
                       </span>
                       <span className="text-xs leading-relaxed">{item}</span>
@@ -72,8 +72,8 @@ export default function ProductDetail({ product }) {
         ) : (
           <ul className="grid sm:grid-cols-2 gap-3" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
             {(product.features[locale] || product.features.en || []).map((feature, i) => (
-              <li key={i} className="flex items-start gap-3 text-[var(--color-text)]/80">
-                <span className="mt-1 w-5 h-5 shrink-0 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center text-xs">
+              <li key={i} className="flex items-start gap-3 text-text-soft-80">
+                <span className="mt-1 w-5 h-5 shrink-0 rounded-full bg-accent-soft-10 text-[var(--color-accent)] flex items-center justify-center text-xs">
                   ✓
                 </span>
                 <span className="text-sm leading-relaxed">{feature}</span>
@@ -91,7 +91,7 @@ export default function ProductDetail({ product }) {
           <h3 className="text-sm font-bold text-[var(--color-primary)] mb-1.5">
             {t('store.legalNote')}
           </h3>
-          <p className="text-sm leading-relaxed text-[var(--color-text)]/60">{legalNote}</p>
+          <p className="text-sm leading-relaxed text-text-soft-60">{legalNote}</p>
         </div>
       )}
 
@@ -104,7 +104,7 @@ export default function ProductDetail({ product }) {
             {tech.map((item) => (
               <span
                 key={item}
-                className="px-3 py-1.5 text-xs font-medium text-[var(--color-tech)] bg-[var(--color-tech)]/10 rounded-full border border-[var(--color-tech)]/20"
+                className="px-3 py-1.5 text-xs font-medium text-[var(--color-tech)] bg-tech-soft-10 rounded-full border border-tech-soft-20"
               >
                 {item}
               </span>

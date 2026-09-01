@@ -25,11 +25,11 @@ export default function ProductCard({ product, featured = false }) {
     <div
       className={`group relative flex h-full flex-col rounded-3xl border bg-[var(--color-bg)] overflow-hidden transition-all duration-500 ${
         featured
-          ? 'border-[var(--color-accent)]/30 shadow-xl shadow-[var(--color-accent)]/10'
-          : 'border-[var(--color-border)] hover:border-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/5 hover:-translate-y-2'
+          ? 'border-accent-soft-30 shadow-xl shadow-accent-soft-10'
+          : 'border-[var(--color-border)] hover:border-accent-soft-20 hover:shadow-xl hover:shadow-accent-soft-5 hover:-translate-y-2'
       } ${isRtl ? 'text-right' : 'text-left'}`}
     >
-      <div className="relative h-52 shrink-0 bg-gradient-to-br from-[var(--color-accent)]/10 via-[var(--color-tech)]/5 to-transparent overflow-hidden">
+      <div className="relative h-52 shrink-0 bg-gradient-to-br from-accent-soft-10 via-tech-soft-5 to-transparent overflow-hidden">
         {product.screenshots?.[0] ? (
           <Image
             src={product.screenshots[0].src}
@@ -49,12 +49,12 @@ export default function ProductCard({ product, featured = false }) {
 
         <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
           {featured && (
-            <span className="pointer-events-auto px-4 py-2 text-xs font-bold tracking-wide text-white bg-[var(--color-accent)]/90 backdrop-blur-sm rounded-lg shadow-lg shadow-[var(--color-accent)]/20">
+            <span className="pointer-events-auto px-4 py-2 text-xs font-bold tracking-wide text-white bg-accent-soft-90 backdrop-blur-sm rounded-lg shadow-lg shadow-accent-soft-20">
               {locale === 'fa' ? 'ویژه' : 'Featured'}
             </span>
           )}
           {isComingSoon && (
-            <span className="pointer-events-auto px-4 py-2 text-xs font-bold tracking-wide text-white bg-[var(--color-tech)]/90 backdrop-blur-sm rounded-lg shadow-lg shadow-[var(--color-tech)]/20">
+            <span className="pointer-events-auto px-4 py-2 text-xs font-bold tracking-wide text-white bg-tech-soft-90 backdrop-blur-sm rounded-lg shadow-lg shadow-tech-soft-20">
               {t('store.comingSoon')}
             </span>
           )}
@@ -92,13 +92,13 @@ export default function ProductCard({ product, featured = false }) {
           {product.title[locale] || product.title.en}
         </h3>
 
-        <p className="mb-4 min-h-[2.5rem] text-sm leading-relaxed text-[var(--color-text)]/50 line-clamp-2">
+        <p className="mb-4 min-h-[2.5rem] text-sm leading-relaxed text-text-soft-50 line-clamp-2">
           {product.shortDescription[locale] || product.shortDescription.en}
         </p>
 
         <div className="mb-5 flex min-h-[1rem] items-center gap-3 overflow-hidden">
           {(product.features?.[locale] || product.features?.en || []).slice(0, 2).map((feature, i) => (
-            <span key={i} className="flex min-w-0 items-center gap-1 text-xs text-[var(--color-text)]/40">
+            <span key={i} className="flex min-w-0 items-center gap-1 text-xs text-text-soft-40">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="shrink-0 text-[var(--color-accent)]">
                 <path d="M20 6L9 17l-5-5" />
               </svg>
@@ -113,7 +113,7 @@ export default function ProductCard({ product, featured = false }) {
           <div className="flex min-h-[3rem] min-w-0 flex-1 flex-col justify-end">
             {hasPlanPricing ? (
               <>
-                <div className="text-xs text-[var(--color-text)]/40 mb-0.5">
+                <div className="text-xs text-text-soft-40 mb-0.5">
                   {locale === 'fa' ? 'شروع از' : 'Starting from'}
                 </div>
                 <div className="flex items-baseline gap-1.5">
@@ -121,7 +121,7 @@ export default function ProductCard({ product, featured = false }) {
                     {priceDisplay}
                   </span>
                   {periodDisplay && (
-                    <span className="text-xs text-[var(--color-text)]/40">
+                    <span className="text-xs text-text-soft-40">
                       {periodDisplay}
                     </span>
                   )}
@@ -140,8 +140,8 @@ export default function ProductCard({ product, featured = false }) {
             href={`/store/${product.slug}`}
             className={`inline-flex shrink-0 items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl active:scale-95 transition-all ${
               isComingSoon
-                ? 'text-[var(--color-accent)] border border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/10'
-                : 'text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent)]/90 shadow-md shadow-[var(--color-accent)]/20'
+                ? 'text-[var(--color-accent)] border border-accent-soft-30 hover:bg-accent-soft-10'
+                : 'text-white bg-[var(--color-accent)] hover:bg-accent-soft-90 shadow-md shadow-accent-soft-20'
             }`}
           >
             {isComingSoon ? t('store.moreInfo') : t('store.buyNow')}

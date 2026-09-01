@@ -52,6 +52,54 @@ module.exports = {
           900: '#032c30',
         },
         surface: '#F8F6F3',
+        // Theme-aware tint utilities. `bg-[var(--color-accent)]/10` generates
+        // no CSS at all (arbitrary var + slash opacity is unsupported), so the
+        // tints the components meant to express were silently absent. These
+        // map the alpha tokens defined in globals.css, which DO flip with the
+        // theme — a plain `bg-accent/10` would bake light-theme RGB in.
+        'accent-soft': {
+          5: 'var(--color-accent-5)',
+          10: 'var(--color-accent-10)',
+          20: 'var(--color-accent-20)',
+          25: 'var(--color-accent-25)',
+          30: 'var(--color-accent-30)',
+          40: 'var(--color-accent-40)',
+          50: 'var(--color-accent-50)',
+        },
+        'tech-soft': {
+          5: 'var(--color-tech-5)',
+          10: 'var(--color-tech-10)',
+          20: 'var(--color-tech-20)',
+          30: 'var(--color-tech-30)',
+        },
+        'success-soft': {
+          5: 'var(--color-success-5)',
+          10: 'var(--color-success-10)',
+          20: 'var(--color-success-20)',
+          30: 'var(--color-success-30)',
+        },
+        'text-soft': {
+          5: 'var(--color-text-5)',
+          10: 'var(--color-text-10)',
+          20: 'var(--color-text-20)',
+          30: 'var(--color-text-30)',
+          40: 'var(--color-text-40)',
+          45: 'var(--color-text-45)',
+          50: 'var(--color-text-50)',
+          60: 'var(--color-text-60)',
+          70: 'var(--color-text-70)',
+          80: 'var(--color-text-80)',
+        },
+        'danger-soft': {
+          5: 'var(--color-danger-5)',
+          10: 'var(--color-danger-10)',
+        },
+        danger: 'var(--color-danger)',
+        ink: 'var(--color-text)',
+        page: 'var(--color-bg)',
+        line: 'var(--color-border)',
+        card: 'var(--color-card)',
+        'surface-soft': 'var(--color-surface-soft)',
       },
       fontFamily: {
         display: ['Vazirmatn', 'system-ui', 'sans-serif'],

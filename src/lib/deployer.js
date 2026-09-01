@@ -133,7 +133,7 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo, p
         error: null,
       })
 
-      await updateOrderStatus(orderId, 'completed', 'فایل ZIP تولید شد')
+      await updateOrderStatus(orderId, 'completed', 'فایل ZIP تولید شد', 'system')
 
       return { success: true, downloadUrl }
     } catch (error) {
@@ -209,7 +209,7 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo, p
       error: null,
     })
 
-    await updateOrderStatus(orderId, 'completed', 'دیپلوی با موفقیت انجام شد')
+    await updateOrderStatus(orderId, 'completed', 'دیپلوی با موفقیت انجام شد', 'system')
 
     console.log(`[Deploy] Deployment completed for order ${orderId}`)
     return { success: true, downloadUrl }
@@ -226,16 +226,23 @@ export async function deployProduct(orderId, { productId, domain, hostingInfo, p
  * receipt. A build or SSH failure is an operational problem on our side: the
  * order stays approved so the admin can fix the cause and retry, instead of a
  * paying customer's order being marked rejected because `zip` was missing.
+ *
+ * The stored/returned message is stage-level on purpose. `error.message` from
+ * execSync carries stderr, local paths and host names — that belongs in the
+ * server log, not in a panel response body or a permanent audit row.
  */
 async function failDeployment(orderId, error, stage) {
-  const message = error?.message || String(error)
-  console.error(`[Deploy] ${stage} failed for order ${orderId}:`, message)
+  const detail = error?.message || String(error)
+  console.error(`[Deploy] ${stage} failed for order ${orderId}:`, detail)
 
+  const message = `${stage} ناموفق بود — جزئیات در لاگ سرور`
   await updateDeployment(orderId, {
     status: 'failed',
     error: message,
   })
-  await updateOrderStatus(orderId, 'approved', `خطای ${stage}: ${message}`)
+  // Actor SYSTEM: the deployer moved this order, not a human clicking — the
+  // audit feed must not read as if the admin pressed a button.
+  await updateOrderStatus(orderId, 'approved', `خطای ${stage}`, 'system')
 
   return { success: false, error: message }
 }
@@ -248,10 +255,12 @@ async function createZipPackage(node, orderId, productId) {
   const productDir = path.join(PRODUCTS_DIR, productId)
 
   console.log(`[Deploy] Creating ZIP package...`)
-  // Paths are validated above, so interpolation here is safe.
+  // Paths are validated above, so interpolation here is safe. The timeout was
+  // missing — the one execSync in the file without one — so a hung `zip` hung
+  // the route, and on a single-process Node host, every other request too.
   const zipBuffer = node.execSync(
     `cd "${productDir}" && zip -r - .next public package.json package-lock.json -x "node_modules/*"`,
-    { stdio: 'pipe', encoding: 'buffer' }
+    { stdio: 'pipe', encoding: 'buffer', timeout: 120000 }
   )
 
   const filename = `deploy-${orderId}.zip`

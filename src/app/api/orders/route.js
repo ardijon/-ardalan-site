@@ -4,6 +4,7 @@ import { getLiveProduct } from '@/lib/products-server'
 import { notifyAdmin } from '@/lib/telegram'
 import { escapeHtml } from '@/lib/markdown'
 import { createRateLimiter } from '@/lib/rate-limit'
+import { checkCsrf } from '@/lib/admin-auth'
 import { extractClientKey } from '@/lib/request-ip'
 
 const PLAN_LABELS = { starter: 'استارتر', pro: 'حرفه‌ای' }
@@ -14,23 +15,14 @@ const orderRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
 })
 
-function checkCsrf(request) {
-  const origin = request.headers.get('origin')
-  const host = request.headers.get('host')
-  if (!origin || !host) return false
-  try {
-    const originHost = new URL(origin).host
-    if (process.env.NODE_ENV === 'production' && new URL(origin).protocol !== 'https:') {
-      return false
-    }
-    return originHost === host
-  } catch {
-    return false
-  }
-}
-
-function getClientIp(request) {
-  return extractClientKey(request)
+// Input length caps. Every order POST rewrites the whole orders collection as
+// one KV value, so an uncapped field is a per-request amplifier toward KV's
+// 25 MB per-value ceiling — past it, EVERY order write fails.
+const FIELD_LIMITS = {
+  name: 100,
+  email: 200,
+  domain: 253,
+  hostingInfo: 2000,
 }
 
 /**
@@ -71,7 +63,7 @@ export async function POST(request) {
   }
 
   // Rate limiting
-  const ip = getClientIp(request)
+  const ip = extractClientKey(request)
   const rateLimitResult = await orderRateLimiter.check(ip)
   if (!rateLimitResult.allowed) {
     return NextResponse.json(
@@ -80,8 +72,14 @@ export async function POST(request) {
     )
   }
 
+  let body
   try {
-    const body = await request.json()
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'درخواست نامعتبر است' }, { status: 400 })
+  }
+
+  try {
     const { productId, plan, customer } = body
 
     if (!productId || !plan || !customer?.name || !customer?.phone) {
@@ -107,6 +105,23 @@ export async function POST(request) {
       )
     }
 
+    // A product that refuses money must not be orderable. The old code fell
+    // through to `basePrice = 0`, which minted a real tracking code and a real
+    // Telegram ping against `0 + random suffix` — an invented price for
+    // something the store deliberately does not sell yet.
+    if (product.status === 'coming_soon') {
+      return NextResponse.json(
+        { error: 'این محصول هنوز منتشر نشده است' },
+        { status: 400 }
+      )
+    }
+    if (product.pricingMode === 'contact') {
+      return NextResponse.json(
+        { error: 'این محصول از طریق گفتگوی مستقیم فروخته می‌شود' },
+        { status: 400 }
+      )
+    }
+
     const phoneRegex = /^09\d{9}$/
     if (!phoneRegex.test(customer.phone)) {
       return NextResponse.json(
@@ -122,12 +137,31 @@ export async function POST(request) {
       )
     }
 
+    for (const [field, limit] of Object.entries(FIELD_LIMITS)) {
+      const value = customer[field]
+      if (typeof value === 'string' && value.length > limit) {
+        return NextResponse.json(
+          { error: `طول فیلد بیش از حد مجاز است (${limit} نویسه)` },
+          { status: 400 }
+        )
+      }
+    }
+
     const basePrice = product.pricing?.[plan]?.price || 0
+    if (!(Number(basePrice) > 0)) {
+      return NextResponse.json(
+        { error: 'این پلن قابل خرید نیست' },
+        { status: 400 }
+      )
+    }
+
     const order = await createOrder({ productId, plan, customer, basePrice })
 
-    // notifyAdmin swallows its own failures, so a Telegram outage cannot turn a
-    // saved order into a 500 that tells the buyer to try again.
-    await notifyNewOrder({ order, product, host: request.headers.get('host') })
+    // Persistence already succeeded — the Telegram ping must not sit on the
+    // buyer's response (or fail it when the egress is slow).
+    notifyNewOrder({ order, product, host: request.headers.get('host') }).catch(error => {
+      console.error('Order notification failed:', error)
+    })
 
     return NextResponse.json({
       success: true,

@@ -30,7 +30,7 @@ export default function Resume() {
           }}
         >
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
+            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
               {t('resume.badge')}
             </span>
             <h2 className="mt-6 text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)]">
@@ -54,14 +54,14 @@ export default function Resume() {
                 )}
 
                 <div className="flex flex-col items-center">
-                  <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-[var(--color-bg)] dark:bg-[var(--color-card)] border-2 border-[var(--color-accent)]/30 flex items-center justify-center text-[10px] sm:text-xs font-bold text-[var(--color-accent)] shrink-0 group-hover:border-[var(--color-accent)] group-hover:scale-110 transition-all duration-300">
+                  <div className="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-[var(--color-bg)] dark:bg-[var(--color-card)] border-2 border-accent-soft-30 flex items-center justify-center text-[10px] sm:text-xs font-bold text-[var(--color-accent)] shrink-0 group-hover:border-[var(--color-accent)] group-hover:scale-110 transition-all duration-300">
                     {i + 1}
                   </div>
                 </div>
 
                 <div className="flex-1 min-w-0 pt-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="inline-block px-2 py-0.5 text-xs font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded">
+                    <span className="inline-block px-2 py-0.5 text-xs font-medium text-[var(--color-accent)] bg-accent-soft-10 rounded">
                       {exp.year}
                     </span>
                     {exp.tag && (
@@ -74,11 +74,11 @@ export default function Resume() {
                     {exp.title}
                   </h3>
                   {exp.subtitle && (
-                    <p className="mt-1 text-xs text-[var(--color-accent)]/70 font-medium">
+                    <p className="mt-1 text-xs text-accent-soft-70 font-medium">
                       {exp.subtitle}
                     </p>
                   )}
-                  <p className="mt-0.5 text-sm text-[var(--color-text)]/50">
+                  <p className="mt-0.5 text-sm text-text-soft-50">
                     {exp.org}
                   </p>
                 </div>

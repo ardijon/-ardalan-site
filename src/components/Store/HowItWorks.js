@@ -63,7 +63,7 @@ export default function HowItWorks() {
           }}
         >
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full border border-[var(--color-accent)]/20">
+            <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full border border-accent-soft-20">
               {locale === 'fa' ? 'نحوه خرید' : 'HOW IT WORKS'}
             </span>
             <h2 className="mt-6 text-3xl sm:text-4xl font-black text-[var(--color-primary)]">
@@ -74,7 +74,7 @@ export default function HowItWorks() {
           </div>
 
           <div className="relative grid md:grid-cols-3 gap-8 md:gap-4">
-            <div className="hidden md:block absolute top-16 left-[20%] right-[20%] h-0.5 bg-gradient-to-r from-[var(--color-accent)]/20 via-[var(--color-accent)]/40 to-[var(--color-accent)]/20" />
+            <div className="hidden md:block absolute top-16 left-[20%] right-[20%] h-0.5 bg-gradient-to-r from-accent-soft-20 via-accent-soft-40 to-accent-soft-20" />
 
             {steps.map((step, i) => (
               <div
@@ -87,7 +87,7 @@ export default function HowItWorks() {
                 className="relative text-center"
               >
                 <div className="relative inline-flex mb-6">
-                  <div className="w-20 h-20 rounded-3xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center relative z-10">
+                  <div className="w-20 h-20 rounded-3xl bg-accent-soft-10 text-[var(--color-accent)] flex items-center justify-center relative z-10">
                     {step.icon}
                   </div>
                   <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[var(--color-accent)] text-white flex items-center justify-center text-sm font-black z-20">
@@ -98,7 +98,7 @@ export default function HowItWorks() {
                 <h3 className="text-lg font-bold text-[var(--color-primary)] mb-2">
                   {t(`howItWorks.${step.key}.title`)}
                 </h3>
-                <p className="text-sm text-[var(--color-text)]/50 leading-relaxed max-w-xs mx-auto">
+                <p className="text-sm text-text-soft-50 leading-relaxed max-w-xs mx-auto">
                   {t(`howItWorks.${step.key}.desc`)}
                 </p>
               </div>

@@ -23,7 +23,7 @@ export default function RelatedProducts({ currentProduct, allProducts }) {
     <section className="py-12">
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full border border-[var(--color-accent)]/20">
+          <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full border border-accent-soft-20">
             {locale === 'fa' ? 'محصولات مشابه' : 'Related Products'}
           </span>
           <h2 className="mt-4 text-2xl sm:text-3xl font-black text-[var(--color-primary)]">

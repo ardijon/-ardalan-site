@@ -58,7 +58,7 @@ export default function Countdown({ releaseAt }) {
           <div className="text-2xl font-black text-[var(--color-accent)] tabular-nums">
             {value.toLocaleString(locale === 'fa' ? 'fa-IR' : 'en-US')}
           </div>
-          <div className="mt-0.5 text-[10px] font-medium text-[var(--color-text)]/50">
+          <div className="mt-0.5 text-[10px] font-medium text-text-soft-50">
             {t(`countdown.${unit}`)}
           </div>
         </div>

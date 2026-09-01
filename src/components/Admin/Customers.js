@@ -60,10 +60,10 @@ function customerColumns(productLabels) {
 function Tile({ label, value, unit }) {
   return (
     <div className="px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-      <div className="text-[10px] text-[var(--color-text)]/40">{label}</div>
+      <div className="text-[10px] text-text-soft-40">{label}</div>
       <div className="mt-0.5 text-base font-bold text-[var(--color-primary)] tabular-nums">
         {value}
-        {unit && <span className="ms-1 text-[10px] font-normal text-[var(--color-text)]/40">{unit}</span>}
+        {unit && <span className="ms-1 text-[10px] font-normal text-text-soft-40">{unit}</span>}
       </div>
     </div>
   )
@@ -84,15 +84,15 @@ function OrderHistory({ orders, productLabels }) {
           <span className="text-[11px] font-medium text-[var(--color-primary)] truncate">
             {productLabels[order.productId] || order.productId}
           </span>
-          <span className="text-[10px] text-[var(--color-text)]/40 shrink-0">
+          <span className="text-[10px] text-text-soft-40 shrink-0">
             {PLAN_LABELS[order.plan] || order.plan}
           </span>
-          <span className="text-[10px] text-[var(--color-text)]/30 shrink-0 font-mono" dir="ltr">{order.id}</span>
+          <span className="text-[10px] text-text-soft-30 shrink-0 font-mono" dir="ltr">{order.id}</span>
           <div className="flex-1" />
-          <span className="text-[11px] tabular-nums text-[var(--color-text)]/60 shrink-0">
+          <span className="text-[11px] tabular-nums text-text-soft-60 shrink-0">
             {toman(order.uniqueAmount)}
           </span>
-          <span className="text-[10px] text-[var(--color-text)]/40 shrink-0">{faDate(order.createdAt)}</span>
+          <span className="text-[10px] text-text-soft-40 shrink-0">{faDate(order.createdAt)}</span>
         </div>
       ))}
     </div>
@@ -145,7 +145,7 @@ export default function Customers({ auth, products = [] }) {
   return (
     <div className="space-y-3">
       {error && (
-        <div className="px-4 py-2.5 text-sm rounded-xl bg-red-50 text-red-600 border border-red-200">{error}</div>
+        <div role="alert" className="px-4 py-2.5 text-sm rounded-xl bg-red-50 text-red-600 border border-red-200">{error}</div>
       )}
 
       <div className="flex items-center gap-2">
@@ -180,9 +180,9 @@ export default function Customers({ auth, products = [] }) {
       </div>
 
       {loading ? (
-        <div className="py-10 text-center text-sm text-[var(--color-text)]/50">در حال بارگذاری...</div>
+        <div className="py-10 text-center text-sm text-text-soft-50">در حال بارگذاری...</div>
       ) : customers.length === 0 ? (
-        <div className="py-10 text-center text-sm text-[var(--color-text)]/50">مشتری‌ای یافت نشد</div>
+        <div className="py-10 text-center text-sm text-text-soft-50">مشتری‌ای یافت نشد</div>
       ) : (
         <div className="space-y-1.5">
           {customers.map(customer => {
@@ -191,7 +191,7 @@ export default function Customers({ auth, products = [] }) {
               <div
                 key={customer.phone}
                 className={`rounded-xl border transition-colors ${
-                  open ? 'border-[var(--color-accent)]/40' : 'border-[var(--color-border)]'
+                  open ? 'border-accent-soft-40' : 'border-[var(--color-border)]'
                 }`}
               >
                 <button
@@ -212,7 +212,7 @@ export default function Customers({ auth, products = [] }) {
                         </span>
                       )}
                     </div>
-                    <div className="mt-0.5 flex items-center gap-2 text-[11px] text-[var(--color-text)]/50">
+                    <div className="mt-0.5 flex items-center gap-2 text-[11px] text-text-soft-50">
                       <span className="tabular-nums" dir="ltr">{customer.phone}</span>
                       {customer.email && <span className="truncate" dir="ltr">{customer.email}</span>}
                       {customer.domain && <span className="truncate" dir="ltr">{customer.domain}</span>}
@@ -225,7 +225,7 @@ export default function Customers({ auth, products = [] }) {
                     {customer.products.map(slug => (
                       <span
                         key={slug}
-                        className="px-1.5 py-0.5 rounded text-[10px] border border-[var(--color-border)] text-[var(--color-text)]/50 max-w-[8rem] truncate"
+                        className="px-1.5 py-0.5 rounded text-[10px] border border-[var(--color-border)] text-text-soft-50 max-w-[8rem] truncate"
                       >
                         {productLabels[slug] || slug}
                       </span>
@@ -235,16 +235,16 @@ export default function Customers({ auth, products = [] }) {
                   <div className="text-end shrink-0">
                     <div className="text-sm font-bold text-[var(--color-primary)] tabular-nums">
                       {toman(customer.revenue)}
-                      <span className="ms-1 text-[10px] font-normal text-[var(--color-text)]/40">تومان</span>
+                      <span className="ms-1 text-[10px] font-normal text-text-soft-40">تومان</span>
                     </div>
-                    <div className="text-[10px] text-[var(--color-text)]/40 tabular-nums">
+                    <div className="text-[10px] text-text-soft-40 tabular-nums">
                       {customer.paidCount} از {customer.orderCount} سفارش · {faDate(customer.lastOrderAt)}
                     </div>
                   </div>
 
                   <svg
                     width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                    className={`shrink-0 text-[var(--color-text)]/30 transition-transform ${open ? 'rotate-90' : '-rotate-90'}`}
+                    className={`shrink-0 text-text-soft-30 transition-transform ${open ? 'rotate-90' : '-rotate-90'}`}
                     aria-hidden="true"
                   >
                     <path d="M9 5l7 7-7 7" />

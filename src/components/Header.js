@@ -83,7 +83,14 @@ export default function Header() {
     // Anchors only. The old version mapped the full nav list, so on /store it
     // called getElementById('/store'), observed nothing, and left every item
     // unhighlighted while the store button had no active state at all.
+    //
+    // Re-runs on `isHome`: this effect used to run once at mount, so arriving
+    // from /store via a client-side Link — where the sections mount AFTER the
+    // effect had already resolved an empty list — left every nav item
+    // unhighlighted for the rest of the session.
+    if (!isHome) return undefined
     const sections = navSections.map(id => document.getElementById(id)).filter(Boolean)
+    if (sections.length === 0) return undefined
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) setActiveSection(entry.target.id)
@@ -91,13 +98,25 @@ export default function Header() {
     }, { threshold: 0.3, rootMargin: '-100px 0px 0px 0px' })
     sections.forEach(s => observer.observe(s))
     return () => observer.disconnect()
-  }, [])
+  }, [isHome])
+
+  // Escape closes the drawer; while closed the whole menu is removed from the
+  // tab order — it used to hide with opacity only, so Tab walked into every
+  // invisible link sitting on top of the page content.
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [menuOpen])
 
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled ? 'bg-[var(--color-bg)]/80 backdrop-blur-xl shadow-sm' : 'bg-transparent'
+          scrolled ? 'bg-text-soft-80 backdrop-blur-xl shadow-sm' : 'bg-transparent'
         }`}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -110,7 +129,7 @@ export default function Header() {
             <a href="/" className="shrink-0"><LogoV1 /></a>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 text-[var(--color-text)] rounded-lg hover:bg-[var(--color-text)]/5 transition-colors"
+              className="p-2 text-[var(--color-text)] rounded-lg hover:bg-text-soft-5 transition-colors"
               aria-label={menuOpen ? t('header.closeLabel') : t('header.menuLabel')}
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
@@ -138,7 +157,7 @@ export default function Header() {
                     key={item.href}
                     href={item.href}
                     className={`text-sm font-medium transition-colors relative ${
-                      isActive ? 'text-[var(--color-accent)]' : 'text-[var(--color-text)]/70 hover:text-[var(--color-accent)]'
+                      isActive ? 'text-[var(--color-accent)]' : 'text-text-soft-70 hover:text-[var(--color-accent)]'
                     }`}
                   >
                     {item.label}
@@ -156,8 +175,8 @@ export default function Header() {
                 aria-current={storeActive ? 'page' : undefined}
                 className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-xl transition-all active:scale-95 ${
                   storeActive
-                    ? 'text-white bg-[var(--color-accent)] shadow-md shadow-[var(--color-accent)]/25'
-                    : 'text-[var(--color-accent)] border border-[var(--color-accent)]/40 hover:text-white hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)]'
+                    ? 'text-white bg-[var(--color-accent)] shadow-md shadow-accent-soft-25'
+                    : 'text-[var(--color-accent)] border border-accent-soft-40 hover:text-white hover:bg-[var(--color-accent)] hover:border-[var(--color-accent)]'
                 }`}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -175,8 +194,9 @@ export default function Header() {
       <div
         id="mobile-menu"
         className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ease-out ${
-          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none invisible'
         }`}
+        aria-hidden={!menuOpen}
       >
         <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
 
@@ -190,7 +210,7 @@ export default function Header() {
             <button
               ref={closeRef}
               onClick={() => setMenuOpen(false)}
-              className="p-2 -ml-2 text-[var(--color-text)]/50 hover:text-[var(--color-text)] rounded-lg hover:bg-[var(--color-text)]/5 transition-colors"
+              className="p-2 -ml-2 text-text-soft-50 hover:text-[var(--color-text)] rounded-lg hover:bg-text-soft-5 transition-colors"
               aria-label={t('header.closeLabel')}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -209,7 +229,7 @@ export default function Header() {
               className={`mb-3 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-bold transition-all ${
                 storeActive
                   ? 'text-white bg-[var(--color-accent)]'
-                  : 'text-[var(--color-accent)] border border-[var(--color-accent)]/40 hover:text-white hover:bg-[var(--color-accent)]'
+                  : 'text-[var(--color-accent)] border border-accent-soft-40 hover:text-white hover:bg-[var(--color-accent)]'
               }`}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -226,11 +246,11 @@ export default function Header() {
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
-                    isActive ? 'text-[var(--color-accent)] bg-[var(--color-accent)]/10' : 'text-[var(--color-text)]/70 hover:text-[var(--color-accent)] hover:bg-[var(--color-accent)]/5'
+                    isActive ? 'text-[var(--color-accent)] bg-accent-soft-10' : 'text-text-soft-70 hover:text-[var(--color-accent)] hover:bg-accent-soft-5'
                   }`}
                 >
                   <span className={`w-1.5 h-1.5 rounded-full transition-all ${
-                    isActive ? 'bg-[var(--color-accent)] scale-100' : 'bg-[var(--color-text)]/20 scale-0'
+                    isActive ? 'bg-[var(--color-accent)] scale-100' : 'bg-text-soft-20 scale-0'
                   }`} />
                   {item.label}
                 </Link>
@@ -239,7 +259,7 @@ export default function Header() {
           </nav>
 
           <div className="p-4 border-t border-[var(--color-border)] space-y-3">
-            <p className="text-xs text-[var(--color-text)]/30 font-medium tracking-wide">{t('header.social')}</p>
+            <p className="text-xs text-text-soft-30 font-medium tracking-wide">{t('header.social')}</p>
             <div className="flex gap-2">
               {socialLinks.map((social) => (
                 <a
@@ -247,7 +267,7 @@ export default function Header() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl border border-[var(--color-border)] text-[var(--color-text)]/40 hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/30 flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-xl border border-[var(--color-border)] text-text-soft-40 hover:text-[var(--color-accent)] hover:border-accent-soft-30 flex items-center justify-center transition-all"
                   aria-label={t(`socialLabels.${social.key}`)}
                 >
                   {social.icon()}

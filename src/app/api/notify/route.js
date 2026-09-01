@@ -4,6 +4,8 @@ import { getLiveProduct } from '@/lib/products-server'
 import { extractClientKey } from '@/lib/request-ip'
 import { escapeHtml } from '@/lib/markdown'
 import { notifyAdmin } from '@/lib/telegram'
+import { createRateLimiter } from '@/lib/rate-limit'
+import { checkCsrf } from '@/lib/admin-auth'
 
 /**
  * Waitlist signup for an unreleased product.
@@ -13,35 +15,11 @@ import { notifyAdmin } from '@/lib/telegram'
  * visitor see an error for something that actually succeeded.
  */
 
-const RATE_WINDOW_MS = 60 * 1000
-const RATE_MAX = 5
-const buckets = new Map()
-
-function checkCsrf(request) {
-  const origin = request.headers.get('origin')
-  const host = request.headers.get('host')
-  if (!origin || !host) return false
-  try {
-    const originUrl = new URL(origin)
-    if (process.env.NODE_ENV === 'production' && originUrl.protocol !== 'https:') {
-      return false
-    }
-    return originUrl.host === host
-  } catch {
-    return false
-  }
-}
-
-// Per-isolate on Workers, like the sibling public routes — it slows down a
-// browser loop, not a distributed one. The KV-backed limiter is a separate job.
-function checkRate(key) {
-  const now = Date.now()
-  const recent = (buckets.get(key) || []).filter(t => now - t < RATE_WINDOW_MS)
-  if (recent.length >= RATE_MAX) return false
-  recent.push(now)
-  buckets.set(key, recent)
-  return true
-}
+const notifyRateLimiter = createRateLimiter({
+  namespace: 'notify',
+  maxAttempts: 5,
+  windowMs: 60 * 1000,
+})
 
 async function pingTelegram({ product, phone, email, duplicate }) {
   const title = product.shortTitle?.fa || product.title?.fa || product.slug
@@ -61,7 +39,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   }
 
-  if (!checkRate(extractClientKey(request))) {
+  if (!(await notifyRateLimiter.check(extractClientKey(request))).allowed) {
     return NextResponse.json(
       { error: 'تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید' },
       { status: 429 }

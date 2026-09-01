@@ -97,7 +97,7 @@ export default function BlogArticleContent({ slug }) {
       />
       <Link
         href="/#blog"
-        className="inline-flex items-center gap-2 text-sm text-[var(--color-text)]/50 hover:text-[var(--color-accent)] transition-colors mb-8"
+        className="inline-flex items-center gap-2 text-sm text-text-soft-50 hover:text-[var(--color-accent)] transition-colors mb-8"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className={isRtl ? 'scale-x-[-1]' : ''}>
           <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -106,11 +106,11 @@ export default function BlogArticleContent({ slug }) {
       </Link>
 
       <div className="flex items-center gap-3 mb-6">
-        <span className="px-3 py-1 text-xs font-medium text-[var(--color-tech)] bg-[var(--color-tech)]/10 rounded-full">
+        <span className="px-3 py-1 text-xs font-medium text-[var(--color-tech)] bg-tech-soft-10 rounded-full">
           {article.cat}
         </span>
-        <span className="text-sm text-[var(--color-text)]/40">{article.date}</span>
-        <span className="text-sm text-[var(--color-text)]/40">· {article.readTime} {t('blog.minuteRead')}</span>
+        <span className="text-sm text-text-soft-40">{article.date}</span>
+        <span className="text-sm text-text-soft-40">· {article.readTime} {t('blog.minuteRead')}</span>
       </div>
 
       <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--color-primary)] leading-tight mb-8">
@@ -118,33 +118,33 @@ export default function BlogArticleContent({ slug }) {
       </h1>
 
       <div
-        className={`prose prose-lg max-w-none text-[var(--color-text)]/80 leading-relaxed
+        className={`prose prose-lg max-w-none text-text-soft-80 leading-relaxed
           prose-headings:text-[var(--color-primary)] prose-headings:font-bold
           prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
           prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
           prose-p:text-base prose-p:leading-8
           prose-strong:text-[var(--color-text)]
           prose-a:text-[var(--color-accent)] prose-a:no-underline hover:prose-a:underline
-          prose-blockquote:border-[var(--color-accent)] prose-blockquote:text-[var(--color-text)]/70 prose-blockquote:italic
-          prose-code:text-[var(--color-tech)] prose-code:bg-[var(--color-tech)]/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-normal prose-code:before:content-none prose-code:after:content-none
+          prose-blockquote:border-[var(--color-accent)] prose-blockquote:text-text-soft-70 prose-blockquote:italic
+          prose-code:text-[var(--color-tech)] prose-code:bg-tech-soft-10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-normal prose-code:before:content-none prose-code:after:content-none
           prose-pre:bg-[var(--color-surface)] prose-pre:border prose-pre:border-[var(--color-border)]
           prose-table:text-sm
           prose-th:text-[var(--color-text)] prose-th:font-semibold ${isRtl ? 'prose-th:text-right' : 'prose-th:text-left'}
-          prose-td:text-[var(--color-text)]/70
-          prose-li:text-[var(--color-text)]/80`}
+          prose-td:text-text-soft-70
+          prose-li:text-text-soft-80`}
         dangerouslySetInnerHTML={{ __html: renderMarkdown(article.content) }}
       />
 
-      <div className="mt-12 p-8 rounded-2xl bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/20 text-center">
+      <div className="mt-12 p-8 rounded-2xl bg-accent-soft-5 border border-accent-soft-20 text-center">
         <p className="text-lg font-bold text-[var(--color-text)] mb-2">
           {t('blog.ctaTitle')}
         </p>
-        <p className="text-sm text-[var(--color-text)]/50 mb-6">
+        <p className="text-sm text-text-soft-50 mb-6">
           {t('blog.ctaDesc')}
         </p>
         <a
           href="/#contact"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-accent)] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-[var(--color-accent)]/20"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-accent)] text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-accent-soft-20"
         >
           {t('blog.ctaBtn')}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" className={isRtl ? 'scale-x-[-1]' : ''}>

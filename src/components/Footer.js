@@ -19,7 +19,7 @@ export default function Footer() {
               <TrustSeal size={36} />
               <span className="text-lg font-bold text-[var(--color-primary)]">Ardalan</span>
             </div>
-            <p className="mt-3 text-sm text-[var(--color-text)]/40 leading-relaxed">
+            <p className="mt-3 text-sm text-text-soft-40 leading-relaxed">
               {t('site.tagline')}
             </p>
           </div>
@@ -34,7 +34,7 @@ export default function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-xl border border-[var(--color-border)] text-[var(--color-text)]/40 hover:text-[var(--color-accent)] hover:border-[var(--color-accent)]/30 flex items-center justify-center transition-all"
+                    className="w-10 h-10 rounded-xl border border-[var(--color-border)] text-text-soft-40 hover:text-[var(--color-accent)] hover:border-accent-soft-30 flex items-center justify-center transition-all"
                     aria-label={t(`socialLabels.${social.key}`)}
                   >
                     {social.icon()}
@@ -49,7 +49,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-5 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-sm text-[var(--color-text)]/50">
+          <p className="text-sm text-text-soft-50">
             &copy; {currentYear} &mdash; Ardalan. {t('site.copyright')}
           </p>
           {/* Order tracking is the only thing that belongs in this row. A visitor
@@ -59,7 +59,7 @@ export default function Footer() {
           <a href="/store/track" className="text-sm text-[var(--color-accent)] hover:underline">
             {t('store.trackOrder')}
           </a>
-          <p className="text-xs text-[var(--color-text)]/40">
+          <p className="text-xs text-text-soft-40">
             {t('site.madeWith')}
           </p>
         </div>

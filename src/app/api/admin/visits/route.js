@@ -5,14 +5,16 @@ import { recentDayKeys, readDays, summarizeVisits } from '@/lib/visit-stats'
 /**
  * Product visit statistics for the dashboard.
  *
- * One KV read per day requested, so the window is capped: 90 days is three
- * Jalali months of history for about 90 reads a load, against a free-tier
- * allowance of a hundred thousand a day. Reads are the cheap resource here —
- * it is writes that are scarce, and this route performs none.
+ * One KV read per day requested — and each read is a subrequest. Cloudflare
+ * caps subrequests per request at 50 on the free plan (1000 on paid), so a
+ * 90-day window was exceeding the cap on free deployments and the failure was
+ * swallowed client-side into a permanently empty panel. 45 days keeps the
+ * dashboard inside the free-plan cap with headroom; a longer horizon needs
+ * pre-aggregated buckets, not a bigger cap here.
  */
 
-const DEFAULT_DAYS = 90
-const MAX_DAYS = 180
+const DEFAULT_DAYS = 45
+const MAX_DAYS = 45
 
 export async function GET(request) {
   const denied = await guardAdminRoute(request)

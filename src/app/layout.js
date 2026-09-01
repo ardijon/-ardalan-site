@@ -2,6 +2,12 @@ import './globals.css'
 import { I18nProvider } from '@/lib/i18n/I18nProvider'
 import Analytics from '@/components/Analytics'
 import { SITE_URL } from '@/lib/constants'
+import dictionary from '@/lib/i18n/dictionary'
+
+/** Server-rendered so the skip link is in the HTML before hydration. */
+function SkipLabel() {
+  return dictionary.fa?.header?.skipToContent || 'رفتن به محتوا'
+}
 
 export const viewport = {
   width: 'device-width',
@@ -73,11 +79,11 @@ export default function RootLayout({ children }) {
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#F8F6F3" />
-        <link rel="icon" href="/profile.png" sizes="any" />
-        <link rel="apple-touch-icon" href="/profile.png" />
-        <link rel="alternate" hrefLang="fa" href={SITE_URL} />
-        <link rel="alternate" hrefLang="en" href={SITE_URL} />
-        <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
+        <link rel="icon" href="/favicon-32.png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* Language switching is client-side on one URL: per-locale alternates
+            all pointing at the same address are noise to crawlers, and the
+            x-default promised a URL structure that does not exist. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
@@ -130,6 +136,16 @@ export default function RootLayout({ children }) {
 
       </head>
       <body className="min-h-screen antialiased">
+        {/* First focusable element: ~13 header links precede <main>, and
+            keyboard users had to tab through all of them on every page (WCAG
+            2.4.1). The dictionary key existed for this link; it just was never
+            rendered. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--color-accent)] focus:text-white focus:font-bold focus:text-sm"
+        >
+          <SkipLabel />
+        </a>
         <I18nProvider>
           {children}
         </I18nProvider>

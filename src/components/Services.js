@@ -13,7 +13,7 @@ const serviceMeta = [
       </svg>
     ),
     color: 'text-[var(--color-tech)]',
-    bgColor: 'bg-[var(--color-tech)]/10',
+    bgColor: 'bg-tech-soft-10',
   },
   {
     icon: (
@@ -25,7 +25,7 @@ const serviceMeta = [
       </svg>
     ),
     color: 'text-[var(--color-accent)]',
-    bgColor: 'bg-[var(--color-accent)]/10',
+    bgColor: 'bg-accent-soft-10',
   },
   {
     icon: (
@@ -34,7 +34,7 @@ const serviceMeta = [
       </svg>
     ),
     color: 'text-[var(--color-primary)]',
-    bgColor: 'bg-[var(--color-primary)]/10',
+    bgColor: 'bg-accent-soft-10',
   },
   {
     icon: (
@@ -43,7 +43,7 @@ const serviceMeta = [
       </svg>
     ),
     color: 'text-[var(--color-tech)]',
-    bgColor: 'bg-[var(--color-tech)]/10',
+    bgColor: 'bg-tech-soft-10',
   },
 ]
 
@@ -89,10 +89,10 @@ export default function Services() {
           }}
         >
           <div className="text-center mb-14">
-            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
+            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
               {t('services.badge')}
             </span>
-            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] whitespace-nowrap">
+            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] text-balance">
               {t('services.title')}
             </h2>
           </div>
@@ -120,7 +120,7 @@ export default function Services() {
                 <h3 className="text-lg font-bold text-[var(--color-text)] mb-2.5">
                   {service.title}
                 </h3>
-                <p className="text-sm text-[var(--color-text)]/50 leading-relaxed">
+                <p className="text-sm text-text-soft-50 leading-relaxed">
                   {service.desc}
                 </p>
               </div>
@@ -132,7 +132,7 @@ export default function Services() {
               visitor reading a services grid has no signal that the second one
               exists. This closes that exit. */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3 text-center">
-            <span className="text-sm text-[var(--color-text)]/50">
+            <span className="text-sm text-text-soft-50">
               {t('services.storeBridge')}
             </span>
             <Link

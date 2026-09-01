@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { uploadReceipt, getOrderById } from '@/lib/orders'
 import { putBlob, deleteBlob } from '@/lib/blob'
+import { createRateLimiter } from '@/lib/rate-limit'
+import { checkCsrf } from '@/lib/admin-auth'
+import { extractClientKey } from '@/lib/request-ip'
 
 /**
  * Customer-facing receipt upload.
@@ -14,16 +17,44 @@ import { putBlob, deleteBlob } from '@/lib/blob'
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp']
 const MAX_SIZE = 5 * 1024 * 1024
+const MAX_TRACKING_CODE = 100
+
+const receiptRateLimiter = createRateLimiter({
+  namespace: 'receipt',
+  maxAttempts: 10,
+  windowMs: 15 * 60 * 1000,
+})
 
 // Validate order ID format (alphanumeric + hyphens only)
 function isValidOrderId(id) {
   return typeof id === 'string' && /^[a-zA-Z0-9-]+$/.test(id) && id.length <= 50
 }
 
+/** Magic-byte signatures for the accepted image formats. */
+function sniffImageType(bytes) {
+  if (!bytes || bytes.length < 12) return null
+  const b = new Uint8Array(bytes)
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return 'image/jpeg'
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return 'image/png'
+  if (
+    b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 &&
+    b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50
+  ) return 'image/webp'
+  return null
+}
+
 /**
- * Validate receipt amount against order's uniqueAmount.
- * Allows ±10% tolerance for bank fees/rounding, but rejects wildly different amounts.
+ * Validate receipt amount against the order's uniqueAmount.
+ *
+ * A small fixed tolerance, not a percentage: the customer is told to transfer
+ * the exact amount, and the amount exists precisely to single this order out.
+ * A ±10% window on a Pro order (≈±1.5M) is wider than the entire 999k suffix
+ * space, i.e. every Pro order's amount would validate against every other's —
+ * the check would never catch a wrong-order receipt. ±5,000 covers bank
+ * rounding without swallowing a neighbouring order's suffix.
  */
+const RECEIPT_TOLERANCE_TOMAN = 5000
+
 function validateReceiptAmount(receiptAmount, expectedAmount) {
   if (!receiptAmount || receiptAmount <= 0) {
     return { valid: false, error: 'مبلغ رسید باید بزرگتر از صفر باشد' }
@@ -33,12 +64,10 @@ function validateReceiptAmount(receiptAmount, expectedAmount) {
   }
 
   const diff = Math.abs(receiptAmount - expectedAmount)
-  const tolerance = expectedAmount * 0.1 // 10% tolerance
-
-  if (diff > tolerance) {
+  if (diff > RECEIPT_TOLERANCE_TOMAN) {
     return {
       valid: false,
-      error: `مبلغ رسید (${receiptAmount.toLocaleString('fa-IR')} تومان) با مبلغ سفارش (${expectedAmount.toLocaleString('fa-IR')} تومان) مطابقت ندارد. تفاوت مجاز: ±${tolerance.toLocaleString('fa-IR')} تومان`
+      error: `مبلغ رسید (${receiptAmount.toLocaleString('fa-IR')} تومان) با مبلغ سفارش (${expectedAmount.toLocaleString('fa-IR')} تومان) مطابقت ندارد. تفاوت مجاز: ±${RECEIPT_TOLERANCE_TOMAN.toLocaleString('fa-IR')} تومان`
     }
   }
   return { valid: true }
@@ -47,6 +76,19 @@ function validateReceiptAmount(receiptAmount, expectedAmount) {
 export async function POST(request, { params }) {
   // Tracked so any failure after the write removes the orphaned blob.
   let storedName = null
+
+  if (!checkCsrf(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
+  }
+
+  const ip = extractClientKey(request)
+  const rateLimitResult = await receiptRateLimiter.check(ip)
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: 'تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید' },
+      { status: 429, headers: { 'Retry-After': String(receiptRateLimiter.retryAfter) } }
+    )
+  }
 
   try {
     const { id } = await params
@@ -84,9 +126,26 @@ export async function POST(request, { params }) {
     const file = formData.get('receipt')
     const amount = formData.get('amount')
     const trackingCode = formData.get('trackingCode')
+    const phone = String(formData.get('phone') || '').trim()
 
     if (!file) {
       return NextResponse.json({ error: 'فایل رسید را انتخاب کنید' }, { status: 400 })
+    }
+
+    // Second factor: the order ID alone is enumerable (timestamp + a few random
+    // bytes), so the buyer's phone must match too — the same two-factor rule
+    // the tracking endpoint applies. Without this, anyone who guesses an
+    // awaiting_payment order ID could attach a fake slip to someone else's
+    // purchase and lock the real buyer out of uploading.
+    if (phone !== existingOrder.customer?.phone) {
+      return NextResponse.json(
+        { error: 'شماره تلفن با سفارش مطابقت ندارد' },
+        { status: 403 }
+      )
+    }
+
+    if (typeof trackingCode === 'string' && trackingCode.length > MAX_TRACKING_CODE) {
+      return NextResponse.json({ error: 'کد رهگیری بیش از حد طولانی است' }, { status: 400 })
     }
 
     // Server-side amount validation against order's uniqueAmount
@@ -108,13 +167,25 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'حجم فایل حداکثر 5MB باشد' }, { status: 400 })
     }
 
+    const bytes = await file.arrayBuffer()
+
+    // The multipart Content-Type is client-controlled, so the declared type is
+    // cross-checked against the file's magic bytes before anything is stored.
+    const sniffed = sniffImageType(bytes)
+    if (!sniffed || sniffed !== file.type) {
+      return NextResponse.json(
+        { error: 'محتوای فایل با فرمت اعلام‌شده مطابقت ندارد' },
+        { status: 400 }
+      )
+    }
+
     // Never trust the client's extension — fall back to jpg rather than storing
     // whatever suffix was uploaded.
     const rawExt = (file.name.split('.').pop() || 'jpg').toLowerCase()
     const ext = ALLOWED_EXTENSIONS.includes(rawExt) ? rawExt : 'jpg'
     const filename = `receipt-${id}-${Date.now()}.${ext}`
 
-    await putBlob(filename, await file.arrayBuffer(), { contentType: file.type })
+    await putBlob(filename, bytes, { contentType: file.type })
     storedName = filename
 
     const order = await uploadReceipt(id, {

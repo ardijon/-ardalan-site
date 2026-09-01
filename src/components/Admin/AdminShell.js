@@ -91,7 +91,7 @@ function RailItem({ tab, active, expanded, count, onClick }) {
       className={`relative w-full flex items-center gap-3 h-10 px-3 rounded-xl text-sm font-medium transition-colors ${
         active
           ? 'bg-[var(--color-accent)] text-white'
-          : 'text-[var(--color-text)]/60 hover:text-[var(--color-text)] hover:bg-[var(--color-text)]/5'
+          : 'text-text-soft-60 hover:text-[var(--color-text)] hover:bg-text-soft-5'
       }`}
     >
       <Icon path={ICONS[tab.icon]} />
@@ -101,7 +101,7 @@ function RailItem({ tab, active, expanded, count, onClick }) {
           in a 40px button, and "something is waiting here" is the whole message. */}
       {count > 0 && (expanded ? (
         <span className={`ms-auto px-1.5 min-w-5 text-center text-xs rounded-full ${
-          active ? 'bg-white/20 text-white' : 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]'
+          active ? 'bg-white/20 text-white' : 'bg-accent-soft-15 text-[var(--color-accent)]'
         }`}>
           {count}
         </span>
@@ -114,7 +114,7 @@ function RailItem({ tab, active, expanded, count, onClick }) {
 
 function IconButton({ label, path, onClick, href }) {
   const className =
-    'p-2 rounded-xl text-[var(--color-text)]/60 hover:text-[var(--color-accent)] hover:bg-[var(--color-text)]/5 transition-colors'
+    'p-2 rounded-xl text-text-soft-60 hover:text-[var(--color-accent)] hover:bg-text-soft-5 transition-colors'
 
   if (href) {
     return (
@@ -169,7 +169,7 @@ export default function AdminShell({ activeTab, onTabChange, counts = {}, action
         <button
           onClick={onLogout}
           title={expanded ? undefined : 'خروج'}
-          className="w-full flex items-center gap-3 h-10 px-3 rounded-xl text-sm font-medium text-[var(--color-text)]/60 hover:text-red-500 hover:bg-red-500/5 transition-colors"
+          className="w-full flex items-center gap-3 h-10 px-3 rounded-xl text-sm font-medium text-text-soft-60 hover:text-red-500 hover:bg-red-500/5 transition-colors"
         >
           <Icon path={ICONS.logout} />
           {expanded && <span>خروج</span>}
@@ -193,7 +193,7 @@ export default function AdminShell({ activeTab, onTabChange, counts = {}, action
       >
         <button
           onClick={toggleRail}
-          className="w-full flex items-center justify-center h-10 mb-1 rounded-xl text-[var(--color-text)]/40 hover:text-[var(--color-accent)] hover:bg-[var(--color-text)]/5 transition-colors"
+          className="w-full flex items-center justify-center h-10 mb-1 rounded-xl text-text-soft-40 hover:text-[var(--color-accent)] hover:bg-text-soft-5 transition-colors"
           aria-label={expanded ? 'جمع کردن منو' : 'باز کردن منو'}
           aria-expanded={expanded}
         >
@@ -208,7 +208,7 @@ export default function AdminShell({ activeTab, onTabChange, counts = {}, action
         <header className="h-14 shrink-0 flex items-center gap-2 px-3 sm:px-4 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
           <button
             onClick={() => setDrawerOpen(true)}
-            className="lg:hidden p-2 -ms-1 rounded-xl text-[var(--color-text)]/60 hover:bg-[var(--color-text)]/5"
+            className="lg:hidden p-2 -ms-1 rounded-xl text-text-soft-60 hover:bg-text-soft-5"
             aria-label="منو"
           >
             <Icon path={ICONS.menu} size={20} />
@@ -254,7 +254,7 @@ export default function AdminShell({ activeTab, onTabChange, counts = {}, action
             </div>
             <button
               onClick={onLogout}
-              className="w-full flex items-center gap-3 h-10 px-3 rounded-xl text-sm font-medium text-[var(--color-text)]/60 hover:text-red-500 transition-colors"
+              className="w-full flex items-center gap-3 h-10 px-3 rounded-xl text-sm font-medium text-text-soft-60 hover:text-red-500 transition-colors"
             >
               <Icon path={ICONS.logout} />
               <span>خروج</span>

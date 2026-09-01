@@ -56,7 +56,7 @@ export default function WhyUs() {
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden">
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[var(--color-surface)]/50 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-surface-soft to-transparent" />
       </div>
 
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -69,7 +69,7 @@ export default function WhyUs() {
           }}
         >
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full border border-[var(--color-accent)]/20">
+            <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full border border-accent-soft-20">
               {locale === 'fa' ? 'چرا ما؟' : 'WHY US'}
             </span>
             <h2 className="mt-6 text-3xl sm:text-4xl font-black text-[var(--color-primary)]">
@@ -88,15 +88,15 @@ export default function WhyUs() {
                   transform: visible ? 'translateY(0)' : 'translateY(20px)',
                   transition: prefersReducedMotion ? 'none' : `opacity 0.6s ease ${0.2 + i * 0.1}s, transform 0.6s ease ${0.2 + i * 0.1}s`,
                 }}
-                className="group p-6 rounded-3xl bg-[var(--color-bg)] border border-[var(--color-border)] hover:border-[var(--color-accent)]/20 hover:shadow-xl hover:shadow-[var(--color-accent)]/5 transition-all duration-500"
+                className="group p-6 rounded-3xl bg-[var(--color-bg)] border border-[var(--color-border)] hover:border-accent-soft-20 hover:shadow-xl hover:shadow-accent-soft-5 transition-all duration-500"
               >
-                <div className="w-14 h-14 rounded-2xl bg-[var(--color-accent)]/10 text-[var(--color-accent)] flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-[var(--color-accent)]/20 transition-all duration-500">
+                <div className="w-14 h-14 rounded-2xl bg-accent-soft-10 text-[var(--color-accent)] flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-accent-soft-20 transition-all duration-500">
                   {reason.icon}
                 </div>
                 <h3 className="text-lg font-bold text-[var(--color-primary)] mb-2">
                   {t(`whyUs.${reason.key}.title`)}
                 </h3>
-                <p className="text-sm text-[var(--color-text)]/50 leading-relaxed">
+                <p className="text-sm text-text-soft-50 leading-relaxed">
                   {t(`whyUs.${reason.key}.desc`)}
                 </p>
               </div>

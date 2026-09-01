@@ -51,12 +51,12 @@ function Tile({ label, value, unit, hint, tone = 'default' }) {
   }
   return (
     <div className="p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
-      <div className="text-xs text-[var(--color-text)]/50">{label}</div>
+      <div className="text-xs text-text-soft-50">{label}</div>
       <div className={`mt-1 text-xl font-bold tabular-nums ${tones[tone]}`}>
         {value}
-        {unit && <span className="ms-1 text-xs font-normal text-[var(--color-text)]/40">{unit}</span>}
+        {unit && <span className="ms-1 text-xs font-normal text-text-soft-40">{unit}</span>}
       </div>
-      {hint && <div className="mt-0.5 text-[11px] text-[var(--color-text)]/35 truncate">{hint}</div>}
+      {hint && <div className="mt-0.5 text-[11px] text-text-soft-35 truncate">{hint}</div>}
     </div>
   )
 }
@@ -65,7 +65,7 @@ function Panel({ title, action, children }) {
   return (
     <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden">
       <div className="flex items-center justify-between gap-2 px-3 h-10 border-b border-[var(--color-border)]">
-        <h2 className="text-xs font-semibold text-[var(--color-text)]/60">{title}</h2>
+        <h2 className="text-xs font-semibold text-text-soft-60">{title}</h2>
         {action}
       </div>
       <div className="p-3">{children}</div>
@@ -75,7 +75,7 @@ function Panel({ title, action, children }) {
 
 function TrendBars({ rows }) {
   if (!rows.length) {
-    return <p className="py-6 text-center text-xs text-[var(--color-text)]/40">هنوز درآمدی ثبت نشده</p>
+    return <p className="py-6 text-center text-xs text-text-soft-40">هنوز درآمدی ثبت نشده</p>
   }
 
   // Scaled to the tallest bar rather than to a fixed ceiling: with two or three
@@ -86,14 +86,14 @@ function TrendBars({ rows }) {
     <div className="flex items-end justify-between gap-2 h-28">
       {rows.map(row => (
         <div key={row.key} className="flex-1 flex flex-col items-center gap-1 min-w-0" title={`${toman(row.revenue)} تومان — ${row.count} سفارش`}>
-          <span className="text-[10px] text-[var(--color-text)]/50 tabular-nums">{toman(row.revenue)}</span>
+          <span className="text-[10px] text-text-soft-50 tabular-nums">{toman(row.revenue)}</span>
           <div className="w-full flex-1 flex items-end">
             <div
-              className="w-full rounded-t bg-[var(--color-accent)]/70 hover:bg-[var(--color-accent)] transition-colors"
+              className="w-full rounded-t bg-accent-soft-70 hover:bg-[var(--color-accent)] transition-colors"
               style={{ height: `${Math.max(4, (row.revenue / max) * 100)}%` }}
             />
           </div>
-          <span className="text-[10px] text-[var(--color-text)]/40 truncate w-full text-center">{row.label}</span>
+          <span className="text-[10px] text-text-soft-40 truncate w-full text-center">{row.label}</span>
         </div>
       ))}
     </div>
@@ -106,13 +106,13 @@ function Breakdown({ rows, labels }) {
     .sort((a, b) => b.revenue - a.revenue)
 
   if (!entries.length) {
-    return <p className="py-6 text-center text-xs text-[var(--color-text)]/40">داده‌ای نیست</p>
+    return <p className="py-6 text-center text-xs text-text-soft-40">داده‌ای نیست</p>
   }
 
   return (
     <table className="w-full text-xs">
       <thead>
-        <tr className="text-[var(--color-text)]/40">
+        <tr className="text-text-soft-40">
           <th className="text-start font-normal pb-2">نام</th>
           <th className="text-start font-normal pb-2">سفارش</th>
           <th className="text-start font-normal pb-2">پرداخت‌شده</th>
@@ -125,8 +125,8 @@ function Breakdown({ rows, labels }) {
             <td className="py-2 font-medium text-[var(--color-primary)] truncate max-w-[10rem]">
               {labels?.[row.key] || row.key}
             </td>
-            <td className="py-2 tabular-nums text-[var(--color-text)]/60">{toman(row.orders)}</td>
-            <td className="py-2 tabular-nums text-[var(--color-text)]/60">{toman(row.paid)}</td>
+            <td className="py-2 tabular-nums text-text-soft-60">{toman(row.orders)}</td>
+            <td className="py-2 tabular-nums text-text-soft-60">{toman(row.paid)}</td>
             <td className="py-2 tabular-nums font-medium">{toman(row.revenue)}</td>
           </tr>
         ))}
@@ -143,13 +143,17 @@ function Breakdown({ rows, labels }) {
  * copy problem no amount of extra traffic fixes. Cloudflare Web Analytics
  * reports the visits; only this can report the reading.
  */
-function VisitStats({ summary, labels }) {
+function VisitStats({ summary, labels, error }) {
   const rows = Object.entries(summary?.byProduct || {})
     .map(([slug, row]) => ({ slug, ...row }))
     .sort((a, b) => b.opens - a.opens)
 
+  if (error) {
+    return <p role="alert" className="py-6 text-center text-xs text-[var(--color-danger, '#dc2626')]">خطا در دریافت آمار بازدید — دوباره تلاش کنید</p>
+  }
+
   if (!rows.length) {
-    return <p className="py-6 text-center text-xs text-[var(--color-text)]/40">هنوز بازدیدی ثبت نشده</p>
+    return <p className="py-6 text-center text-xs text-text-soft-40">هنوز بازدیدی ثبت نشده</p>
   }
 
   const months = summary?.byMonth || []
@@ -157,7 +161,7 @@ function VisitStats({ summary, labels }) {
   return (
     <>
       {months.length > 0 && (
-        <ul className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[var(--color-text)]/45">
+        <ul className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-text-soft-45">
           {months.map(month => (
             <li key={month.key} className="tabular-nums">
               {month.label}:{' '}
@@ -170,7 +174,7 @@ function VisitStats({ summary, labels }) {
 
       <table className="w-full text-xs">
         <thead>
-          <tr className="text-[var(--color-text)]/40">
+          <tr className="text-text-soft-40">
             <th className="text-start font-normal pb-2">محصول</th>
             <th className="text-start font-normal pb-2">باز شد</th>
             <th className="text-start font-normal pb-2">خوانده شد</th>
@@ -183,8 +187,8 @@ function VisitStats({ summary, labels }) {
               <td className="py-2 font-medium text-[var(--color-primary)] truncate max-w-[10rem]">
                 {labels?.[row.slug] || row.slug}
               </td>
-              <td className="py-2 tabular-nums text-[var(--color-text)]/60">{toman(row.opens)}</td>
-              <td className="py-2 tabular-nums text-[var(--color-text)]/60">{toman(row.reads)}</td>
+              <td className="py-2 tabular-nums text-text-soft-60">{toman(row.opens)}</td>
+              <td className="py-2 tabular-nums text-text-soft-60">{toman(row.reads)}</td>
               <td className={`py-2 tabular-nums font-medium ${row.readRate >= 30 ? 'text-[var(--color-accent)]' : ''}`}>
                 {toman(row.readRate)}٪
               </td>
@@ -195,7 +199,7 @@ function VisitStats({ summary, labels }) {
 
       {/* The definition ships with the number. Without it «نرخ خواندن ۱۲٪» is a
           figure the owner has to guess at, and a guessed metric gets ignored. */}
-      <p className="mt-2 text-[11px] leading-relaxed text-[var(--color-text)]/35">
+      <p className="mt-2 text-[11px] leading-relaxed text-text-soft-35">
         «خوانده شد» یعنی بیش از ۶۰٪ صفحه دیده شده و بیش از ۴۵ ثانیه باز مانده. هر بازدیدکننده در هر
         نیم‌ساعت یک‌بار شمرده می‌شود، پس عدد تقریبی است نه دقیق.
       </p>
@@ -242,7 +246,7 @@ function auditColumns(actions) {
  */
 function ActivityFeed({ entries, actions }) {
   if (!entries.length) {
-    return <p className="py-6 text-center text-xs text-[var(--color-text)]/40">رویدادی ثبت نشده</p>
+    return <p className="py-6 text-center text-xs text-text-soft-40">رویدادی ثبت نشده</p>
   }
 
   return (
@@ -258,8 +262,8 @@ function ActivityFeed({ entries, actions }) {
             >
               {meta.label || entry.action}
             </span>
-            <span className="min-w-0 flex-1 text-[var(--color-text)]/70">{entry.summary}</span>
-            <span className="shrink-0 text-[10px] text-[var(--color-text)]/35 tabular-nums">
+            <span className="min-w-0 flex-1 text-text-soft-70">{entry.summary}</span>
+            <span className="shrink-0 text-[10px] text-text-soft-35 tabular-nums">
               {faDateTime(entry.at)}
             </span>
           </li>
@@ -273,6 +277,7 @@ export default function Dashboard({ auth, products = [], onGoToOrders, onStats }
   const [data, setData] = useState({ orders: [], stats: {} })
   const [activity, setActivity] = useState({ entries: [], actions: {} })
   const [visits, setVisits] = useState(null)
+  const [visitsError, setVisitsError] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -324,16 +329,22 @@ export default function Dashboard({ auth, products = [], onGoToOrders, onStats }
   // Separate for the same reason as the log above, and doubly so: visit counts
   // are the newest collection here, so an empty panel is a plausible state on its
   // own and must not be able to blank out the revenue figures next to it.
+  // A failure is shown, not swallowed: an empty visits panel used to be
+  // indistinguishable from "nobody visited", and the route can genuinely fail
+  // (KV hiccup) — the admin should know which of the two they are looking at.
   useEffect(() => {
     if (!auth) return
     let cancelled = false
     fetch('/api/admin/visits', { credentials: 'same-origin' })
-      .then(res => (res.ok ? res.json() : null))
+      .then(res => (res.ok ? res.json() : Promise.reject(new Error('visits unavailable'))))
       .then(json => {
-        if (cancelled || !json) return
+        if (cancelled) return
         setVisits(json.summary || null)
+        setVisitsError(false)
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setVisitsError(true)
+      })
     return () => { cancelled = true }
   }, [auth])
 
@@ -344,7 +355,7 @@ export default function Dashboard({ auth, products = [], onGoToOrders, onStats }
   const productLabels = Object.fromEntries(products.map(p => [p.slug, p.shortTitle?.fa || p.title?.fa || p.slug]))
 
   if (loading) {
-    return <div className="py-16 text-center text-sm text-[var(--color-text)]/50">در حال بارگذاری...</div>
+    return <div className="py-16 text-center text-sm text-text-soft-50">در حال بارگذاری...</div>
   }
 
   return (
@@ -358,11 +369,11 @@ export default function Dashboard({ auth, products = [], onGoToOrders, onStats }
       {stats.receiptUploaded > 0 && (
         <button
           onClick={onGoToOrders}
-          className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-[var(--color-accent)]/40 bg-[var(--color-accent)]/5 text-start hover:bg-[var(--color-accent)]/10 transition-colors"
+          className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-accent-soft-40 bg-accent-soft-5 text-start hover:bg-accent-soft-10 transition-colors"
         >
           <span className="text-sm font-medium text-[var(--color-primary)]">
             {toman(stats.receiptUploaded)} رسید در انتظار بررسی
-            <span className="ms-2 font-normal text-[var(--color-text)]/50">
+            <span className="ms-2 font-normal text-text-soft-50">
               معادل {toman(stats.pendingRevenue)} تومان
             </span>
           </span>
@@ -402,7 +413,7 @@ export default function Dashboard({ auth, products = [], onGoToOrders, onStats }
           }
         >
           {orders.length === 0 ? (
-            <p className="py-6 text-center text-xs text-[var(--color-text)]/40">هنوز سفارشی ثبت نشده</p>
+            <p className="py-6 text-center text-xs text-text-soft-40">هنوز سفارشی ثبت نشده</p>
           ) : (
             <ul className="text-xs divide-y divide-[var(--color-border)]">
               {/* The API already sorts newest-first. */}
@@ -410,11 +421,11 @@ export default function Dashboard({ auth, products = [], onGoToOrders, onStats }
                 <li key={order.id} className="py-2 flex items-center justify-between gap-2">
                   <span className="min-w-0 truncate">
                     <span className="font-medium text-[var(--color-primary)]">{order.customer?.name || '—'}</span>
-                    <span className="ms-2 text-[var(--color-text)]/40">
+                    <span className="ms-2 text-text-soft-40">
                       {productLabels[order.productId] || order.productId}
                     </span>
                   </span>
-                  <span className="shrink-0 tabular-nums text-[var(--color-text)]/60">{toman(order.uniqueAmount)}</span>
+                  <span className="shrink-0 tabular-nums text-text-soft-60">{toman(order.uniqueAmount)}</span>
                 </li>
               ))}
             </ul>
@@ -422,8 +433,8 @@ export default function Dashboard({ auth, products = [], onGoToOrders, onStats }
         </Panel>
       </div>
 
-      <Panel title="بازدید محصولات — ۹۰ روز اخیر (شمسی)">
-        <VisitStats summary={visits} labels={productLabels} />
+      <Panel title="بازدید محصولات — ۴۵ روز اخیر (شمسی)">
+        <VisitStats summary={visits} labels={productLabels} error={visitsError} />
       </Panel>
 
       {/* Full width and scrolled internally rather than paired in a two-column row:

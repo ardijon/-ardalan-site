@@ -28,7 +28,7 @@ export default function ComingSoonPanel({ product }) {
 
   return (
     <div className="space-y-5" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
-      <div className="p-6 rounded-2xl border-2 border-[var(--color-tech)]/30 bg-[var(--color-tech)]/5">
+      <div className="p-6 rounded-2xl border-2 border-tech-soft-30 bg-tech-soft-5">
         <span className="inline-block px-3 py-1 mb-3 text-[11px] font-bold text-white bg-[var(--color-tech)] rounded-full">
           {t('store.comingSoon')}
         </span>
@@ -38,7 +38,7 @@ export default function ComingSoonPanel({ product }) {
         )}
 
         {priceNote && (
-          <p className="mt-2 text-xs leading-relaxed text-[var(--color-text)]/50">{priceNote}</p>
+          <p className="mt-2 text-xs leading-relaxed text-text-soft-50">{priceNote}</p>
         )}
       </div>
 
@@ -53,7 +53,7 @@ export default function ComingSoonPanel({ product }) {
           </h3>
           <Link
             href="/#contact"
-            className="inline-flex w-full items-center justify-center gap-2 py-2.5 px-4 text-sm font-bold text-white bg-[var(--color-accent)] rounded-xl hover:bg-[var(--color-accent)]/90 active:scale-95 transition-all"
+            className="inline-flex w-full items-center justify-center gap-2 py-2.5 px-4 text-sm font-bold text-white bg-[var(--color-accent)] rounded-xl hover:bg-accent-soft-90 active:scale-95 transition-all"
           >
             {t('store.notify.contactCta')}
           </Link>

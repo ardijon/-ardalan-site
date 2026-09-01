@@ -98,19 +98,11 @@ export default function ScreenshotGallery({ screenshots }) {
     return () => { document.body.style.overflow = '' }
   }, [lightboxOpen])
 
-  // Mouse wheel navigation on main image (passive: false needed for preventDefault)
-  useEffect(() => {
-    const el = mainImageRef.current
-    if (!el) return
-    const handler = (e) => {
-      if (Math.abs(e.deltaY) < 30) return
-      e.preventDefault()
-      if (e.deltaY > 0) goTo(activeIndex + 1)
-      else goTo(activeIndex - 1)
-    }
-    el.addEventListener('wheel', handler, { passive: false })
-    return () => el.removeEventListener('wheel', handler)
-  }, [activeIndex, goTo])
+  // Wheel navigation removed: hijacking the wheel over the hero image trapped
+  // the page scroll — a desktop user resting the cursor on the image and
+  // scrolling down the PAGE cycled screenshots instead. Arrows, swipe, the
+  // thumbnail strip and the keyboard already cover every way to move.
+  void mainImageRef
 
   const onTouchStart = (e) => { setTouchStart(e.targetTouches[0].clientX) }
   const onTouchMove = (e) => { setTouchEnd(e.targetTouches[0].clientX) }
@@ -144,24 +136,28 @@ export default function ScreenshotGallery({ screenshots }) {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* Navigation arrows on main image */}
+        {/* Navigation arrows on main image.
+            Labels follow the ACTION, never the mirrored position: the button
+            that calls goTo(-1) is always «قبلی», because a screen-reader user
+            activating "بعدی" and landing on an earlier slide is a silent lie —
+            the chevron glyph can mirror, the meaning cannot. */}
         {screenshots.length > 1 && (
           <>
             <button
               className="absolute start-2 sm:start-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white shadow-lg transition-all"
               onClick={(e) => { e.stopPropagation(); goTo(activeIndex - 1) }}
-              aria-label={isRtl ? 'بعدی' : 'Previous'}
+              aria-label={isRtl ? 'قبلی' : 'Previous'}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                 <polyline points={isRtl ? '9 18 15 12 9 6' : '15 18 9 12 15 6'} />
               </svg>
             </button>
             <button
               className="absolute end-2 sm:end-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white shadow-lg transition-all"
               onClick={(e) => { e.stopPropagation(); goTo(activeIndex + 1) }}
-              aria-label={isRtl ? 'قبلی' : 'Next'}
+              aria-label={isRtl ? 'بعدی' : 'Next'}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                 <polyline points={isRtl ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
               </svg>
             </button>
@@ -219,7 +215,7 @@ export default function ScreenshotGallery({ screenshots }) {
               onClick={() => setActiveIndex(i)}
               className={`relative shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                 i === activeIndex
-                  ? 'border-[var(--color-accent)] shadow-lg scale-105 ring-2 ring-[var(--color-accent)]/30'
+                  ? 'border-[var(--color-accent)] shadow-lg scale-105 ring-2 ring-accent-soft-30'
                   : 'border-[var(--color-border)] opacity-65 hover:opacity-100 hover:scale-105'
               }`}
             >
@@ -285,15 +281,15 @@ export default function ScreenshotGallery({ screenshots }) {
           {/* Bottom bar */}
           <div className="border-t border-white/10 px-4 py-3 short:py-1.5">
             <div className="flex items-center justify-between gap-3">
-              {/* Prev */}
+              {/* Prev — labeled by action: this button goes back, always. */}
               <button
                 ref={previousButtonRef}
                 onClick={() => goTo(activeIndex - 1)}
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={activeIndex === 0}
-                aria-label={isRtl ? 'بعدی' : 'Previous'}
+                aria-label={isRtl ? 'قبلی' : 'Previous'}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
               </button>
@@ -327,14 +323,14 @@ export default function ScreenshotGallery({ screenshots }) {
                 ))}
               </div>
 
-              {/* Next */}
+              {/* Next — labeled by action: forward, always. */}
               <button
                 onClick={() => goTo(activeIndex + 1)}
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={activeIndex === screenshots.length - 1}
-                aria-label={isRtl ? 'قبلی' : 'Next'}
+                aria-label={isRtl ? 'بعدی' : 'Next'}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <polyline points="15 18 9 12 15 6" />
                 </svg>
               </button>

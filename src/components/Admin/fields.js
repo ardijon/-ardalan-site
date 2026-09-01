@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import {
   JALALI_MONTHS,
   JALALI_WEEKDAY_INITIALS,
@@ -58,14 +58,16 @@ export function TranslateButton({ onClick, busy, disabled }) {
 }
 
 export function InputField({ label, value, onChange, multiline, placeholder, hint, dir, onTranslate, translating, canTranslate = true, disabled }) {
+  const id = useId()
   return (
     <div>
       <div className="flex items-center justify-between gap-2 mb-1">
-        <label className="block text-xs font-medium text-gray-500">{label}</label>
+        <label htmlFor={id} className="block text-xs font-medium text-text-soft-60">{label}</label>
         {onTranslate && <TranslateButton onClick={onTranslate} busy={translating} disabled={!canTranslate} />}
       </div>
       {multiline ? (
         <textarea
+          id={id}
           value={value ?? ''}
           onChange={e => onChange?.(e.target.value)}
           rows={3}
@@ -73,11 +75,12 @@ export function InputField({ label, value, onChange, multiline, placeholder, hin
           dir={dir}
           disabled={disabled}
           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none ${
-            disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'border-gray-200'
+            disabled ? 'bg-text-soft-10 text-text-soft-60 cursor-not-allowed' : 'border-[var(--color-border)]'
           }`}
         />
       ) : (
         <input
+          id={id}
           type="text"
           value={value ?? ''}
           onChange={e => onChange?.(e.target.value)}
@@ -85,11 +88,11 @@ export function InputField({ label, value, onChange, multiline, placeholder, hin
           dir={dir}
           disabled={disabled}
           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
-            disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'border-gray-200'
+            disabled ? 'bg-text-soft-10 text-text-soft-60 cursor-not-allowed' : 'border-[var(--color-border)]'
           }`}
         />
       )}
-      {hint && <p className="mt-1 text-[11px] text-gray-400">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] text-text-soft-40">{hint}</p>}
     </div>
   )
 }
@@ -103,28 +106,32 @@ export function InputField({ label, value, onChange, multiline, placeholder, hin
  * a dropdown and cannot be typed at all.
  */
 export function SelectField({ label, value, onChange, options, hint }) {
+  const id = useId()
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
+      <label htmlFor={id} className="block text-xs font-medium text-text-soft-60 mb-1">{label}</label>
       <select
+        id={id}
         value={value ?? ''}
         onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white"
+        className="w-full px-3 py-2 text-sm border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-[var(--color-surface)]"
       >
         {options.map(opt => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
         ))}
       </select>
-      {hint && <p className="mt-1 text-[11px] text-gray-400">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] text-text-soft-40">{hint}</p>}
     </div>
   )
 }
 
 export function NumberField({ label, value, onChange, hint, min = 0, step = 1 }) {
+  const id = useId()
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
+      <label htmlFor={id} className="block text-xs font-medium text-text-soft-60 mb-1">{label}</label>
       <input
+        id={id}
         type="number"
         // Empty rather than 0 when unset: a literal 0 in a price box reads as
         // "free" and gets saved that way.
@@ -133,9 +140,9 @@ export function NumberField({ label, value, onChange, hint, min = 0, step = 1 })
         min={min}
         step={step}
         dir="ltr"
-        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+        className="w-full px-3 py-2 text-sm border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
       />
-      {hint && <p className="mt-1 text-[11px] text-gray-400">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] text-text-soft-40">{hint}</p>}
     </div>
   )
 }
@@ -150,8 +157,8 @@ export function CheckboxField({ label, checked, onChange, hint }) {
         className="mt-0.5 w-4 h-4 accent-orange-500"
       />
       <span>
-        <span className="block text-xs font-medium text-gray-600">{label}</span>
-        {hint && <span className="block text-[11px] text-gray-400">{hint}</span>}
+        <span className="block text-xs font-medium text-text-soft-70">{label}</span>
+        {hint && <span className="block text-[11px] text-text-soft-40">{hint}</span>}
       </span>
     </label>
   )
@@ -191,17 +198,17 @@ export function DateField({ label, value, onChange, hint }) {
 
   return (
     <div className="relative" ref={wrapper}>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-text-soft-60 mb-1">{label}</label>
       <div className="flex gap-1">
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
-          className="flex-1 min-w-0 flex items-center justify-between gap-2 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white hover:border-orange-300 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+          className="flex-1 min-w-0 flex items-center justify-between gap-2 px-3 py-2 text-sm border border-[var(--color-border)] rounded-lg bg-[var(--color-surface)] hover:border-orange-300 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
         >
-          <span className={parts ? 'truncate text-gray-800' : 'truncate text-gray-400'}>
+          <span className={parts ? 'truncate text-[var(--color-text)]' : 'truncate text-text-soft-40'}>
             {parts ? formatJalaliLong(value) : 'انتخاب تاریخ'}
           </span>
-          <svg className="shrink-0 text-gray-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <svg className="shrink-0 text-text-soft-40" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <rect x="3" y="5" width="18" height="16" rx="2" />
             <path d="M3 10h18M8 3v4M16 3v4" />
           </svg>
@@ -224,7 +231,7 @@ export function DateField({ label, value, onChange, hint }) {
           onPick={(jy, jm, jd) => { onChange(jalaliToISO(jy, jm, jd)); setOpen(false) }}
         />
       )}
-      {hint && <p className="mt-1 text-[11px] text-gray-400">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] text-text-soft-40">{hint}</p>}
     </div>
   )
 }
@@ -254,7 +261,7 @@ export function JalaliCalendar({ selected, onPick }) {
   }
 
   return (
-    <div className="absolute z-30 top-full right-0 mt-1 w-64 p-3 bg-white rounded-xl border border-gray-200 shadow-xl">
+    <div className="absolute z-30 top-full right-0 mt-1 w-64 p-3 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] shadow-xl">
       <div className="flex items-center justify-between mb-2">
         {/*
           Chevrons as SVG rather than ‹ › because those two characters are
@@ -262,20 +269,20 @@ export function JalaliCalendar({ selected, onPick }) {
           pointing the opposite way to the month it moves to. DOM order puts the
           previous month on the right, which is where it belongs in Persian.
         */}
-        <button type="button" onClick={() => shiftMonth(-1)} aria-label="ماه قبل" className="p-1 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100">
+        <button type="button" onClick={() => shiftMonth(-1)} aria-label="ماه قبل" className="p-1 rounded text-text-soft-40 hover:text-[var(--color-text)] hover:bg-text-soft-10">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
         </button>
-        <span className="text-xs font-semibold text-gray-700">
+        <span className="text-xs font-semibold text-[var(--color-text)]">
           {JALALI_MONTHS[view.jm - 1]} {toPersianDigits(view.jy)}
         </span>
-        <button type="button" onClick={() => shiftMonth(1)} aria-label="ماه بعد" className="p-1 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100">
+        <button type="button" onClick={() => shiftMonth(1)} aria-label="ماه بعد" className="p-1 rounded text-text-soft-40 hover:text-[var(--color-text)] hover:bg-text-soft-10">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
         </button>
       </div>
 
       <div className="grid grid-cols-7 gap-0.5 text-center">
         {JALALI_WEEKDAY_INITIALS.map(initial => (
-          <span key={initial} className="py-1 text-[10px] font-medium text-gray-400">{initial}</span>
+          <span key={initial} className="py-1 text-[10px] font-medium text-text-soft-40">{initial}</span>
         ))}
         {Array.from({ length: offset }, (_, i) => <span key={`pad-${i}`} aria-hidden="true" />)}
         {Array.from({ length: days }, (_, i) => {
@@ -292,7 +299,7 @@ export function JalaliCalendar({ selected, onPick }) {
                   ? 'bg-orange-500 text-white font-bold'
                   : isToday
                     ? 'bg-orange-50 text-orange-600 font-bold'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    : 'text-[var(--color-text)] hover:bg-text-soft-10'
               }`}
             >
               {toPersianDigits(day)}
@@ -316,7 +323,7 @@ export function ArrayField({ label, items, onItemChange, onRemove, onAdd, onTran
   return (
     <div>
       <div className="flex items-center justify-between gap-2 mb-1">
-        <label className="block text-xs font-medium text-gray-500">{label}</label>
+        <label className="block text-xs font-medium text-text-soft-60">{label}</label>
         {onTranslate && <TranslateButton onClick={onTranslate} busy={translating} disabled={!canTranslate} />}
       </div>
       <div className="space-y-1">
@@ -326,7 +333,7 @@ export function ArrayField({ label, items, onItemChange, onRemove, onAdd, onTran
               type="text"
               value={item ?? ''}
               onChange={e => onItemChange(i, e.target.value)}
-              className="flex-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+              className="flex-1 px-3 py-1.5 text-sm border border-[var(--color-border)] rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
             />
             <button
               type="button"
@@ -360,7 +367,7 @@ export function ArrayField({ label, items, onItemChange, onRemove, onAdd, onTran
 export function TestimonialFields({ items, onFieldChange, onRemove, onAdd, translateProps }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-[var(--color-text)]/60 mb-3">نقل قول مشتری‌ها</h3>
+      <h3 className="text-sm font-semibold text-text-soft-60 mb-3">نقل قول مشتری‌ها</h3>
       <div className="space-y-4">
         {(items || []).map((item, i) => (
           <div key={i} className="p-4 rounded-xl border border-[var(--color-border)] space-y-3">
@@ -385,7 +392,7 @@ export function TestimonialFields({ items, onFieldChange, onRemove, onAdd, trans
             <InputField label="متن نقل قول (فارسی)" value={item.quote?.fa} onChange={v => onFieldChange(i, 'quote.fa', v)} multiline />
 
             <details>
-              <summary className="text-xs text-[var(--color-text)]/40 cursor-pointer">ترجمه انگلیسی (اختیاری)</summary>
+              <summary className="text-xs text-text-soft-40 cursor-pointer">ترجمه انگلیسی (اختیاری)</summary>
               <div className="mt-3 space-y-3">
                 <InputField
                   label="سمت / شرکت (انگلیسی)"
@@ -431,7 +438,7 @@ export function TestimonialFields({ items, onFieldChange, onRemove, onAdd, trans
 export function ScreenshotFields({ items, onFieldChange, onRemove, onAdd, translateProps }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-[var(--color-text)]/60 mb-3">اسکرین‌شات‌ها</h3>
+      <h3 className="text-sm font-semibold text-text-soft-60 mb-3">اسکرین‌شات‌ها</h3>
       <div className="space-y-4">
         {(items || []).map((item, i) => (
           <div key={i} className="p-4 rounded-xl border border-[var(--color-border)] space-y-3">

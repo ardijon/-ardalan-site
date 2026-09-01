@@ -50,7 +50,7 @@ export default function Testimonials({ testimonials }) {
                   <span
                     key={star}
                     aria-hidden="true"
-                    className={star < item.rating ? 'text-[var(--color-accent)]' : 'text-[var(--color-text)]/15'}
+                    className={star < item.rating ? 'text-[var(--color-accent)]' : 'text-text-soft-15'}
                   >
                     ★
                   </span>
@@ -58,12 +58,12 @@ export default function Testimonials({ testimonials }) {
               </div>
             )}
 
-            <blockquote className="flex-1 text-sm leading-relaxed text-[var(--color-text)]/75">
+            <blockquote className="flex-1 text-sm leading-relaxed text-text-soft-75">
               {item.quote}
             </blockquote>
 
             <figcaption className="mt-4 flex items-center gap-3 border-t border-[var(--color-border)] pt-4">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)]/10 text-sm font-black text-[var(--color-accent)]">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-soft-10 text-sm font-black text-[var(--color-accent)]">
                 {item.name.trim().charAt(0)}
               </span>
               <span className="min-w-0">
@@ -71,7 +71,7 @@ export default function Testimonials({ testimonials }) {
                   {item.name}
                 </span>
                 {item.role && (
-                  <span className="block truncate text-xs text-[var(--color-text)]/40">
+                  <span className="block truncate text-xs text-text-soft-40">
                     {item.role}
                   </span>
                 )}

@@ -111,7 +111,7 @@ export function ExportButton({ columns, rows, prefix, label = 'خروجی CSV', 
       title={label}
       // `compact` matches the 40px panel headers; the default matches the h-9
       // toolbar the filter chips and the search box sit in.
-      className={`flex items-center gap-1.5 shrink-0 rounded-lg border border-[var(--color-border)] text-xs font-medium text-[var(--color-text)]/60 hover:border-[var(--color-accent)]/30 hover:text-[var(--color-text)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${
+      className={`flex items-center gap-1.5 shrink-0 rounded-lg border border-[var(--color-border)] text-xs font-medium text-text-soft-60 hover:border-accent-soft-30 hover:text-[var(--color-text)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${
         compact ? 'h-7 px-2' : 'h-9 px-3'
       }`}
     >

@@ -137,3 +137,18 @@ export function formatEnNumber(value) {
   const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   return (n < 0 ? '-' : '') + grouped + (fractionParts.length ? '.' + fractionParts.join('') : '')
 }
+
+/**
+ * The canonical Persian money format for customer-facing screens:
+ * formatFaNumber + ' تومان'.
+ *
+ * Lives here rather than staying in Admin/shared.js so public components (the
+ * order tracker) can use the same formatter without importing an admin module —
+ * the panel bundle used to ride along into the public tracking page for one
+ * function.
+ */
+export function toman(value) {
+  const amount = Number(value)
+  if (!Number.isFinite(amount) || amount <= 0) return formatFaNumber(0)
+  return formatFaNumber(amount)
+}

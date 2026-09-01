@@ -73,7 +73,7 @@ export default function ProjectModal({ project, onClose }) {
       >
         <button
           onClick={onClose}
-          className={`absolute top-4 ${isRtl ? 'left-4' : 'right-4'} p-1.5 rounded-lg text-[var(--color-text)]/40 hover:text-[var(--color-text)] hover:bg-[var(--color-text)]/5 transition-all z-10`}
+          className={`absolute top-4 ${isRtl ? 'left-4' : 'right-4'} p-1.5 rounded-lg text-text-soft-40 hover:text-[var(--color-text)] hover:bg-text-soft-5 transition-all z-10`}
           aria-label={t('projectModal.close')}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -88,10 +88,10 @@ export default function ProjectModal({ project, onClose }) {
         )}
 
         <h3 id="modal-title" className="text-2xl font-bold text-[var(--color-text)]">{project.title}</h3>
-        <span className="inline-block mt-2 px-3 py-1 text-xs font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
+        <span className="inline-block mt-2 px-3 py-1 text-xs font-medium text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
           {project.cat}
         </span>
-        <p className="mt-4 text-sm text-[var(--color-text)]/60 leading-relaxed">
+        <p className="mt-4 text-sm text-text-soft-60 leading-relaxed">
           {project.desc || t('projectModal.descPlaceholder')}
         </p>
 
@@ -100,7 +100,7 @@ export default function ProjectModal({ project, onClose }) {
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:opacity-90 transition-all shadow-lg shadow-[var(--color-accent)]/20"
+            className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 text-sm font-medium text-white bg-[var(--color-accent)] rounded-xl hover:opacity-90 transition-all shadow-lg shadow-accent-soft-20"
           >
             {t('projectModal.viewProject')}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">

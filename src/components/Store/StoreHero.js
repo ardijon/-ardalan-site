@@ -105,9 +105,17 @@ function HexagonParticles({ containerRef }) {
     }
     s.cells = cells
 
-    // Animation loop for breathing
+    // Animation loop for breathing.
+    //
+    // The loop used to run unconditionally from mount, transforming every cell
+    // at ~20fps on every visitor's CPU — including before the first mousemove
+    // and after mouseleave faded the wrapper to opacity 0, i.e. most of the
+    // time on a phone the decoration was invisible work. The loop now starts
+    // on the first mouseenter and cancels on mouseleave; a static frame is
+    // left in place, and the next entry restarts it.
     let lastTime = 0
     const animate = (time) => {
+      if (!s.inside) { s.raf = 0; return }
       if (time - lastTime > 50) { // ~20fps for breathing — enough for subtle motion
         lastTime = time
         for (const c of cells) {
@@ -144,12 +152,18 @@ function HexagonParticles({ containerRef }) {
       glow.style.opacity = '0'
     }
 
-    s.raf = requestAnimationFrame(animate)
+    // Idle until the cursor arrives; torn down when it leaves.
+    const startLoop = () => {
+      if (!s.raf) s.raf = requestAnimationFrame(animate)
+    }
+
+    container.addEventListener('mouseenter', startLoop)
     container.addEventListener('mousemove', onMove, { passive: true })
     container.addEventListener('mouseleave', onLeave)
 
     return () => {
       cancelAnimationFrame(s.raf)
+      container.removeEventListener('mouseenter', startLoop)
       container.removeEventListener('mousemove', onMove)
       container.removeEventListener('mouseleave', onLeave)
       wrapper.remove()
@@ -180,8 +194,8 @@ export default function StoreHero() {
   return (
     <section className="relative pt-32 sm:pt-36 pb-12 sm:pb-16 overflow-hidden">
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-20 left-1/4 w-72 h-72 bg-[var(--color-accent)]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-[var(--color-tech)]/5 rounded-full blur-3xl" />
+        <div className="absolute top-20 left-1/4 w-72 h-72 bg-accent-soft-5 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-tech-soft-5 rounded-full blur-3xl" />
       </div>
 
       <div ref={boxRef} className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 store-hero-box overflow-hidden relative">
@@ -199,7 +213,7 @@ export default function StoreHero() {
             {renderHeadline(t('store.heroTitle'))}
           </h1>
 
-          <p className="mt-4 text-base sm:text-lg text-[var(--color-text)]/60 max-w-xl mx-auto">
+          <p className="mt-4 text-base sm:text-lg text-text-soft-60 max-w-xl mx-auto">
             {t('store.subtitle')}
           </p>
 
@@ -214,7 +228,7 @@ export default function StoreHero() {
                 }}
               >
                 <span className="text-base">{featureIcons[i]}</span>
-                <span className="text-sm text-[var(--color-text)]/50">{text}</span>
+                <span className="text-sm text-text-soft-50">{text}</span>
               </div>
             ))}
           </div>

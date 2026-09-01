@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { getDoc, putDoc, deleteDoc } from '@/lib/storage'
+import { safeEqual } from '@/lib/admin-auth'
 
 /**
  * Admin login OTP.
@@ -49,7 +50,7 @@ export async function verifyOtp(id, inputOtp) {
     return { valid: false, error: 'max_attempts' }
   }
 
-  if (record.otp !== inputOtp) {
+  if (!(await safeEqual(record.otp, inputOtp))) {
     // Persist the attempt count, otherwise the limit above can never be
     // reached and the code could be guessed indefinitely.
     await putDoc(

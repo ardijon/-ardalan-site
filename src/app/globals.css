@@ -20,6 +20,20 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Latin Extended-A/B: characters like پ-specific glyphs aside, this face was
+   shipped in /public/fonts for years but never declared — a dead asset. It is
+   now wired up so accented Latin (é, ñ, ğ …) renders in Vazirmatn instead of
+   silently falling back to system-ui whenever the site shows Latin text that
+   goes beyond basic ASCII. */
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/vazirmatn-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 :root {
   color-scheme: light;
   --color-bg: #F8F6F3;
@@ -32,6 +46,45 @@
   --color-card: #ffffff;
   --color-border: rgba(26, 26, 46, 0.08);
   --color-glow: rgba(217, 119, 6, 0.06);
+
+  /*
+   * Alpha tokens. `bg-[var(--color-accent)]/10` looks like it works in code
+   * review but Tailwind emits NOTHING for an arbitrary var() value with slash
+   * opacity — 418 such classes across src/ produced no CSS at all, so every
+   * intended 10-25% tint (badges, icon chips, soft borders) silently rendered
+   * at full strength or not at all. These are the real declarations those
+   * classes thought they were writing; utilities like `bg-accent-10` map to
+   * them in tailwind.config.js.
+   */
+  --color-accent-5: rgba(217, 119, 6, 0.05);
+  --color-accent-10: rgba(217, 119, 6, 0.1);
+  --color-accent-20: rgba(217, 119, 6, 0.2);
+  --color-accent-25: rgba(217, 119, 6, 0.25);
+  --color-accent-30: rgba(217, 119, 6, 0.3);
+  --color-accent-40: rgba(217, 119, 6, 0.4);
+  --color-accent-50: rgba(217, 119, 6, 0.5);
+  --color-tech-5: rgba(13, 148, 136, 0.05);
+  --color-tech-10: rgba(13, 148, 136, 0.1);
+  --color-tech-20: rgba(13, 148, 136, 0.2);
+  --color-tech-30: rgba(13, 148, 136, 0.3);
+  --color-success-5: rgba(22, 163, 74, 0.05);
+  --color-success-10: rgba(22, 163, 74, 0.1);
+  --color-success-20: rgba(22, 163, 74, 0.2);
+  --color-success-30: rgba(22, 163, 74, 0.3);
+  --color-text-5: rgba(26, 26, 46, 0.05);
+  --color-text-10: rgba(26, 26, 46, 0.1);
+  --color-text-20: rgba(26, 26, 46, 0.2);
+  --color-text-30: rgba(26, 26, 46, 0.3);
+  --color-text-40: rgba(26, 26, 46, 0.4);
+  --color-text-45: rgba(26, 26, 46, 0.45);
+  --color-text-50: rgba(26, 26, 46, 0.5);
+  --color-text-60: rgba(26, 26, 46, 0.6);
+  --color-text-70: rgba(26, 26, 46, 0.7);
+  --color-text-80: rgba(26, 26, 46, 0.8);
+  --color-danger: #dc2626;
+  --color-danger-5: rgba(220, 38, 38, 0.05);
+  --color-danger-10: rgba(220, 38, 38, 0.1);
+  --color-surface-soft: rgba(255, 255, 255, 0.5);
 }
 
 .dark {
@@ -46,6 +99,36 @@
   --color-card: #1E293B;
   --color-border: rgba(226, 232, 240, 0.08);
   --color-glow: rgba(245, 158, 11, 0.05);
+
+  --color-accent-5: rgba(245, 158, 11, 0.05);
+  --color-accent-10: rgba(245, 158, 11, 0.1);
+  --color-accent-20: rgba(245, 158, 11, 0.2);
+  --color-accent-25: rgba(245, 158, 11, 0.25);
+  --color-accent-30: rgba(245, 158, 11, 0.3);
+  --color-accent-40: rgba(245, 158, 11, 0.4);
+  --color-accent-50: rgba(245, 158, 11, 0.5);
+  --color-tech-5: rgba(45, 212, 191, 0.05);
+  --color-tech-10: rgba(45, 212, 191, 0.1);
+  --color-tech-20: rgba(45, 212, 191, 0.2);
+  --color-tech-30: rgba(45, 212, 191, 0.3);
+  --color-success-5: rgba(34, 197, 94, 0.05);
+  --color-success-10: rgba(34, 197, 94, 0.1);
+  --color-success-20: rgba(34, 197, 94, 0.2);
+  --color-success-30: rgba(34, 197, 94, 0.3);
+  --color-text-5: rgba(226, 232, 240, 0.05);
+  --color-text-10: rgba(226, 232, 240, 0.1);
+  --color-text-20: rgba(226, 232, 240, 0.2);
+  --color-text-30: rgba(226, 232, 240, 0.3);
+  --color-text-40: rgba(226, 232, 240, 0.4);
+  --color-text-45: rgba(226, 232, 240, 0.45);
+  --color-text-50: rgba(226, 232, 240, 0.5);
+  --color-text-60: rgba(226, 232, 240, 0.6);
+  --color-text-70: rgba(226, 232, 240, 0.7);
+  --color-text-80: rgba(226, 232, 240, 0.8);
+  --color-danger: #f87171;
+  --color-danger-5: rgba(248, 113, 113, 0.05);
+  --color-danger-10: rgba(248, 113, 113, 0.1);
+  --color-surface-soft: rgba(15, 23, 42, 0.4);
 }
 
 body {

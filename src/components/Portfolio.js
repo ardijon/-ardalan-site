@@ -84,7 +84,7 @@ export default function Portfolio() {
   }
 
   return (
-    <section id="portfolio" className="py-16 sm:py-20 lg:py-28 bg-[var(--color-surface)]/50 scroll-mt-20">
+    <section id="portfolio" className="py-16 sm:py-20 lg:py-28 bg-surface-soft scroll-mt-20">
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8">
         <div
           ref={ref}
@@ -95,7 +95,7 @@ export default function Portfolio() {
           }}
         >
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-[var(--color-accent)]/10 rounded-full">
+            <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
               {t('portfolio.badge')}
             </span>
             <h2 className="mt-6 text-[clamp(1.8rem,5.5vw,4.5rem)] font-black text-[var(--color-primary)]">
@@ -108,10 +108,11 @@ export default function Portfolio() {
               <button
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
+                aria-pressed={activeCategory === cat}
                 className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
                   activeCategory === cat
-                    ? 'bg-[var(--color-accent)] text-white shadow-lg shadow-[var(--color-accent)]/20'
-                    : 'bg-[var(--color-text)]/5 text-[var(--color-text)]/60 hover:bg-[var(--color-text)]/10'
+                    ? 'bg-[var(--color-accent)] text-white shadow-lg shadow-accent-soft-20'
+                    : 'bg-text-soft-5 text-text-soft-60 hover:bg-text-soft-10'
                 }`}
               >
                 {cat}
@@ -158,7 +159,7 @@ export default function Portfolio() {
                         <Link
                           href={storeLink}
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-white bg-[var(--color-accent)] rounded-full hover:bg-[var(--color-accent)]/90 transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-white bg-[var(--color-accent)] rounded-full hover:bg-accent-soft-90 transition-colors"
                         >
                           {t('store.buyNow')}
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -168,7 +169,7 @@ export default function Portfolio() {
                       ) : (
                         <button
                           onClick={() => setSelected(project)}
-                          className="group/btn inline-flex items-center gap-1.5 text-white text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full hover:bg-[var(--color-accent)] hover:scale-105"
+                          className="group/btn inline-flex items-center gap-1.5 text-white text-sm opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 group-focus-within:translate-y-0 bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full hover:bg-[var(--color-accent)] hover:scale-105"
                         >
                           <span>{t('portfolio.viewProject')}</span>
                           <svg className="w-4 h-4 group-hover/btn:translate-x-1 rtl:group-hover/btn:-translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -187,7 +188,7 @@ export default function Portfolio() {
             <div className="text-center mt-10">
               <button
                 onClick={() => setShowCount(prev => prev + INITIAL_COUNT)}
-                className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-[var(--color-accent)] border-2 border-[var(--color-accent)]/30 rounded-xl hover:bg-[var(--color-accent)] hover:text-white hover:border-[var(--color-accent)] hover:shadow-lg hover:shadow-[var(--color-accent)]/20 hover:-translate-y-1 transition-all duration-300"
+                className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-[var(--color-accent)] border-2 border-accent-soft-30 rounded-xl hover:bg-[var(--color-accent)] hover:text-white hover:border-[var(--color-accent)] hover:shadow-lg hover:shadow-accent-soft-20 hover:-translate-y-1 transition-all duration-300"
               >
                 <span>{t('portfolio.more')}</span>
                 <svg className="w-4 h-4 group-hover:translate-y-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
