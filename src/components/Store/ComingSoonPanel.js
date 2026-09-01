@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Countdown from '@/components/Countdown'
 import NotifyForm from './NotifyForm'
 import { useI18n } from '@/lib/i18n/I18nProvider'
+import { summaryPriceLine } from '@/lib/number-fa'
 
 /**
  * Replaces the pricing table and purchase form on a product that is not out yet.
@@ -18,7 +19,7 @@ export default function ComingSoonPanel({ product }) {
   const isRtl = dir === 'rtl'
 
   const summary = product.priceSummary
-  const priceLabel = summary?.display?.[locale] || summary?.display?.en || ''
+  const priceLabel = summaryPriceLine(summary, locale)
   const priceNote = summary?.note?.[locale] || summary?.note?.en || ''
 
   // Rahyar sells in a conversation, not from a page: the ask is a direct call,

@@ -22,6 +22,7 @@ import {
   serializeProduct,
   productWarnings,
 } from '@/lib/product-shape'
+import { formatFaNumber, formatEnNumber } from '@/lib/number-fa'
 
 /**
  * The product editor.
@@ -102,6 +103,31 @@ export default function ProductForm({ initial, saving, onSave, onCancel }) {
 
   function change(path, value) {
     setForm(prev => setNested(prev, path, value))
+  }
+
+  // Nothing but digits, separators and whitespace — i.e. a display field the
+  // admin left empty or filled with a raw number. Anything with letters ("۳ تا
+  // ۳.۵ میلیون", "تماس برای قیمت", "$109") is deliberate copy and is left alone.
+  const BARE_DISPLAY = /^[\d.,\s٬،]*$/
+
+  /**
+   * Change a plan's numeric price and keep its display fields honest.
+   *
+   * Before this, changing «قیمت (عدد)» left «قیمت نمایشی (فارسی)» wherever it
+   * was — the typed price went live while the site kept showing (or, worse,
+   * blank) — and typing the raw number into the display box yourself is how a
+   * Persian page ended up printing "9900000" with no grouping and Latin digits.
+   * When the display is empty or already just a number, it now follows the
+   * number automatically: Persian digits with grouping for fa, grouped Latin
+   * for en. A display someone actually wrote is never overwritten.
+   */
+  function changePrice(base, value) {
+    change(`${base}.price`, value)
+    if (!(Number(value) > 0)) return
+    const fa = String(readPath(form, `${base}.priceDisplay.fa`) ?? '').trim()
+    const en = String(readPath(form, `${base}.priceDisplay.en`) ?? '').trim()
+    if (BARE_DISPLAY.test(fa)) change(`${base}.priceDisplay.fa`, formatFaNumber(value))
+    if (BARE_DISPLAY.test(en)) change(`${base}.priceDisplay.en`, formatEnNumber(value))
   }
 
   function changeArrayItem(path, index, value) {
@@ -483,10 +509,10 @@ export default function ProductForm({ initial, saving, onSave, onCancel }) {
               <NumberField
                 label="عدد قیمت (برای گوگل)"
                 value={form.priceSummary.price}
-                onChange={v => change('priceSummary.price', v)}
+                onChange={v => changePrice('priceSummary', v)}
                 hint={form.pricingMode === 'contact' ? 'در حالت «تماس برای قیمت» ذخیره نمی‌شود' : 'به تومان'}
               />
-              <InputField label="نمایش قیمت (فارسی)" value={form.priceSummary.display.fa} onChange={v => change('priceSummary.display.fa', v)} />
+              <InputField label="نمایش قیمت (فارسی)" value={form.priceSummary.display.fa} onChange={v => change('priceSummary.display.fa', v)} hint="خالی یا عدد خام بماند، خودکار با ارقام فارسی و جداکننده پر می‌شود" />
               <InputField label="نمایش قیمت (انگلیسی)" value={form.priceSummary.display.en} onChange={v => change('priceSummary.display.en', v)} dir="ltr" {...pairProps('priceSummary.display')} />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -502,10 +528,10 @@ export default function ProductForm({ initial, saving, onSave, onCancel }) {
                 <NumberField
                   label="قیمت (عدد)"
                   value={form.pricing[plan].price}
-                  onChange={v => change(`pricing.${plan}.price`, v)}
+                  onChange={v => changePrice(`pricing.${plan}`, v)}
                   hint="به تومان — مبلغ واریز از این محاسبه می‌شود"
                 />
-                <InputField label="قیمت نمایشی (فارسی)" value={form.pricing[plan].priceDisplay.fa} onChange={v => change(`pricing.${plan}.priceDisplay.fa`, v)} />
+                <InputField label="قیمت نمایشی (فارسی)" value={form.pricing[plan].priceDisplay.fa} onChange={v => change(`pricing.${plan}.priceDisplay.fa`, v)} hint="خالی یا عدد خام بماند، خودکار با ارقام فارسی و جداکننده پر می‌شود" />
                 <InputField label="قیمت نمایشی (انگلیسی)" value={form.pricing[plan].priceDisplay.en} onChange={v => change(`pricing.${plan}.priceDisplay.en`, v)} dir="ltr" {...pairProps(`pricing.${plan}.priceDisplay`)} />
               </div>
               <div className="grid grid-cols-2 gap-3">

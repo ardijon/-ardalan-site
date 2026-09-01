@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
+import { planPriceLine, summaryPriceLine } from '@/lib/number-fa'
 
 /**
  * The landing page's bridge into the store.
@@ -148,12 +149,9 @@ function ProductRow({ product, step, isRtl, locale, t }) {
 
   // Two pricing shapes: `pricing.starter/pro` for anything purchasable, a flat
   // `priceSummary` for a range or "contact for pricing".
-  const planPrice = product.pricing?.starter?.priceDisplay?.[locale]
-    || product.pricing?.starter?.priceDisplay?.en
-    || product.pricing?.pro?.priceDisplay?.[locale]
-    || ''
+  const planPrice = planPriceLine(product.pricing?.starter || product.pricing?.pro, locale)
   const planPeriod = product.pricing?.starter?.period?.[locale] || product.pricing?.pro?.period?.[locale] || ''
-  const summaryPrice = product.priceSummary?.display?.[locale] || product.priceSummary?.display?.en || ''
+  const summaryPrice = summaryPriceLine(product.priceSummary, locale)
 
   return (
     <li

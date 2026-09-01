@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n/I18nProvider'
+import { planPriceLine, summaryPriceLine } from '@/lib/number-fa'
 
 export default function ProductCard({ product, featured = false }) {
   const { t, dir, locale } = useI18n()
@@ -14,9 +15,9 @@ export default function ProductCard({ product, featured = false }) {
   // through PurchaseForm, and a flat `priceSummary` for products that are only a
   // number on a page (a range, or "contact for pricing").
   const hasPlanPricing = Boolean(product.pricing?.pro || product.pricing?.starter)
-  const priceDisplay = product.pricing?.starter?.priceDisplay?.[locale] || product.pricing?.starter?.priceDisplay?.en || product.pricing?.pro?.priceDisplay?.[locale] || ''
+  const priceDisplay = planPriceLine(product.pricing?.starter || product.pricing?.pro, locale)
   const periodDisplay = product.pricing?.starter?.period?.[locale] || product.pricing?.pro?.period?.[locale] || ''
-  const summaryLabel = product.priceSummary?.display?.[locale] || product.priceSummary?.display?.en || ''
+  const summaryLabel = summaryPriceLine(product.priceSummary, locale)
 
   const audience = product.audience?.[locale] || product.audience?.en || ''
 

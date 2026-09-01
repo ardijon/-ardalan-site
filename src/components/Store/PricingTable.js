@@ -1,6 +1,7 @@
 'use client'
 
 import { useI18n } from '@/lib/i18n/I18nProvider'
+import { priceText } from '@/lib/number-fa'
 
 const comparisonFeatures = [
   {
@@ -119,7 +120,7 @@ export default function PricingTable({ pricing, selectedPlan, onSelectPlan }) {
 
               <div className="mb-4 whitespace-nowrap">
                 <span className="text-3xl font-black text-[var(--color-primary)]">
-                  {plan.priceDisplay?.[locale] || plan.priceDisplay?.en || ''}
+                  {priceText(plan.priceDisplay?.[locale] || plan.priceDisplay?.en, plan.price, locale)}
                 </span>
                 {plan.period?.[locale] && (
                   <span className={`text-sm text-[var(--color-text)]/50 ${isRtl ? 'ml-1' : 'mr-1'}`}>

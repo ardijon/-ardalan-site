@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ReceiptUpload from './ReceiptUpload'
 import { useI18n } from '@/lib/i18n/I18nProvider'
+import { planPriceLine } from '@/lib/number-fa'
 
 export default function PurchaseForm({ product, selectedPlan }) {
   const { t, dir, locale } = useI18n()
@@ -37,7 +38,7 @@ export default function PurchaseForm({ product, selectedPlan }) {
   }
 
   const planInfo = product.pricing[selectedPlan]
-  const priceDisplay = planInfo?.priceDisplay?.[locale] || planInfo?.priceDisplay?.en || ''
+  const priceDisplay = planPriceLine(planInfo, locale)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
