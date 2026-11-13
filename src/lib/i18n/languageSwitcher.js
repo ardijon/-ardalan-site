@@ -8,7 +8,7 @@ export default function LanguageSwitcher() {
   return (
     <button
       onClick={toggleLocale}
-      className="p-2 rounded-xl text-text-soft-60 hover:text-[var(--color-accent)] hover:bg-text-soft-5 transition-all text-sm font-medium"
+      className="min-w-11 h-11 px-2 flex items-center justify-center rounded-xl text-text-soft-60 hover:text-[var(--color-accent)] hover:bg-text-soft-5 transition-all text-sm font-medium"
       aria-label={locale === 'fa' ? 'English' : 'فارسی'}
     >
       {locale === 'fa' ? 'EN' : 'FA'}

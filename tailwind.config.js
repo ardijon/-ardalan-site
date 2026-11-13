@@ -100,10 +100,16 @@ module.exports = {
         line: 'var(--color-border)',
         card: 'var(--color-card)',
         'surface-soft': 'var(--color-surface-soft)',
+        // Translucent page background for the scrolled header. Using the text
+        // color here (the old bg-text-soft-80) painted a dark bar under dark
+        // links in light mode — and the inverse in dark mode.
+        'page-soft': {
+          80: 'var(--color-bg-80)',
+        },
       },
       fontFamily: {
-        display: ['Vazirmatn', 'system-ui', 'sans-serif'],
-        body: ['Vazirmatn', 'system-ui', 'sans-serif'],
+        display: ['Dastkhat', 'Vazirmatn', 'system-ui', 'sans-serif'],
+        body: ['Dastkhat', 'Vazirmatn', 'system-ui', 'sans-serif'],
       },
     },
   },

@@ -12,18 +12,19 @@ import { socialLinks } from '@/lib/socials'
 /**
  * Anchor sections only, in the order they appear on the landing page.
  *
- * The store used to be the fourth of eight equal-weight items here, which is how
- * the only page that sells anything ended up looking like a footnote. It now gets
- * a CTA button of its own (STORE_HREF below) and is deliberately absent from this
- * list.
+ * The store used to be an equal-weight item here, which is how the only page
+ * that sells anything ended up looking like a footnote. It now gets a CTA button
+ * of its own (STORE_HREF below) and is deliberately absent from this list.
  *
- * `#resume` is also gone: a résumé is proof, not a destination, so it is reached
- * from inside About instead of competing with the six real stops. Order tracking
- * left too — it is an after-sale tool and lives in the footer.
+ * Portfolio and Resume were removed from the landing page entirely, and Blog was
+ * relocated to its own route (/blog) — so Blog is a page link spliced into the
+ * nav below, not an anchor. Order tracking is an after-sale tool and lives in the
+ * footer.
  */
-const navSections = ['about', 'products', 'services', 'portfolio', 'blog', 'contact']
+const navSections = ['about', 'products', 'services', 'contact']
 
 const STORE_HREF = '/store'
+const BLOG_HREF = '/blog'
 
 export default function Header() {
   const { t } = useI18n()
@@ -46,11 +47,18 @@ export default function Header() {
 
   // Off the landing page a bare `#about` resolves against the current route, so
   // clicking it on /store asked for /store#about and did nothing.
-  const navItems = navSections.map(id => ({
+  const anchorItems = navSections.map(id => ({
     id,
     href: isHome ? `#${id}` : `/#${id}`,
     label: t(`header.nav.${id}`),
   }))
+  // Blog is a page now, not a section. Splice it back between Services and
+  // Contact so the nav keeps the order visitors already know.
+  const navItems = [
+    ...anchorItems.slice(0, 3),
+    { id: 'blog', href: BLOG_HREF, label: t('header.nav.blog'), route: true },
+    ...anchorItems.slice(3),
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -116,7 +124,7 @@ export default function Header() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled ? 'bg-text-soft-80 backdrop-blur-xl shadow-sm' : 'bg-transparent'
+          scrolled ? 'bg-page-soft-80 backdrop-blur-xl shadow-sm' : 'bg-transparent'
         }`}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -129,7 +137,7 @@ export default function Header() {
             <a href="/" className="shrink-0"><LogoV1 /></a>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 text-[var(--color-text)] rounded-lg hover:bg-text-soft-5 transition-colors"
+              className="w-11 h-11 flex items-center justify-center text-[var(--color-text)] rounded-lg hover:bg-text-soft-5 transition-colors"
               aria-label={menuOpen ? t('header.closeLabel') : t('header.menuLabel')}
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
@@ -151,7 +159,7 @@ export default function Header() {
 
             <nav className="flex items-center gap-6 lg:gap-8" aria-label={t('header.menuLabel')}>
               {navItems.map((item) => {
-                const isActive = isHome && activeSection === item.id
+                const isActive = item.route ? Boolean(pathname?.startsWith(item.href)) : (isHome && activeSection === item.id)
                 return (
                   <Link
                     key={item.href}
@@ -210,7 +218,7 @@ export default function Header() {
             <button
               ref={closeRef}
               onClick={() => setMenuOpen(false)}
-              className="p-2 -ml-2 text-text-soft-50 hover:text-[var(--color-text)] rounded-lg hover:bg-text-soft-5 transition-colors"
+              className="w-11 h-11 -ml-2 flex items-center justify-center text-text-soft-50 hover:text-[var(--color-text)] rounded-lg hover:bg-text-soft-5 transition-colors"
               aria-label={t('header.closeLabel')}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -239,7 +247,7 @@ export default function Header() {
             </Link>
 
             {navItems.map((item) => {
-              const isActive = isHome && activeSection === item.id
+              const isActive = item.route ? Boolean(pathname?.startsWith(item.href)) : (isHome && activeSection === item.id)
               return (
                 <Link
                   key={item.href}
@@ -267,7 +275,7 @@ export default function Header() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl border border-[var(--color-border)] text-text-soft-40 hover:text-[var(--color-accent)] hover:border-accent-soft-30 flex items-center justify-center transition-all"
+                  className="w-11 h-11 rounded-xl border border-[var(--color-border)] text-text-soft-40 hover:text-[var(--color-accent)] hover:border-accent-soft-30 flex items-center justify-center transition-all"
                   aria-label={t(`socialLabels.${social.key}`)}
                 >
                   {social.icon()}

@@ -11,6 +11,8 @@ export default async function sitemap() {
     // six entries that were discarded as noise on ingestion. The homepage's
     // sections are reachable from the single / entry.
     { url: `${baseUrl}/store`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    // The blog listing is its own page now, not a #blog fragment on the homepage.
+    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
   ]
 
   const blogPages = getAllSlugs().map(slug => ({

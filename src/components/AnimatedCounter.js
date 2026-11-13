@@ -4,22 +4,16 @@ import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
 const FA_DIGITS = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹']
-const AR_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩']
-
 function toLocalizedNum(n, locale) {
   if (locale === 'en') return String(n)
-  const digits = locale === 'ar' ? AR_DIGITS : FA_DIGITS
-  return String(n).split('').map(d => digits[parseInt(d, 10)] ?? d).join('')
+  return String(n).split('').map(d => FA_DIGITS[parseInt(d, 10)] ?? d).join('')
 }
 
 export default function AnimatedCounter({ value, prefix = '', suffix = '', duration = 2000 }) {
   const [display, setDisplay] = useState(0)
   const { locale } = useI18n()
   // The animation always runs FROM the value currently on screen TO the new
-  // one. `duration` in the deps used to restart the effect on every hover
-  // (About's StatCard passes 800 on hover, 2000 off it), and since `display`
-  // restarted from 0 the numbers visibly flashed to zero each time a cursor
-  // crossed a card.
+  // one, so a value or duration change mid-count never flashes back to zero.
   const fromRef = useRef(0)
 
   useEffect(() => {

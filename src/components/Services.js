@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback, useRef } from 'react'
-import Link from 'next/link'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
 
@@ -51,31 +49,6 @@ export default function Services() {
   const { t } = useI18n()
   const [ref, visible] = useInView({ threshold: 0.08 })
   const items = t('services.items')
-  const cardsRef = useRef([])
-
-  const handleMouseMove = useCallback((e, index) => {
-    const card = cardsRef.current[index]
-    if (!card) return
-
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    const centerX = rect.width / 2
-    const centerY = rect.height / 2
-    const rotateX = (y - centerY) / 20
-    const rotateY = (centerX - x) / 20
-
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`
-    card.style.boxShadow = `0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 40px rgba(217, 119, 6, 0.1)`
-  }, [])
-
-  const handleMouseLeave = useCallback((index) => {
-    const card = cardsRef.current[index]
-    if (!card) return
-
-    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
-    card.style.boxShadow = 'none'
-  }, [])
 
   return (
     <section id="services" className="py-16 sm:py-20 lg:py-28 scroll-mt-20">
@@ -85,14 +58,14 @@ export default function Services() {
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(24px)',
-            transition: 'opacity 0.7s ease, transform 0.7s ease',
+            transition: 'opacity 0.5s ease, transform 0.5s ease',
           }}
         >
           <div className="text-center mb-14">
             <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
               {t('services.badge')}
             </span>
-            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] text-balance">
+            <h2 className="mt-6 text-[clamp(1.75rem,4vw,2.75rem)] font-black text-[var(--color-primary)] text-balance">
               {t('services.title')}
             </h2>
           </div>
@@ -103,47 +76,25 @@ export default function Services() {
               return (
               <div
                 key={service.title}
-                ref={el => cardsRef.current[i] = el}
                 style={{
                   opacity: visible ? 1 : 0,
                   transform: visible ? 'translateY(0)' : 'translateY(24px)',
-                  transition: `opacity 0.6s ease ${i * 120}ms, transform 0.6s ease ${i * 120}ms, box-shadow 0.3s ease`,
-                  transformStyle: 'preserve-3d',
+                  transition: `opacity 0.5s ease ${i * 50}ms, transform 0.5s ease ${i * 50}ms`,
                 }}
-                className="group relative p-7 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] transition-all duration-300 cursor-pointer"
-                onMouseMove={(e) => handleMouseMove(e, i)}
-                onMouseLeave={() => handleMouseLeave(i)}
+                className="p-7 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:border-accent-soft-20 hover:shadow-md transition-all duration-300"
               >
-                <div className={`w-12 h-12 rounded-xl ${meta.bgColor} ${meta.color} flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`} aria-hidden="true">
+                <div className={`w-12 h-12 rounded-xl ${meta.bgColor} ${meta.color} flex items-center justify-center mb-5`} aria-hidden="true">
                   {meta.icon}
                 </div>
                 <h3 className="text-lg font-bold text-[var(--color-text)] mb-2.5">
                   {service.title}
                 </h3>
-                <p className="text-sm text-text-soft-50 leading-relaxed">
+                <p className="text-base text-text-soft-50 leading-relaxed">
                   {service.desc}
                 </p>
               </div>
               )
             })}
-          </div>
-
-          {/* Custom work and ready-made products are two different asks, and a
-              visitor reading a services grid has no signal that the second one
-              exists. This closes that exit. */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 text-center">
-            <span className="text-sm text-text-soft-50">
-              {t('services.storeBridge')}
-            </span>
-            <Link
-              href="/store"
-              className="group inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-accent)] hover:underline"
-            >
-              {t('services.storeBridgeCta')}
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" className="rtl:rotate-180">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </Link>
           </div>
         </div>
       </div>

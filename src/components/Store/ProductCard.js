@@ -40,7 +40,10 @@ export default function ProductCard({ product, featured = false }) {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-7xl opacity-10 group-hover:scale-110 transition-transform duration-500" aria-hidden="true">📦</span>
+            <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="opacity-10 text-[var(--color-primary)]" aria-hidden="true">
+              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+              <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" />
+            </svg>
             <span className="sr-only">{locale === 'fa' ? 'پیش‌نمایش موجود نیست' : 'No preview available'}</span>
           </div>
         )}
@@ -138,6 +141,7 @@ export default function ProductCard({ product, featured = false }) {
 
           <Link
             href={`/store/${product.slug}`}
+            prefetch={false}
             className={`inline-flex shrink-0 items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl active:scale-95 transition-all ${
               isComingSoon
                 ? 'text-[var(--color-accent)] border border-accent-soft-30 hover:bg-accent-soft-10'

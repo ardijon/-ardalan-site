@@ -3,7 +3,19 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
-import TrustSeal from './TrustSeal'
+
+// Persian and Arabic digits are normalized before validation so a number typed
+// as ۰۹۱۲… on a Persian keyboard passes the same check as 0912… .
+const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
+const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩'
+const PHONE_RE = /^(?:\+98|98|0)?9\d{9}$/
+
+function normalizePhone(value) {
+  return value
+    .replace(/[۰-۹]/g, d => String(FA_DIGITS.indexOf(d)))
+    .replace(/[٠-٩]/g, d => String(AR_DIGITS.indexOf(d)))
+    .replace(/[\s\-()]/g, '')
+}
 
 const contactIcons = [
   <svg key="phone" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -29,8 +41,11 @@ export default function Contact() {
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(false)
-  const [validationError, setValidationError] = useState('')
+  const [errors, setErrors] = useState({})
   const buttonRef = useRef(null)
+  const nameRef = useRef(null)
+  const phoneRef = useRef(null)
+  const messageRef = useRef(null)
   const timeoutRefs = useRef([])
 
   // Cleanup all timeouts on unmount
@@ -65,21 +80,33 @@ export default function Contact() {
     }, 600)
   }, [trackTimeout])
 
+  const clearError = useCallback((field) => {
+    setErrors(prev => (prev[field] ? { ...prev, [field]: undefined } : prev))
+  }, [])
+
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     const form = e.currentTarget
     const data = new FormData(form)
     const name = (data.get('name') || '').toString().trim()
-    const phone = (data.get('phone') || '').toString().trim()
+    const phone = normalizePhone((data.get('phone') || '').toString().trim())
     const message = (data.get('message') || '').toString().trim()
 
-    if (!name || !phone || !message) {
-      setValidationError(t('contact.form.validationError'))
-      trackTimeout(() => setValidationError(''), 3000)
+    const nextErrors = {}
+    if (!name) nextErrors.name = t('contact.form.nameRequired')
+    if (!phone) nextErrors.phone = t('contact.form.phoneRequired')
+    else if (!PHONE_RE.test(phone)) nextErrors.phone = t('contact.form.phoneInvalid')
+    if (!message) nextErrors.message = t('contact.form.messageRequired')
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors)
+      const first = ['name', 'phone', 'message'].find(f => nextErrors[f])
+      const fieldRefs = { name: nameRef, phone: phoneRef, message: messageRef }
+      fieldRefs[first].current?.focus()
       return
     }
 
-    setValidationError('')
+    setErrors({})
     setSending(true)
     setError(false)
 
@@ -118,13 +145,10 @@ export default function Contact() {
             <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
               {t('contact.badge')}
             </span>
-            <div className="flex items-center justify-center gap-3 mt-6">
-              <TrustSeal size={32} />
-              <h2 className="text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)]">
-                {t('contact.title')}
-              </h2>
-            </div>
-            <p className="mt-4 text-text-soft-50">
+            <h2 className="mt-6 text-[clamp(1.75rem,4vw,2.75rem)] font-black text-[var(--color-primary)]">
+              {t('contact.title')}
+            </h2>
+            <p className="mt-4 text-base sm:text-lg text-text-soft-50">
               {t('contact.subtitle')}
             </p>
           </div>
@@ -144,7 +168,7 @@ export default function Contact() {
                     style={{
                       opacity: visible ? 1 : 0,
                       transform: visible ? 'translateY(0)' : 'translateY(16px)',
-                      transition: `opacity 0.5s ease ${200 + i * 100}ms, transform 0.5s ease ${200 + i * 100}ms`,
+                      transition: `opacity 0.5s ease ${i * 60}ms, transform 0.5s ease ${i * 60}ms`,
                     }}
                     className="flex items-center gap-4 p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
                   >
@@ -171,44 +195,77 @@ export default function Contact() {
               style={{
                 opacity: visible ? 1 : 0,
                 transform: visible ? 'translateY(0)' : 'translateY(16px)',
-                transition: `opacity 0.5s ease 650ms, transform 0.5s ease 650ms`,
+                transition: 'opacity 0.5s ease 150ms, transform 0.5s ease 150ms',
               }}
             >
               <div className="col-span-full sm:col-span-1">
-                <label htmlFor="contact-name" className="sr-only">{t('contact.form.name')}</label>
+                <label htmlFor="contact-name" className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
+                  {t('contact.form.name')}
+                </label>
                 <input
+                  ref={nameRef}
                   id="contact-name"
                   name="name"
                   type="text"
                   autoComplete="name"
-                  placeholder={t('contact.form.name')}
+                  placeholder={t('contact.form.namePlaceholder')}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all"
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? 'contact-name-error' : undefined}
+                  onChange={() => clearError('name')}
+                  className={`w-full px-4 py-3 rounded-xl border bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-45 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all ${errors.name ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
                 />
+                {errors.name && (
+                  <p id="contact-name-error" role="alert" className="mt-1.5 text-xs font-medium text-[var(--color-danger)]">
+                    {errors.name}
+                  </p>
+                )}
               </div>
               <div className="col-span-full sm:col-span-1">
-                <label htmlFor="contact-phone" className="sr-only">{t('contact.form.phone')}</label>
+                <label htmlFor="contact-phone" className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
+                  {t('contact.form.phone')}
+                </label>
                 <input
+                  ref={phoneRef}
                   id="contact-phone"
                   name="phone"
                   type="tel"
                   autoComplete="tel"
                   inputMode="tel"
-                  placeholder={t('contact.form.phone')}
+                  placeholder={t('contact.form.phonePlaceholder')}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all"
+                  aria-invalid={Boolean(errors.phone)}
+                  aria-describedby={errors.phone ? 'contact-phone-error' : undefined}
+                  onChange={() => clearError('phone')}
+                  className={`w-full px-4 py-3 rounded-xl border bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-45 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all ${errors.phone ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
                 />
+                {errors.phone && (
+                  <p id="contact-phone-error" role="alert" className="mt-1.5 text-xs font-medium text-[var(--color-danger)]">
+                    {errors.phone}
+                  </p>
+                )}
               </div>
               <div className="col-span-full">
-                <label htmlFor="contact-message" className="sr-only">{t('contact.form.message')}</label>
+                <label htmlFor="contact-message" className="block text-sm font-medium text-[var(--color-text)] mb-1.5">
+                  {t('contact.form.message')}
+                </label>
                 <textarea
+                  ref={messageRef}
                   id="contact-message"
                   name="message"
-                  placeholder={t('contact.form.message')}
+                  placeholder={t('contact.form.messagePlaceholder')}
                   rows="4"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-30 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all resize-none"
+                  aria-invalid={Boolean(errors.message)}
+                  aria-describedby={errors.message ? 'contact-message-error' : undefined}
+                  onChange={() => clearError('message')}
+                  className={`w-full px-4 py-3 rounded-xl border bg-[var(--color-bg)] text-sm text-[var(--color-text)] placeholder:text-text-soft-45 focus:outline-none focus:border-[var(--color-accent)] focus:ring-1 focus:ring-accent-soft-20 transition-all resize-none ${errors.message ? 'border-[var(--color-danger)]' : 'border-[var(--color-border)]'}`}
                 />
+                {errors.message && (
+                  <p id="contact-message-error" role="alert" className="mt-1.5 text-xs font-medium text-[var(--color-danger)]">
+                    {errors.message}
+                  </p>
+                )}
               </div>
               <button
                 ref={buttonRef}
@@ -247,15 +304,6 @@ export default function Contact() {
                   className="col-span-full mt-2 text-sm font-medium text-red-600 dark:text-red-400 text-center"
                 >
                   {t('contact.form.error')}
-                </p>
-              )}
-
-              {validationError && (
-                <p
-                  role="status"
-                  className="col-span-full mt-2 text-sm font-medium text-amber-600 dark:text-amber-400 text-center"
-                >
-                  {validationError}
                 </p>
               )}
             </form>

@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dastkhat — the whole-system face, matching the reference site (eskandari.prof).
+   One variable woff2 covering weights 100–900. Vazirmatn stays behind it as a
+   graceful fallback for any glyph Dastkhat lacks, so nothing renders as tofu. */
+@font-face {
+  font-family: 'Dastkhat';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/dastkhat.woff2') format('woff2');
+}
+
 @font-face {
   font-family: 'Vazirmatn';
   font-style: normal;
@@ -85,6 +96,7 @@
   --color-danger-5: rgba(220, 38, 38, 0.05);
   --color-danger-10: rgba(220, 38, 38, 0.1);
   --color-surface-soft: rgba(255, 255, 255, 0.5);
+  --color-bg-80: rgba(248, 246, 243, 0.8);
 }
 
 .dark {
@@ -129,12 +141,13 @@
   --color-danger-5: rgba(248, 113, 113, 0.05);
   --color-danger-10: rgba(248, 113, 113, 0.1);
   --color-surface-soft: rgba(15, 23, 42, 0.4);
+  --color-bg-80: rgba(11, 17, 32, 0.8);
 }
 
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Dastkhat', 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   /*
    * No `direction` here on purpose.
    *
@@ -168,7 +181,7 @@ body {
 }
 
 html[lang="en"] body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Vazirmatn', sans-serif;
+  font-family: 'Dastkhat', 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -260,17 +273,6 @@ button, a, input, textarea, select {
   }
 }
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Gradient Text Utility */
 .gradient-text {
   background-clip: text;
@@ -290,44 +292,11 @@ button, a, input, textarea, select {
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
-/* Store hero: shimmer on dark text */
-@keyframes shimmerPass {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
-}
-
-.store-hero-shimmer {
-  position: relative;
-  display: inline;
-  background: linear-gradient(
-    110deg,
-    var(--color-primary) 0%,
-    var(--color-primary) 40%,
-    rgba(251,191,36,0.6) 50%,
-    var(--color-primary) 60%,
-    var(--color-primary) 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmerPass 4s ease-in-out infinite;
-}
-
-/* Store hero: animated gradient border */
-@keyframes borderGlow {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Store hero: slow-moving background */
-@keyframes bgDrift {
-  0%   { background-position: 0% 0%; }
-  25%  { background-position: 100% 50%; }
-  50%  { background-position: 50% 100%; }
-  75%  { background-position: 0% 50%; }
-  100% { background-position: 0% 0%; }
+/* Store hero: the accented run of the headline (the `*...*` part of
+   store.heroTitle). Static accent color — the infinite shimmer pass it
+   replaced ran forever on the store page for no informational gain. */
+.store-hero-gradient {
+  color: var(--color-accent);
 }
 
 .store-hero-box {
@@ -335,8 +304,6 @@ button, a, input, textarea, select {
   border-radius: 1.5rem;
   padding: 2.5rem 1.5rem;
   background: linear-gradient(135deg, rgba(217,119,6,0.06), rgba(13,148,136,0.04), rgba(245,158,11,0.06), rgba(13,148,136,0.03));
-  background-size: 300% 300%;
-  animation: bgDrift 12s ease infinite;
 }
 
 .store-hero-box::before {
@@ -346,8 +313,6 @@ button, a, input, textarea, select {
   border-radius: 1.5rem;
   padding: 2px;
   background: linear-gradient(135deg, #D97706, #0D9488, #F59E0B, #D97706);
-  background-size: 300% 300%;
-  animation: borderGlow 5s ease infinite;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -364,3 +329,33 @@ button, a, input, textarea, select {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* HeroBanner — the product stage's motion. Every animation here is decorative
+   and is collapsed to a single frame by the global prefers-reduced-motion rule
+   above; autoplay is separately disabled in the component under the same query. */
+@keyframes heroDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(3%, -2%, 0) scale(1.06); }
+}
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+@keyframes heroKenBurns {
+  from { transform: scale(1.03); }
+  to { transform: scale(1.09); }
+}
+@keyframes heroPing {
+  0% { transform: scale(1); opacity: 0.7; }
+  80%, 100% { transform: scale(2.4); opacity: 0; }
+}
+
+.hero-aurora { animation: heroDrift 16s ease-in-out infinite; }
+.hero-enter { animation: heroFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.hero-float { animation: heroFloat 5.5s ease-in-out infinite; }
+.hero-kenburns { animation: heroKenBurns 14s ease-in-out infinite alternate; }
+.hero-ping { animation: heroPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; }

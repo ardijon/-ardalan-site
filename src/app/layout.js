@@ -76,7 +76,7 @@ export default function RootLayout({ children }) {
   }
 
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning>
+    <html lang="fa" dir="rtl" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#F8F6F3" />
         <link rel="icon" href="/favicon-32.png" sizes="32x32" />
@@ -130,6 +130,41 @@ export default function RootLayout({ children }) {
               // we use documentElement instead. The inline style does not conflict
               // with React's dir attribute management.
               document.documentElement.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
+            })();
+          `
+        }} />
+        {/* Stale-chunk self-heal. Prerendered pages ship with a one-year CDN
+            cache (s-maxage=31536000), so a visitor can hold HTML from build A
+            while the server already serves build B. The first menu click then
+            asks the router for chunk hashes build B no longer has, which throws
+            ChunkLoadError and blanks the page — an async import failure the
+            error boundary never sees. Reload once to fetch matching HTML and
+            chunks. The timestamp cooldown stops a reload loop if the server is
+            genuinely down, yet still lets a later deploy in the same tab heal. */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              var KEY = '__chunkReloadAt';
+              var COOLDOWN = 15000;
+              function isChunkError(text) {
+                return /ChunkLoadError|Loading chunk|Loading CSS chunk|dynamically imported module|module script failed/i.test(text || '');
+              }
+              function recover() {
+                var now = Date.now();
+                try {
+                  var last = Number(sessionStorage.getItem(KEY) || 0);
+                  if (now - last < COOLDOWN) return;
+                  sessionStorage.setItem(KEY, String(now));
+                } catch (e) { /* storage blocked: allow the single reload */ }
+                window.location.reload();
+              }
+              window.addEventListener('error', function(e) {
+                if (isChunkError(e.message)) recover();
+              });
+              window.addEventListener('unhandledrejection', function(e) {
+                var r = e.reason;
+                if (isChunkError(r && (r.message || r.name || String(r)))) recover();
+              });
             })();
           `
         }} />

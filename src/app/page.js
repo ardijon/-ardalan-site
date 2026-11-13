@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import GirihDivider from '@/components/GirihDivider'
+import ValueBand from '@/components/ValueBand'
 import { getAllProducts } from '@/lib/products'
 import { toLadderSummary } from '@/lib/product-summary'
 
@@ -14,14 +15,14 @@ import { toLadderSummary } from '@/lib/product-summary'
 
 // Dynamic imports for below-fold components to reduce initial bundle size.
 //
-// Deliberately WITHOUT `ssr: false`. These eight sections carry every word of
+// Deliberately WITHOUT `ssr: false`. These sections carry every word of
 // content on the page, and `ssr: false` kept all of it out of the server HTML —
 // Googlebot, and every link-preview bot that does not run JavaScript, saw the
-// hero and eight empty skeleton divs. Code splitting survives here without it;
+// hero and empty skeleton divs. Code splitting survives here without it;
 // only the server render was being thrown away. Re-adding `ssr: false` would
 // make the page invisible again, so `__tests__/homepage-ssr.test.js` guards it.
 //
-// Safe to server-render because none of the eight touch `window`/`document`/
+// Safe to server-render because none of them touch `window`/`document`/
 // storage at module or render time, and I18nProvider starts at `useState('fa')`
 // and only reads localStorage inside an effect — so the server and the client's
 // first render agree and there is no hydration mismatch to trade for the SEO.
@@ -35,20 +36,8 @@ const Services = dynamic(() => import('@/components/Services'), {
 
 // The bridge from the personal landing into the store. Sits directly after
 // About: the bio is the proof, so the products come while that proof is still
-// on screen rather than after four more sections.
+// on screen.
 const Products = dynamic(() => import('@/components/Products'), {
-  loading: () => <div className="h-64 skeleton" />,
-})
-
-const Portfolio = dynamic(() => import('@/components/Portfolio'), {
-  loading: () => <div className="h-64 skeleton" />,
-})
-
-const Resume = dynamic(() => import('@/components/Resume'), {
-  loading: () => <div className="h-64 skeleton" />,
-})
-
-const Blog = dynamic(() => import('@/components/Blog'), {
   loading: () => <div className="h-64 skeleton" />,
 })
 
@@ -81,27 +70,13 @@ export default function Home() {
         <Suspense fallback={<div className="h-96 skeleton" />}>
           <About />
         </Suspense>
-        <GirihDivider />
         <Suspense fallback={<div className="h-64 skeleton" />}>
           <Products initialProducts={ladder} />
         </Suspense>
-        <GirihDivider />
+        <ValueBand />
         <Suspense fallback={<div className="h-64 skeleton" />}>
           <Services />
         </Suspense>
-        <GirihDivider />
-        <Suspense fallback={<div className="h-64 skeleton" />}>
-          <Portfolio />
-        </Suspense>
-        <GirihDivider />
-        <Suspense fallback={<div className="h-64 skeleton" />}>
-          <Resume />
-        </Suspense>
-        <GirihDivider />
-        <Suspense fallback={<div className="h-64 skeleton" />}>
-          <Blog />
-        </Suspense>
-        <GirihDivider />
         <Suspense fallback={<div className="h-64 skeleton" />}>
           <Contact />
         </Suspense>

@@ -1,6 +1,6 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import StoreHero from '@/components/Store/StoreHero'
+import HeroBanner from '@/components/HeroBanner'
 import ProductLadder from '@/components/Store/ProductLadder'
 import WhyUs from '@/components/Store/WhyUs'
 import HowItWorks from '@/components/Store/HowItWorks'
@@ -74,7 +74,7 @@ export default async function StorePage() {
     <>
       <Header />
       <main>
-        <StoreHero />
+        <HeroBanner />
         <ProductLadder products={products} />
         <WhyUs />
         <HowItWorks />

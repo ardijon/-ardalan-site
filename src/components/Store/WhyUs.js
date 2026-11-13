@@ -64,8 +64,8 @@ export default function WhyUs() {
           ref={ref}
           style={{
             opacity: visible ? 1 : 0,
-            transform: visible ? 'translateY(0)' : 'translateY(30px)',
-            transition: prefersReducedMotion ? 'none' : 'opacity 0.8s ease, transform 0.8s ease',
+            transform: visible ? 'translateY(0)' : 'translateY(24px)',
+            transition: prefersReducedMotion ? 'none' : 'opacity 0.5s ease, transform 0.5s ease',
           }}
         >
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -86,7 +86,7 @@ export default function WhyUs() {
                 style={{
                   opacity: visible ? 1 : 0,
                   transform: visible ? 'translateY(0)' : 'translateY(20px)',
-                  transition: prefersReducedMotion ? 'none' : `opacity 0.6s ease ${0.2 + i * 0.1}s, transform 0.6s ease ${0.2 + i * 0.1}s`,
+                  transition: prefersReducedMotion ? 'none' : `opacity 0.5s ease ${i * 0.05}s, transform 0.5s ease ${i * 0.05}s`,
                 }}
                 className="group p-6 rounded-3xl bg-[var(--color-bg)] border border-[var(--color-border)] hover:border-accent-soft-20 hover:shadow-xl hover:shadow-accent-soft-5 transition-all duration-500"
               >

@@ -7,19 +7,19 @@ import products from '@/data/products.json'
 /**
  * The homepage must keep server-rendering its content.
  *
- * Every section below the hero — About, Products, Services, Portfolio, Resume,
- * Blog, Contact, Footer — is loaded through `next/dynamic`. That is fine on its
- * own: code splitting is worth having. What was not fine is `ssr: false`, which
- * was set on all eight and kept every word of the page out of the server HTML.
- * The response was the hero plus eight empty skeleton divs, so Googlebot and
- * every link-preview bot that does not execute JavaScript saw an empty page.
+ * Every section below the hero — About, Products, Services, Contact, Footer —
+ * is loaded through `next/dynamic`. That is fine on its own: code splitting is
+ * worth having. What was not fine is `ssr: false`, which was set on all of them
+ * and kept every word of the page out of the server HTML. The response was the
+ * hero plus empty skeleton divs, so Googlebot and every link-preview bot that
+ * does not execute JavaScript saw an empty page.
  *
  * `ssr: false` reads like a harmless performance flag, which is exactly why it
  * needs a guard: nothing fails, no test goes red, the page still looks correct
  * in a browser, and the cost is invisible until someone checks the raw HTML.
  *
  * Removing it is safe here and the reasons are worth keeping written down: none
- * of the eight touch `window`/`document`/storage at module or render time, and
+ * of these touch `window`/`document`/storage at module or render time, and
  * I18nProvider starts at `useState('fa')` and only reads localStorage inside an
  * effect — so the server render and the client's first render agree.
  */
@@ -41,7 +41,7 @@ describe('homepage server rendering', () => {
     // The fix was to drop one option, not to drop `dynamic()`. If a later change
     // converts these to static imports, that is a different trade-off and this
     // test should be revisited deliberately rather than deleted in passing.
-    const sections = ['About', 'Products', 'Services', 'Portfolio', 'Resume', 'Blog', 'Contact', 'Footer']
+    const sections = ['About', 'Products', 'Services', 'Contact', 'Footer']
     const missing = sections.filter(
       name => !new RegExp(`const ${name} = dynamic\\(`).test(source)
     )
@@ -112,11 +112,12 @@ describe('product ladder data', () => {
 describe('about section heading', () => {
   const source = fs.readFileSync(ABOUT, 'utf8')
 
-  it('emits the real title alongside the typed one', () => {
-    // The typewriter renders '' until an IntersectionObserver fires, which never
-    // happens on the server — so the <h2> went out empty. The sr-only copy is the
-    // text; the typed span is the animation.
-    expect(source).toMatch(/<span className="sr-only">\{titleText\}<\/span>/)
-    expect(source).toMatch(/<span aria-hidden="true">/)
+  it('renders the title as real text, not a typewriter', () => {
+    // The typewriter kept the <h2> empty until an IntersectionObserver fired —
+    // which never happens on the server — and held the visible title hostage to
+    // a 100ms interval. The heading is plain text now, so the title ships in the
+    // HTML and no interval is left behind.
+    expect(source).toMatch(/\{titleText\}/)
+    expect(offendingLines(source, /setInterval/)).toEqual([])
   })
 })

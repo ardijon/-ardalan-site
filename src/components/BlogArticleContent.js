@@ -96,7 +96,7 @@ export default function BlogArticleContent({ slug }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Link
-        href="/#blog"
+        href="/blog"
         className="inline-flex items-center gap-2 text-sm text-text-soft-50 hover:text-[var(--color-accent)] transition-colors mb-8"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className={isRtl ? 'scale-x-[-1]' : ''}>

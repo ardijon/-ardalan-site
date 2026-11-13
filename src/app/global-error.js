@@ -10,7 +10,7 @@ export default function GlobalError({
 }) {
   return (
     <html lang="fa" dir="rtl">
-      <body style={{ fontFamily: 'Vazirmatn, sans-serif' }}>
+      <body style={{ fontFamily: 'Dastkhat, Vazirmatn, sans-serif' }}>
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2>مشکلی پیش آمد!</h2>
           <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>{t?.error?.description || 'خطایی رخ داد — لطفاً دوباره تلاش کنید'}</p>

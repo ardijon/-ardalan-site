@@ -63,8 +63,6 @@ describe('Header anchor navigation', () => {
       about: 'About',
       products: 'Products',
       services: 'Services',
-      portfolio: 'Portfolio',
-      blog: 'Blog',
       contact: 'Contact',
     }
     for (const id of ids) {

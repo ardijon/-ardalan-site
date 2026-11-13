@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import Link from 'next/link'
 import { useInView } from '@/hooks/useInView'
 import { useI18n } from '@/lib/i18n/I18nProvider'
@@ -12,32 +12,73 @@ import { toPersianDigits } from '@/lib/jalali'
  *
  * A visitor arriving at "اردلان پیری، توسعه‌دهنده" has no reason to click a
  * "Store" item tucked into the nav bar. This section is what makes the store a
- * destination: it states the ladder (one agent → a team → an organisation) in
- * three lines and hands every level a link.
+ * destination: it states the ladder (one agent → a team → an organisation) as
+ * three commerce cards and hands every level a link.
  *
- * Deliberately a summary, not a second copy of `/store`: no screenshots, no
- * feature lists, no plan comparison. Its only job is to make the visitor pick a
- * level and click through, because the product page is where the selling actually
- * happens.
+ * Deliberately a summary, not a second copy of `/store`: no plan comparison, no
+ * feature lists. Each card carries a cover, who it is for, one sentence, two
+ * value chips, an honest "starting from" price and a single CTA — enough to pick
+ * a level and click through, because the product page is where the selling
+ * actually happens.
  *
- * The catalogue arrives as a prop, trimmed. `page.js` is a server component and
- * reads it there, so the 37 KB of screenshots and copy in `@/lib/products` never
- * enters the landing bundle — see `src/lib/product-summary.js` for what is kept.
- * The refresh effect below stays anyway: the homepage prerenders, so a product
- * added from the admin panel is in KV but not in the prerendered HTML, and the
- * fetch is what puts it on screen.
- *
- * This used to be the other way round — no prop, `useState(null)`, and the fetch
- * as the only source — on the reasoning that the section rendered behind
- * `ssr: false` so nothing was lost by waiting a round trip. That stopped being
- * true when `ssr: false` came off: for a while the server HTML carried three empty
- * skeletons where the product names should be.
+ * The covers are generated brand art (gradient + glyph), not screenshots, so no
+ * image asset rides into the landing bundle. The catalogue arrives as a prop,
+ * trimmed — `page.js` reads it on the server and only the summary crosses to the
+ * client (see `src/lib/product-summary.js`). The refresh effect stays because the
+ * homepage prerenders: a product added from the admin panel is in KV but not in
+ * the prerendered HTML, and the fetch is what puts it on screen.
  */
 
 // A product with no tier sorts last so anything added from the admin panel still
 // shows up instead of silently vanishing.
 function byTier(a, b) {
   return (a.tier ?? 99) - (b.tier ?? 99)
+}
+
+// Decorative cover art per product. Fixed brand hues — like app icons, a cover
+// reads the same in light and dark — with a white glyph on top. Teal for the
+// individual agent, amber for the team tool, indigo for the organisation system.
+const COVER_ART = {
+  'agent-site': {
+    gradient: 'linear-gradient(135deg, #0D9488 0%, #14B8A6 100%)',
+    icon: (
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <circle cx="8.5" cy="11" r="2" />
+        <path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4M14 9.5h4M14 12.5h4M14 15.5h2.5" />
+      </svg>
+    ),
+  },
+  tavana: {
+    gradient: 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)',
+    icon: (
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="9" cy="8" r="3" />
+        <path d="M3.5 19c.7-3 2.9-4.5 5.5-4.5s4.8 1.5 5.5 4.5" />
+        <circle cx="17" cy="9" r="2.3" />
+        <path d="M16 14.6c2.3.2 3.9 1.6 4.5 4" />
+      </svg>
+    ),
+  },
+  rahyar: {
+    gradient: 'linear-gradient(135deg, #4338CA 0%, #6366F1 100%)',
+    icon: (
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4" />
+        <path d="M9 10h.01M12 10h.01M15 10h.01M9 13.5h.01M12 13.5h.01M15 13.5h.01" />
+      </svg>
+    ),
+  },
+}
+
+const FALLBACK_ART = {
+  gradient: 'linear-gradient(135deg, #0D9488 0%, #0EA5E9 100%)',
+  icon: (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+      <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" />
+    </svg>
+  ),
 }
 
 export default function Products({ initialProducts }) {
@@ -85,10 +126,10 @@ export default function Products({ initialProducts }) {
             <span className="inline-block px-3 py-1 text-xs font-semibold tracking-widest text-[var(--color-accent)] bg-accent-soft-10 rounded-full">
               {t('products.badge')}
             </span>
-            <h2 className="mt-6 text-[clamp(1.5rem,5vw,3.75rem)] font-black text-[var(--color-primary)] text-balance">
+            <h2 className="mt-6 text-[clamp(1.75rem,4vw,2.75rem)] font-black text-[var(--color-primary)] text-balance">
               {t('products.title')}
             </h2>
-            <p className="mt-4 text-sm sm:text-base text-text-soft-50 leading-relaxed">
+            <p className="mt-4 text-base sm:text-lg text-text-soft-50 leading-relaxed">
               {t('products.subtitle')}
             </p>
             {t('products.highlights')?.map((line, i) => (
@@ -99,18 +140,17 @@ export default function Products({ initialProducts }) {
           </div>
 
           {loading ? (
-            <div className="space-y-4" aria-hidden="true">
-              <div className="h-28 skeleton rounded-2xl" />
-              <div className="h-28 skeleton rounded-2xl" />
-              <div className="h-28 skeleton rounded-2xl" />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-hidden="true">
+              <div className="h-80 skeleton rounded-3xl" />
+              <div className="h-80 skeleton rounded-3xl" />
+              <div className="h-80 skeleton rounded-3xl" />
             </div>
           ) : (
-            <ol className="space-y-4">
-              {ordered.map((product, i) => (
-                <ProductRow
+            <ol className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ordered.map((product) => (
+                <ProductCard
                   key={product.slug}
                   product={product}
-                  step={i + 1}
                   isRtl={isRtl}
                   locale={locale}
                   t={t}
@@ -118,18 +158,6 @@ export default function Products({ initialProducts }) {
               ))}
             </ol>
           )}
-
-          <div className="mt-10 text-center">
-            <Link
-              href="/store"
-              className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-[var(--color-accent)] border-2 border-accent-soft-30 rounded-xl hover:bg-[var(--color-accent)] hover:text-white transition-all duration-300"
-            >
-              {t('products.viewAll')}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" className={isRtl ? 'rotate-180' : ''}>
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
         </div>
       </div>
     </section>
@@ -137,11 +165,12 @@ export default function Products({ initialProducts }) {
 }
 
 /**
- * One rung of the ladder. Kept at module scope rather than inlined so React
- * reconciles it by position instead of remounting the whole list when the fetch
- * resolves.
+ * One rung of the ladder, as a commerce card. Kept at module scope so React
+ * reconciles it by position instead of remounting the list when the fetch
+ * resolves. `h-full` + `flex-1` body + `mt-auto` footer keep every CTA on one
+ * line whatever the copy length.
  */
-function ProductRow({ product, step, isRtl, locale, t }) {
+function ProductCard({ product, isRtl, locale, t }) {
   const isComingSoon = product.status === 'coming_soon'
 
   const audience = product.audience?.[locale] || product.audience?.en || ''
@@ -150,76 +179,148 @@ function ProductRow({ product, step, isRtl, locale, t }) {
 
   // Two pricing shapes: `pricing.starter/pro` for anything purchasable, a flat
   // `priceSummary` for a range or "contact for pricing".
+  const hasPlanPricing = Boolean(product.pricing?.starter || product.pricing?.pro)
   const planPrice = planPriceLine(product.pricing?.starter || product.pricing?.pro, locale)
   const planPeriod = product.pricing?.starter?.period?.[locale] || product.pricing?.pro?.period?.[locale] || ''
   const summaryPrice = summaryPriceLine(product.priceSummary, locale)
 
   return (
     <li
-      className={`group relative flex flex-col gap-4 p-5 sm:p-6 rounded-2xl border bg-[var(--color-bg)] transition-all duration-300 sm:flex-row sm:items-center ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border bg-[var(--color-card)] transition-all duration-500 ${
         product.featured
-          ? 'border-accent-soft-30 shadow-lg shadow-accent-soft-5'
-          : 'border-[var(--color-border)] hover:border-accent-soft-20'
+          ? 'border-accent-soft-40 shadow-xl shadow-accent-soft-10 ring-1 ring-accent-soft-20'
+          : 'border-[var(--color-border)] hover:-translate-y-2 hover:border-accent-soft-20 hover:shadow-xl hover:shadow-accent-soft-5'
       } ${isRtl ? 'text-right' : 'text-left'}`}
     >
-      {/* The step number is the whole point of the ladder metaphor — it says
-          "these are sizes of the same thing", not three unrelated products. */}
-      <div className="flex shrink-0 items-center gap-3 sm:flex-col sm:gap-1">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft-10 text-base font-black text-[var(--color-accent)]">
-          {locale === 'fa' ? toPersianDigits(step) : String(step)}
-        </span>
-        <span className="text-[10px] font-medium uppercase tracking-wide text-text-soft-30">
-          {t('products.levelLabel')}
-        </span>
-      </div>
+      <ProductCover
+        slug={product.slug}
+        tier={product.tier}
+        featured={product.featured}
+        isComingSoon={isComingSoon}
+        locale={locale}
+        t={t}
+      />
 
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          {audience && (
-            <span className="text-[11px] font-bold uppercase tracking-wide text-[var(--color-accent)]">
-              {audience}
-            </span>
-          )}
-          {isComingSoon && (
-            <span className="rounded-full bg-tech-soft-10 px-2 py-0.5 text-[10px] font-bold text-[var(--color-tech)]">
-              {t('store.comingSoon')}
-            </span>
-          )}
+      <div className="flex flex-1 flex-col p-6">
+        <div className="mb-2 min-h-[1.125rem] text-[11px] font-bold uppercase tracking-wide text-[var(--color-accent)]">
+          {audience}
         </div>
-        <h3 className="mt-1 text-base font-bold leading-snug text-[var(--color-primary)] group-hover:text-[var(--color-accent)] transition-colors sm:text-lg">
+        <h3 className="mb-2 min-h-[2.75rem] text-lg font-bold leading-snug text-[var(--color-primary)] transition-colors group-hover:text-[var(--color-accent)]">
           {title}
         </h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-text-soft-50">
+        <p className="mb-4 min-h-[2.5rem] text-sm leading-relaxed text-text-soft-50 line-clamp-2">
           {summary}
         </p>
-      </div>
 
-      <div className={`flex shrink-0 items-center justify-between gap-4 sm:flex-col sm:items-end sm:justify-center ${isRtl ? 'sm:text-right' : 'sm:text-left'}`}>
-        <div className="min-w-0">
-          {planPrice ? (
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-lg font-black text-[var(--color-accent)] whitespace-nowrap">{planPrice}</span>
-              {planPeriod && <span className="text-xs text-text-soft-40">{planPeriod}</span>}
-            </div>
-          ) : summaryPrice ? (
-            <span className="text-sm font-black leading-snug text-[var(--color-accent)]">{summaryPrice}</span>
-          ) : null}
+        <div className="mb-5 flex flex-wrap gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-text-soft-5 px-2.5 py-1 text-[11px] text-text-soft-60">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+            </svg>
+            {t('products.metaSupport')}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-text-soft-5 px-2.5 py-1 text-[11px] text-text-soft-60">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-tech)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="8" rx="2" />
+              <rect x="2" y="14" width="20" height="8" rx="2" />
+              <path d="M6 6h.01M6 18h.01" />
+            </svg>
+            {t('products.metaHosting')}
+          </span>
         </div>
 
-        <Link
-          href={`/store/${product.slug}`}
-          className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold transition-all active:scale-95 ${
-            isComingSoon
-              ? 'text-[var(--color-accent)] border border-accent-soft-30 hover:bg-accent-soft-10'
-              : 'text-white bg-[var(--color-accent)] hover:bg-accent-soft-90 shadow-md shadow-accent-soft-20'
-          }`}
-        >
-          {isComingSoon ? t('store.moreInfo') : t('store.buyNow')}
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" className={isRtl ? 'rotate-180' : ''}>
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </Link>
+        <div className="mt-auto flex items-end justify-between gap-3 border-t border-[var(--color-border)] pt-4">
+          {/* Fixed height so a price that wraps to two lines cannot shove this
+              card's button out of line with the others. */}
+          <div className="flex min-h-[3rem] min-w-0 flex-1 flex-col justify-end">
+            {hasPlanPricing ? (
+              <>
+                <div className="mb-0.5 text-xs text-text-soft-40">{t('store.startingFrom')}</div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-black text-[var(--color-accent)]">{planPrice}</span>
+                  {planPeriod && <span className="text-xs text-text-soft-40">{planPeriod}</span>}
+                </div>
+              </>
+            ) : summaryPrice ? (
+              // A range or "contact for pricing" is the whole statement, so it
+              // gets no "starting from" prefix to argue with.
+              <div className="text-base font-black leading-snug text-[var(--color-accent)]">{summaryPrice}</div>
+            ) : null}
+          </div>
+
+          <Link
+            href={`/store/${product.slug}`}
+            prefetch={false}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold transition-all active:scale-95 ${
+              isComingSoon
+                ? 'border border-accent-soft-30 text-[var(--color-accent)] hover:bg-accent-soft-10'
+                : 'bg-[var(--color-accent)] text-white shadow-md shadow-accent-soft-20 hover:opacity-90'
+            }`}
+          >
+            {isComingSoon ? t('store.moreInfo') : t('store.buyNow')}
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true" className={isRtl ? 'rotate-180' : ''}>
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </li>
+  )
+}
+
+/**
+ * Generated cover art: a bold brand gradient, a faint girih-like lattice, a soft
+ * glow and a frosted glyph. The tier chip keeps the "sizes of the same thing"
+ * ladder legible; featured / coming-soon badges sit at the inline-start corner so
+ * they land correctly in both RTL and LTR.
+ */
+function ProductCover({ slug, tier, featured, isComingSoon, locale, t }) {
+  const patternId = useId()
+  const art = COVER_ART[slug] || FALLBACK_ART
+  const level = tier ? (locale === 'fa' ? toPersianDigits(tier) : String(tier)) : null
+
+  return (
+    <div className="relative h-44 shrink-0 overflow-hidden sm:h-48" style={{ background: art.gradient }}>
+      <svg className="absolute inset-0 h-full w-full opacity-[0.16]" aria-hidden="true">
+        <defs>
+          <pattern id={patternId} width="26" height="26" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <path d="M13 0L26 13L13 26L0 13Z" fill="none" stroke="#fff" strokeWidth="1" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill={`url(#${patternId})`} />
+      </svg>
+
+      <div className="absolute -right-8 -top-10 h-36 w-36 rounded-full bg-white/25 blur-2xl" aria-hidden="true" />
+
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/30 bg-white/15 text-white shadow-lg backdrop-blur-sm transition-transform duration-500 group-hover:scale-110">
+          {art.icon}
+        </div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/25 to-transparent" aria-hidden="true" />
+
+      <div className="absolute top-3 start-3 flex items-center gap-2">
+        {featured && (
+          <span className="inline-flex items-center gap-1 rounded-lg bg-white/90 px-2.5 py-1 text-[11px] font-bold text-amber-700 shadow-sm backdrop-blur">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z" />
+            </svg>
+            {t('products.featured')}
+          </span>
+        )}
+        {isComingSoon && (
+          <span className="rounded-lg border border-white/25 bg-black/35 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
+            {t('store.comingSoon')}
+          </span>
+        )}
+      </div>
+
+      {level && (
+        <span className="absolute bottom-3 start-3 rounded-lg border border-white/20 bg-black/30 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur">
+          {t('products.level')} {level}
+        </span>
+      )}
+    </div>
   )
 }
